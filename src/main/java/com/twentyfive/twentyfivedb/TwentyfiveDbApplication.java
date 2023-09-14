@@ -9,16 +9,7 @@ import twentyfive.twentyfiveadapter.Mapper.TwentyFiveMapper;
 @SpringBootApplication
 public class TwentyfiveDbApplication {
 
-    public static void main(String[] args) {
-
-        UserLinkDocumentDB documenDB= new UserLinkDocumentDB();
-        documenDB.setId("culo");
-        UserLink userLink= new UserLink();
-        userLink.setUserId("pinocchiio");
-        documenDB = TwentyFiveMapper.INSTANCE.userLinkToUserLinkDocumentDB(userLink);
-        System.out.println(documenDB);
-
-        SpringApplication.run(TwentyfiveDbApplication.class, args);
+    public static void main(String[] args) {SpringApplication.run(TwentyfiveDbApplication.class, args);
     }
 
 }
