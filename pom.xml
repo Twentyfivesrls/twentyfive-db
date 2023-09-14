@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.twentyfive</groupId>
     <artifactId>twentyfive-db</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
     <distributionManagement>
         <repository>
@@ -39,10 +39,21 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.twentyfive</groupId>
+            <artifactId>twentyfive-models</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twentyfive</groupId>
+            <artifactId>twentyfive-adapters</artifactId>
+            <version>0.0.2</version>
         </dependency>
     </dependencies>
 
