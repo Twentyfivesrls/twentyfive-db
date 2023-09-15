@@ -37,14 +37,6 @@ public class UserLinkController {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/findByUser")
-    public ResponseEntity<Object> findByUserId(@RequestParam("username") String username){
-        try {
-            return new ResponseEntity<>(userLinkService.findByUsername(username), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
-        }
-    }
     @GetMapping("/findByUsername")
     public ResponseEntity<Object> findByUsername(@RequestParam("username") String username){
         try {

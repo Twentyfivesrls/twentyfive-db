@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserLinkService {
     private final UserLinkRepository userLinkRepository;
-    //private final AuthenticationService authenticationService;
     public UserLink findByUsername(String username) throws RuntimeException{
         UserLinkDocumentDB userLink = userLinkRepository.findByUserId(username)
                 .orElseThrow(() -> new UserLinkDoesntExistException());
@@ -26,8 +25,6 @@ public class UserLinkService {
     }
 
     public UserLink add(LinkTree linkTree, String username) throws RuntimeException{
-        //if (!(DataCheck.isLinkCorrect(linkTree.getLink()))) throw new LinkNotCorrectException();
-        //String username=authenticationService.getUsernameFromToken();
         linkTree.setId(UUID.randomUUID().toString());
         if(!userLinkRepository.existsByUserId(username)) {
             UserLink newUser = new UserLink();
