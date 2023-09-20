@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.Document.UserLinkDocumentDB;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,35 +18,23 @@ public class UserLinkController {
 
     @PostMapping("/add")
     public ResponseEntity<Object> add(@RequestBody LinkTree linkTree, @RequestParam("username") String username){
-        try {
             return new ResponseEntity<>(userLinkService.add(linkTree, username), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
-        }
     }
+
     @DeleteMapping("/delete")
     public ResponseEntity<Object> delete(@RequestParam("id") String id, @RequestParam("username") String username){
-        try {
             return new ResponseEntity<>(userLinkService.delete(id, username), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
-        }
     }
+
     @PutMapping("/update")
     public ResponseEntity<Object> update(@RequestParam("id")String id, @RequestBody LinkTree linkTree, @RequestParam("username") String username){
-        try {
             return new ResponseEntity<>(userLinkService.update(id, linkTree, username), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
-        }
     }
+
     @GetMapping("/findByUsername")
-    public ResponseEntity<Object> findByUsername(@RequestParam("username") String username){
-        try {
-            return new ResponseEntity<>(userLinkService.findByUsername(username), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<UserLinkDocumentDB> findByUsername(@RequestParam("username") String username){
+
+        return new ResponseEntity(userLinkService.findByUsername(username), HttpStatus.OK);
     }
    /* @GetMapping("/update/")
     public wduudewiud (@RequestParam("id") String id)*/

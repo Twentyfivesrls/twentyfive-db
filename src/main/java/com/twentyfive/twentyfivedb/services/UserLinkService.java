@@ -6,21 +6,25 @@ import com.twentyfive.twentyfivemodel.exceptions.UserLinkDoesntExistException;
 import com.twentyfive.twentyfivemodel.models.LinkTree;
 import com.twentyfive.twentyfivemodel.models.UserLink;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.Document.UserLinkDocumentDB;
 import twentyfive.twentyfiveadapter.Mapper.TwentyFiveMapper;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserLinkService {
     private final UserLinkRepository userLinkRepository;
-    public UserLink findByUsername(String username) throws RuntimeException{
-        UserLinkDocumentDB userLink = userLinkRepository.findByUserId(username)
-                .orElseThrow(() -> new UserLinkDoesntExistException());
+
+    public UserLink findByUsername(String username){
+
+        UserLinkDocumentDB userLink = userLinkRepository.findByUserId(username).orElse(null);
+
         return TwentyFiveMapper.INSTANCE.userLinkDocumentDBToUserLink(userLink);
     }
 
