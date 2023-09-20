@@ -1,19 +1,17 @@
-package com.twentyfive.twentyfivedb.services;
+package com.twentyfive.twentyfivedb.linktreeDB.services;
 
-import com.twentyfive.twentyfivedb.repositories.UserLinkRepository;
+import com.twentyfive.twentyfivedb.linktreeDB.repositories.UserLinkRepository;
 import com.twentyfive.twentyfivemodel.exceptions.LinkDoesntExistException;
 import com.twentyfive.twentyfivemodel.exceptions.UserLinkDoesntExistException;
-import com.twentyfive.twentyfivemodel.models.LinkTree;
-import com.twentyfive.twentyfivemodel.models.UserLink;
+import com.twentyfive.twentyfivemodel.models.linktreeModels.LinkTree;
+import com.twentyfive.twentyfivemodel.models.linktreeModels.UserLink;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.Document.UserLinkDocumentDB;
-import twentyfive.twentyfiveadapter.Mapper.TwentyFiveMapper;
+import twentyfive.twentyfiveadapter.linktreeAdapter.Document.UserLinkDocumentDB;
+import twentyfive.twentyfiveadapter.linktreeAdapter.Mapper.TwentyFiveMapper;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

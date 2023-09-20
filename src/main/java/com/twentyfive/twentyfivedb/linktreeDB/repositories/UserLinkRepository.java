@@ -1,8 +1,8 @@
-package com.twentyfive.twentyfivedb.repositories;
+package com.twentyfive.twentyfivedb.linktreeDB.repositories;
 
-import com.twentyfive.twentyfivemodel.models.LinkTree;
+import com.twentyfive.twentyfivemodel.models.linktreeModels.LinkTree;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import twentyfive.twentyfiveadapter.Document.UserLinkDocumentDB;
+import twentyfive.twentyfiveadapter.linktreeAdapter.Document.UserLinkDocumentDB;
 
 import java.util.ArrayList;
 import java.util.Optional;

@@ -1,12 +1,12 @@
-package com.twentyfive.twentyfivedb.controllers;
+package com.twentyfive.twentyfivedb.linktreeDB.controllers;
 
-import com.twentyfive.twentyfivedb.services.UserLinkService;
-import com.twentyfive.twentyfivemodel.models.LinkTree;
+import com.twentyfive.twentyfivedb.linktreeDB.services.UserLinkService;
+import com.twentyfive.twentyfivemodel.models.linktreeModels.LinkTree;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.Document.UserLinkDocumentDB;
+import twentyfive.twentyfiveadapter.linktreeAdapter.Document.UserLinkDocumentDB;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +36,4 @@ public class UserLinkController {
 
         return new ResponseEntity(userLinkService.findByUsername(username), HttpStatus.OK);
     }
-   /* @GetMapping("/update/")
-    public wduudewiud (@RequestParam("id") String id)*/
 }
