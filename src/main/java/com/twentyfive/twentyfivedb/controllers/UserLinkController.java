@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin("*")
 @RequestMapping("/linkTree")
 public class UserLinkController {
 
     private final UserLinkService userLinkService;
+
     @PostMapping("/add")
     public ResponseEntity<Object> add(@RequestBody LinkTree linkTree, @RequestParam("username") String username){
         try {
@@ -45,4 +47,6 @@ public class UserLinkController {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
     }
+   /* @GetMapping("/update/")
+    public wduudewiud (@RequestParam("id") String id)*/
 }
