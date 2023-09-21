@@ -1,0 +1,61 @@
+package com.twentyfive.twentyfivedb.qrGenDB.controller;
+
+
+import com.twentyfive.twentyfivedb.qrGenDB.service.QrStatisticsService;
+import com.twentyfive.twentyfivemodel.models.qrGenModels.QrStatistics;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequestMapping("/qr_statistics")
+@RestController
+public class QrStatisticsController {
+    @Autowired
+    private QrStatisticsService qrStatisticsService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<QrStatistics>> getAllQrStatistics() {
+
+        return ResponseEntity.status(HttpStatus.OK).body(qrStatisticsService.getAllQrStatistics());
+    }
+
+
+    @PostMapping("/save")
+    public ResponseEntity<QrStatistics> saveQrStatistics(@RequestBody QrStatistics qrStatistics) {
+        if (qrStatistics == null)
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+        qrStatisticsService.saveQrStatistics(qrStatistics);
+        return ResponseEntity.status(HttpStatus.OK).body(qrStatistics);
+    }
+
+
+    @GetMapping("/qrStatisticsById/{idQrCode}")
+    public ResponseEntity<List<QrStatistics>> getQrStatisticsById(@PathVariable String idQrCode) {
+        if (qrStatisticsService.getQrStatisticsByIdQrCodeObject(idQrCode) == null)
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(qrStatisticsService.getQrStatisticsByIdQrCodeObject(idQrCode));
+    }
+
+    @GetMapping("/qrStatisticsById/desktopSize/{idQrCode}")
+    public ResponseEntity<Integer> getQrStatisticsByIdDesktopSize(@PathVariable String idQrCode) {
+        if (qrStatisticsService.getQrStatisticsByIdQrCodeObject(idQrCode) == null)
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
+
+        List<QrStatistics> d = qrStatisticsService.getQrStatisticsByIdQrCodeObject(idQrCode);
+        Integer desktop = 0;
+        for (QrStatistics qr : d) {
+            if (qr.getDevice().equals("Desktop")) {
+                desktop++;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(desktop);
+
+    }
+
+}
