@@ -7,8 +7,9 @@ import com.twentyfive.twentyfivemodel.models.linktreeModels.LinkTree;
 import com.twentyfive.twentyfivemodel.models.linktreeModels.UserLink;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.linktreeAdapter.Document.UserLinkDocumentDB;
-import twentyfive.twentyfiveadapter.linktreeAdapter.Mapper.TwentyFiveMapper;
+import twentyfive.twentyfiveadapter.adapter.Document.UserLinkDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
+
 
 import java.util.LinkedList;
 import java.util.List;
