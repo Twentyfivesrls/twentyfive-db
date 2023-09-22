@@ -19,13 +19,13 @@ public class EmailSenderService {
     private JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
     //@Value("${spring.mail.username}")
-    private String email;
+    private String email = "spot97fy@gmail.com";
    // @Value("${spring.mail.password}")
-    private String password;
+    private String password = "rfrtyzxvzdbtonwq";
    // @Value("${spring.mail.host}")
-    private String host;
+    private String host = "smtp.gmail.com";
     //@Value("${spring.mail.port}")
-    private Integer port;
+    private Integer port = 587;
 
     //@Value("${custom.frontend.url}")
     private String frontendUrl;
