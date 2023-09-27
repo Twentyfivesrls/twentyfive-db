@@ -3,12 +3,11 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
-import com.twentyfive.twentyfivemodel.dto.ResponseImage;
+import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -30,7 +29,7 @@ public class QrCodeObjectController {
 
 
     //@Value("${deployment.base.url}")
-    private String baseUrl;
+    private String baseUrl = "http://80.211.123.141:5555/";
 
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
@@ -141,6 +140,11 @@ public class QrCodeObjectController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<QrCodeObject>> getAllQrCodeObject() {
+        return ResponseEntity.status(HttpStatus.OK).body(qrCodeObjectService.getAllQrCodeObject());
     }
 
 }

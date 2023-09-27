@@ -48,12 +48,12 @@
         <dependency>
             <groupId>com.twentyfive</groupId>
             <artifactId>twentyfive-models</artifactId>
-            <version>0.0.9</version>
+            <version>0.0.11</version>
         </dependency>
         <dependency>
             <groupId>com.twentyfive</groupId>
             <artifactId>twentyfive-adapters</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>

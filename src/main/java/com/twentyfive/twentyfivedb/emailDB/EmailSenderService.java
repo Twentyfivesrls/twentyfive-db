@@ -1,4 +1,4 @@
-package com.twentyfive.twentyfivedb.qrGenDB.service;
+package com.twentyfive.twentyfivedb.emailDB;
 
 
 import lombok.extern.slf4j.Slf4j;
