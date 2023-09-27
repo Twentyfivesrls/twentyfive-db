@@ -16,6 +16,7 @@ public class ShortenLinkController {
     @Autowired
     private ShortenLinkService shortenLinkService;
 
+
     @PostMapping("/generate")
     public ResponseEntity<ResponseValue> generateShortenLink(@RequestBody RequestValue requestValue /*, @RequestParam(value = "username") String username*/) {
         ShortenLink result = shortenLinkService.generateShortUrl(requestValue);
@@ -39,7 +40,7 @@ public class ShortenLinkController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseValue> deleteLink(@PathVariable String id) {
         shortenLinkService.deleteLink(id);
-        return ResponseEntity.ok(new ResponseValue("Deleted"));
+        return ResponseEntity.ok(new ResponseValue("DeletedByAction"));
     }
 
 }
