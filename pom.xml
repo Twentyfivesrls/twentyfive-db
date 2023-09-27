@@ -120,13 +120,7 @@
                 <version>3.0.0-M1</version>
                 <configuration>
                     <altDeploymentRepository>
-                        <repository>
-                            <id>github</id>
-                            <url>https://maven.pkg.github.com/Twentyfivesrls/*</url>
-                            <snapshots>
-                                <enabled>true</enabled>
-                            </snapshots>
-                        </repository>
+                        internal.repo::default::https://maven.pkg.github.com/Twentyfivesrls/*
                     </altDeploymentRepository>
                 </configuration>
             </plugin>
