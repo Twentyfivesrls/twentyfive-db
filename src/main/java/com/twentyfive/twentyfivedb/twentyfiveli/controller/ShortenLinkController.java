@@ -40,7 +40,7 @@ public class ShortenLinkController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseValue> deleteLink(@PathVariable String id) {
         shortenLinkService.deleteLink(id);
-        return ResponseEntity.ok(new ResponseValue("DeletedByActionTest"));
+        return ResponseEntity.ok(new ResponseValue("DeletedByAction"));
     }
 
 }
