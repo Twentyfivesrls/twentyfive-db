@@ -15,20 +15,6 @@
         </repository>
         <repository>
             <id>github</id>
-            <url>https://maven.pkg.github.com/trifoglietto97/demoRes</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/Stemicio9/*</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>github</id>
             <url>https://maven.pkg.github.com/Twentyfivesrls/*</url>
             <snapshots>
                 <enabled>true</enabled>
