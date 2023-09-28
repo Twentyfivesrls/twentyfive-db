@@ -10,17 +10,7 @@
     </parent>
     <groupId>com.twentyfive</groupId>
     <artifactId>twentyfive-db</artifactId>
-   <!-- <version>0.0.4</version> -->
     <packaging>war</packaging>
-
-
-    <!--<distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Twentyfivesrls Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/Twentyfivesrls/twentyfive-db</url>
-        </repository>
-    </distributionManagement>-->
     <name>twentyfive-db</name>
     <description>twentyfive-db</description>
     <properties>
