@@ -11,6 +11,6 @@ public class PublicController {
 
     @GetMapping("/test")
     public String prova(){
-        return "prova";
+        return "prova4";
     }
 }
