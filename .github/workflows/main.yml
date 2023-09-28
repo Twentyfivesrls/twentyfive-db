@@ -44,4 +44,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /actions/dist_tomcat/twentyfive-db
-            docker cp ./ 24f1ac863dfd:/usr/local/tomcat/webapps
+            docker cp ./ tomcat-twentyfive-db:/usr/local/tomcat/webapps
