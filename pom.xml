@@ -25,6 +25,8 @@
     <description>twentyfive-db</description>
     <properties>
         <java.version>17</java.version>
+        <github.username>Twentyfivesrls</github.username>
+        <github.password>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</github.password>
     </properties>
 
     <repositories>
@@ -126,11 +128,16 @@
         <plugins>
 
             <plugin>
-                <groupId>com.twentyfive</groupId>
-                <artifactId>twentyfive-models</artifactId>
-                <version>0.0.11</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <altDeploymentRepository>
+                        github::default::https://maven.pkg.github.com/Twentyfivesrls/twentyfive-models
+                    </altDeploymentRepository>
+                    <repositoryId>github</repositoryId>
+                </configuration>
             </plugin>
-
      <!--       <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -146,4 +153,8 @@
             </plugin> -->
         </plugins>
     </build>
+
+
+
+
 </project>
