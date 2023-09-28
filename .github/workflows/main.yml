@@ -44,8 +44,9 @@ jobs:
             cd actions
             mkdir -p dist_tomcat
             cd dist_tomcat
-            mkdir -p twentyfive-db
-            cd twentyfive-db
+            FOLDER_NAME=${{ secrets.SSH_PROJECT_NAME }}
+            mkdir -p $FOLDER_NAME
+            cd ${{ secrets.SSH_PROJECT_NAME }}
 
 
       - name: Move build to server with rsync
