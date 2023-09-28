@@ -32,6 +32,9 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
 
+      - name: Create dist_tomcat folder
+        run: mkdir -p /actions/dist_tomcat/${{ secrets.PROJECT_NAME }}
+
       - name: Move build to server with rsync
         run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" ./target/twentyfive-db.war ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/actions/dist_tomcat/twentyfive-db
 
