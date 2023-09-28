@@ -7,11 +7,16 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3.9.0
         with:
           distribution: 'adopt'
           java-version: '17'
+
+      - uses: s4u/maven-settings-action@v2.8.0
+        with:
+          servers: '[{"id": "github", "username": ${{secrets.SSH_USERNAME}}, "password": "${{secretsSSH_PASSWORD}}"}]'
 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots clean package -DskipTests
