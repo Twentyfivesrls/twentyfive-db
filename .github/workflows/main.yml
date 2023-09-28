@@ -18,6 +18,8 @@ jobs:
         with:
           servers: '[{"id": "github", "username": "${{secrets.SSH_USERNAME}}", "password": "${{secrets.SSH_PASSWORD}}"}]'
 
+
+
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots clean package -DskipTests
 
@@ -31,7 +33,7 @@ jobs:
         run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
 
       - name: Move build to server with rsync
-        run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" ./target/twentyfive-db.war ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/dist_tomcat/twentyfive-db
+        run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" ./target/twentyfive-db.war ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/actions/dist_tomcat/twentyfive-db
 
       - name: Move data inside Tomcat Container
         uses: appleboy/ssh-action@master
@@ -41,5 +43,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /root/dist_tomcat/twentyfive-db
+            cd /actions/dist_tomcat/twentyfive-db
             docker cp ./ 24f1ac863dfd:/usr/local/tomcat/webapps
