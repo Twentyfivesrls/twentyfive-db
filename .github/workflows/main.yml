@@ -40,12 +40,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            cd ..
             mkdir -p actions
             cd actions
             mkdir -p dist_tomcat
             cd dist_tomcat
-            FOLDER_NAME=${{ secrets.SSH_PROJECT_NAME }}
-            mkdir -p $FOLDER_NAME
+            mkdir -p ${{ secrets.SSH_PROJECT_NAME }}
             cd ${{ secrets.SSH_PROJECT_NAME }}
 
 
