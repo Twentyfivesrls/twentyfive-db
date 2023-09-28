@@ -16,7 +16,7 @@ jobs:
 
       - uses: s4u/maven-settings-action@v2.8.0
         with:
-          servers: '[{"id": "github", "username": ${{secrets.SSH_USERNAME}}, "password": "${{secrets.SSH_PASSWORD}}"}]'
+          servers: '[{"id": "github", "username": "${{secrets.SSH_USERNAME}}", "password": "${{secrets.SSH_PASSWORD}}"}]'
 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots clean package -DskipTests
