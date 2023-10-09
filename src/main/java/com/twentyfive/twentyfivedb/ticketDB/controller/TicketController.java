@@ -44,7 +44,7 @@ public class TicketController {
     /*
     * Generate ticket
     */
-    @PostMapping("/generate/{name}/{lastName}/{email}")
+    @PostMapping("/generate")
     public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email) {
 
 
