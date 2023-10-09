@@ -88,20 +88,6 @@ public class AddressBookService {
 
     }
 
-    public List<AddressBook> getAddressBookByDateOfBirth(LocalDateTime dateOfBirth) {
-        if (dateOfBirth == null) {
-            log.error("DateOfBirth is null or empty");
-            throw new IllegalArgumentException("DateOfBirth is null or empty");
-        }
-        List<AddressBook> list = new ArrayList<>();
-
-        List<AddressBookDocumentDB> listDB = addressBookRepository.findByDateOfBirth(dateOfBirth);
-        for (AddressBookDocumentDB addressBookDocumentDB : listDB) {
-            list.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
-        }
-
-        return list;
-    }
 
     public AddressBook saveAddressBook(AddressBook addressBook) {
         if (addressBook == null) {
@@ -177,5 +163,13 @@ public class AddressBookService {
             throw new IllegalArgumentException("Email is null or empty");
         }
         return addressBookRepository.findByEmail(email);
+    }
+
+    public AddressBook getAddressBookByEmail(String email) {
+        if (StringUtils.isBlank(email)) {
+            log.error("Email is null or empty");
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookRepository.findByEmail(email));
     }
 }
