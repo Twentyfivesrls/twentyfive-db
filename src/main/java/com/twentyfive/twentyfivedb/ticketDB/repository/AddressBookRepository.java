@@ -14,9 +14,5 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
 
     List<AddressBookDocumentDB> findByLastName(String lastName);
 
-    List<AddressBookDocumentDB> findByDateOfBirth(LocalDateTime dateOfBirth);
-    
-    AddressBookDocumentDB findByFirstNameAndLastNameAndEmail(String firstName, String lastName, String email);
-
     AddressBookDocumentDB findByEmail(String email);
 }
