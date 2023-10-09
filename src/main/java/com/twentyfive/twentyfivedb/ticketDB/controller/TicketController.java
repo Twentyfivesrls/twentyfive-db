@@ -44,11 +44,11 @@ public class TicketController {
     /*
     * Generate ticket
     */
-    @PostMapping("/generate/{name}/{lastName}/{dateOfBirth}")
-    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @PathVariable String name, @PathVariable String lastName, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime dateOfBirth) {
+    @PostMapping("/generate/{name}/{lastName}/{email}")
+    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email) {
 
 
-        ticketService.saveTicket(ticket, name, lastName, dateOfBirth);
+        ticketService.saveTicket(ticket, name, lastName, email);
         return ResponseEntity.ok(ticket);
     }
 

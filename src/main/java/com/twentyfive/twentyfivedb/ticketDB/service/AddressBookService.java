@@ -126,11 +126,9 @@ public class AddressBookService {
             Pattern pattern = Pattern.compile(filterObject.getLastName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("lastName").regex(pattern));
         }
-        if (filterObject.getStartDate() != null) {
-            criteriaList.add(Criteria.where("dateOfBirth").gte(filterObject.getStartDate()));
-        }
-        if (filterObject.getEndDate() != null) {
-            criteriaList.add(Criteria.where("dateOfBirth").lte(filterObject.getEndDate()));
+        if(StringUtils.isNotBlank(filterObject.getEmail())){
+            Pattern pattern = Pattern.compile(filterObject.getEmail(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("email").regex(pattern));
         }
 
         Query query = new Query();
@@ -164,26 +162,20 @@ public class AddressBookService {
         }
         findAddressBook.setFirstName(addressBook.getFirstName());
         findAddressBook.setLastName(addressBook.getLastName());
-        findAddressBook.setDateOfBirth(addressBook.getDateOfBirth());
+        findAddressBook.setEmail(addressBook.getEmail());
         addressBookRepository.save(findAddressBook);
 
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(findAddressBook);
     }
 
-    public  AddressBookDocumentDB getAddressBookByFirstNameAndLastNameAndDateOfBirth(String firstName, String lastName, LocalDateTime dateOfBirth) {
-        if (StringUtils.isBlank(firstName)) {
-            log.error("FirstName is null or empty");
-            throw new IllegalArgumentException("FirstName is null or empty");
-        }
-        if (StringUtils.isBlank(lastName)) {
-            log.error("LastName is null or empty");
-            throw new IllegalArgumentException("LastName is null or empty");
-        }
-        if (dateOfBirth == null) {
-            log.error("DateOfBirth is null or empty");
-            throw new IllegalArgumentException("DateOfBirth is null or empty");
-        }
-        return addressBookRepository.findByFirstNameAndLastNameAndDateOfBirth(firstName, lastName, dateOfBirth);
-    }
 
+
+
+    public AddressBookDocumentDB findByEmail(String email) {
+        if (StringUtils.isBlank(email)) {
+            log.error("Email is null or empty");
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        return addressBookRepository.findByEmail(email);
+    }
 }

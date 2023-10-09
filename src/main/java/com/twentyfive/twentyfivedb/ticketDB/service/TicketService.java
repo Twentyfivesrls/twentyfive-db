@@ -37,7 +37,7 @@ public class TicketService {
 
 
 
-    public void saveTicket(Ticket ticket, String firstName, String lastName, LocalDateTime dateOfBirth) {
+    public void saveTicket(Ticket ticket, String firstName, String lastName, String email) {
         if (ticket == null) {
             log.error("Ticket cannot be null");
             throw new IllegalArgumentException("Ticket cannot be null");
@@ -50,19 +50,19 @@ public class TicketService {
             log.error("Last name cannot be null or empty");
             throw new IllegalArgumentException("Last name cannot be null or empty");
         }
-        if (dateOfBirth == null) {
+        if (email == null) {
             log.error("Date of birth cannot be null");
             throw new IllegalArgumentException("Date of birth cannot be null");
         }
 
 
-        AddressBookDocumentDB addressBookControll = addressBookService.getAddressBookByFirstNameAndLastNameAndDateOfBirth(firstName, lastName, dateOfBirth);
+        AddressBookDocumentDB addressBookControll = addressBookService.findByEmail(email);
         AddressBookDocumentDB addressBook = new AddressBookDocumentDB();
 
         if(addressBookControll == null) {
             addressBook.setFirstName(firstName);
             addressBook.setLastName(lastName);
-            addressBook.setDateOfBirth(dateOfBirth);
+            addressBook.setEmail(email);
             addressBookService.saveAddressBook(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBook));
         }
         else{
@@ -78,7 +78,7 @@ public class TicketService {
         finalTicket.setEventDateEnd(ticket.getEventDateEnd());
         finalTicket.setUsed(ticket.getUsed());
         finalTicket.setActive(ticket.getActive());
-        finalTicket.setAddressBookId(addressBook.getId());
+        finalTicket.setAddressBookId(addressBook.getEmail());
 
 
         ticketRepository.save(finalTicket);
