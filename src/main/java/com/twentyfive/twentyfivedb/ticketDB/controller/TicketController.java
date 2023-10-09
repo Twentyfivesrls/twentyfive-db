@@ -43,8 +43,8 @@ public class TicketController {
     /*
     * Generate ticket
     */
-    @PostMapping("/generate/{name}/{lastName}/{dateOfBirth}")
-    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @PathVariable String name, @PathVariable String lastName, @PathVariable LocalDateTime dateOfBirth) {
+    @PostMapping("/generate")
+    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("dateOfBirth") LocalDateTime dateOfBirth) {
 
 
         ticketService.saveTicket(ticket, name, lastName, dateOfBirth);
