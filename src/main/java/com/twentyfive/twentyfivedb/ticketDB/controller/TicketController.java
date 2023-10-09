@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class TicketController {
     * Generate ticket
     */
     @PostMapping("/generate/{name}/{lastName}/{dateOfBirth}")
-    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @PathVariable String name, @PathVariable String lastName, @PathVariable LocalDateTime dateOfBirth) {
+    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @PathVariable String name, @PathVariable String lastName, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime dateOfBirth) {
 
 
         ticketService.saveTicket(ticket, name, lastName, dateOfBirth);
