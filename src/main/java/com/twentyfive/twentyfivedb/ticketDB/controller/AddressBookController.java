@@ -93,7 +93,7 @@ public class AddressBookController {
         /*for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
             mapList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
         }*/
-        Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(mapList, pageable);
+        Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(addressBookList, pageable);
         return ResponseEntity.ok(addressBookPage);
     }
 
