@@ -87,8 +87,13 @@ public class AddressBookController {
     @PostMapping("/list")
     public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter){
 
+        log.info("filter: {}", filter);
+        System.out.println("filter: " + filter);
+
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<AddressBook> addressBookList = addressBookService.findContactByCriteria(filter);
+        log.info("addressBookList: {}", addressBookList);
+        System.out.println("addressBookList: " + addressBookList);
         List<AddressBook> mapList = new ArrayList<>();
         /*for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
             mapList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
