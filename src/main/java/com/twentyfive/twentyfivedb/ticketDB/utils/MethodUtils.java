@@ -84,7 +84,7 @@ public class MethodUtils {
     public static Pageable makePageableFromFilter(FilterObject filterObject) {
         log.info("makePageableFromFilter: " + filterObject);
         System.out.println("makePageableFromFilter: " + filterObject);
-        if (filterObject == null) {
+        if (filterObject.getPage() == null && filterObject.getSize() == null) {
             log.info("ENTRO IN NULLLLLLLLLL");
             System.out.println("ENTRO IN NULLLLLLLLLL");
             return PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
