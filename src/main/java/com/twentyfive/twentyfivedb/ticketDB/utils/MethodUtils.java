@@ -92,10 +92,16 @@ public class MethodUtils {
             log.info("ENTRO IN ELSE");
             System.out.println("ENTRO IN ELSE");
             if (filterObject.getPage() != null && filterObject.getSize() != null) {
+                log.info("ENTRO IN IF");
+                System.out.println("ENTRO IN IF");
                 return PageRequest.of(filterObject.getPage(), filterObject.getSize());
             } else if (filterObject.getPage() != null) {
+                log.info("ENTRO IN IF 2");
+                System.out.println("ENTRO IN IF 2");
                 return PageRequest.of(filterObject.getPage(), PAGE_SIZE);
             } else {
+                log.info("ENTRO IN ELSE 2");
+                System.out.println("ENTRO IN ELSE 2");
                 return PageRequest.of(PAGE_NUMBER, filterObject.getSize());
             }
         }
