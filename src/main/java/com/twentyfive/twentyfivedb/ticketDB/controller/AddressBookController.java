@@ -4,6 +4,7 @@ package com.twentyfive.twentyfivedb.ticketDB.controller;
 import com.twentyfive.twentyfivedb.ticketDB.service.AddressBookService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
+import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Filter;
 
 
 @Slf4j
@@ -85,20 +87,21 @@ public class AddressBookController {
      * Get address book list end filters
      */
     @PostMapping("/list")
-    public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter){
+    public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size){
 
-        log.info("filter: {}", filter);
-        System.out.println("filter: " + filter);
+        FilterObject filterObject = new FilterObject(page,size);
+        log.info("filter: {}", filterObject);
+        System.out.println("filter: " + filterObject);
 
-        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<AddressBook> addressBookList = addressBookService.findContactByCriteria(filter);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filterObject);
+        List<AddressBookDocumentDB> addressBookList = addressBookService.findContactByCriteria(filter);
         log.info("addressBookList: {}", addressBookList);
         System.out.println("addressBookList: " + addressBookList);
         List<AddressBook> mapList = new ArrayList<>();
-        /*for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
+        for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
             mapList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
-        }*/
-        Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(addressBookList, pageable);
+        }
+        Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(mapList, pageable);
         return ResponseEntity.ok(addressBookPage);
     }
 
