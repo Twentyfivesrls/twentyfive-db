@@ -9,6 +9,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 
 public class MethodUtils {
 
@@ -79,10 +81,16 @@ public class MethodUtils {
         return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
-    public static Pageable makePageableFromFilter(AddressBookFilter filterObject) {
+    public static Pageable makePageableFromFilter(FilterObject filterObject) {
+        log.info("makePageableFromFilter: " + filterObject);
+        System.out.println("makePageableFromFilter: " + filterObject);
         if (filterObject == null) {
+            log.info("ENTRO IN NULLLLLLLLLL");
+            System.out.println("ENTRO IN NULLLLLLLLLL");
             return PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
         } else {
+            log.info("ENTRO IN ELSE");
+            System.out.println("ENTRO IN ELSE");
             if (filterObject.getPage() != null && filterObject.getSize() != null) {
                 return PageRequest.of(filterObject.getPage(), filterObject.getSize());
             } else if (filterObject.getPage() != null) {
