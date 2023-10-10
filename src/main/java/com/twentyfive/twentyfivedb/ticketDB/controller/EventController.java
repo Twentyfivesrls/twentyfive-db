@@ -37,7 +37,7 @@ public class EventController {
      */
     @PostMapping("/filter")
     public ResponseEntity<Page<Event>> getEventList(@RequestBody EventFilter filterObject) {
-        Pageable pageable = MethodUtils.makePageableFromFilter(filterObject);
+        Pageable pageable =/* MethodUtils.makePageableFromFilter(filterObject);*/ null;
         List<EventDocumentDB> eventPage = eventService.eventSearch(filterObject);
         List<Event> eventList = new ArrayList<>();
         for (EventDocumentDB eventDocumentDB : eventPage) {

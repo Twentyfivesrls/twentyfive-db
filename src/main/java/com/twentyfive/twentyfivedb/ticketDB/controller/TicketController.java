@@ -59,7 +59,7 @@ public class TicketController {
     @PostMapping("/list")
     public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody TicketFilter filterObject) {
 
-        Pageable pageable = MethodUtils.makePageableFromFilter(filterObject);
+        Pageable pageable = /*MethodUtils.makePageableFromFilter(filterObject);*/ null;
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {

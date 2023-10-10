@@ -7,6 +7,7 @@ import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -78,7 +79,7 @@ public class MethodUtils {
         return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
-    public static Pageable makePageableFromFilter(FilterObject filterObject) {
+    public static Pageable makePageableFromFilter(AddressBookFilter filterObject) {
         if (filterObject == null) {
             return PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
         } else {
