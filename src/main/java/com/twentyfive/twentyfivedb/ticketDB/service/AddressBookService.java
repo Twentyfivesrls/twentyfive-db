@@ -99,7 +99,7 @@ public class AddressBookService {
     }
 
 
-    public List<AddressBookDocumentDB> findContactByCriteria(AddressBookFilter filterObject) {
+    public List<AddressBook> findContactByCriteria(AddressBookFilter filterObject) {
 
 
         List<Criteria> criteriaList = new ArrayList<>();
@@ -120,12 +120,12 @@ public class AddressBookService {
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-            return mongoTemplate.find(query, AddressBookDocumentDB.class);
+            return mongoTemplate.find(query, AddressBook.class);
         }
 
 
 
-        return mongoTemplate.findAll(AddressBookDocumentDB.class);
+        return mongoTemplate.findAll(AddressBook.class);
     }
 
 

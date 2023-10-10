@@ -88,11 +88,11 @@ public class AddressBookController {
     public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter){
 
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<AddressBookDocumentDB> addressBookList = addressBookService.findContactByCriteria(filter);
+        List<AddressBook> addressBookList = addressBookService.findContactByCriteria(filter);
         List<AddressBook> mapList = new ArrayList<>();
-        for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
+        /*for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
             mapList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
-        }
+        }*/
         Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(mapList, pageable);
         return ResponseEntity.ok(addressBookPage);
     }
