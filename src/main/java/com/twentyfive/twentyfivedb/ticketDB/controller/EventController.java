@@ -7,6 +7,7 @@ import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 
 
 import com.twentyfive.twentyfivemodel.filterTicket.EventFilter;
+import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,10 @@ public class EventController {
      * Get event list end filters
      */
     @PostMapping("/filter")
-    public ResponseEntity<Page<Event>> getEventList(@RequestBody EventFilter filterObject) {
-        Pageable pageable =/* MethodUtils.makePageableFromFilter(filterObject);*/ null;
+    public ResponseEntity<Page<Event>> getEventList(@RequestBody EventFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+
+        FilterObject filter = new FilterObject(page, size);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<EventDocumentDB> eventPage = eventService.eventSearch(filterObject);
         List<Event> eventList = new ArrayList<>();
         for (EventDocumentDB eventDocumentDB : eventPage) {

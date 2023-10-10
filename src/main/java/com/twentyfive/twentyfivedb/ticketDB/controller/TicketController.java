@@ -5,6 +5,7 @@ import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
+import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.filterTicket.TicketFilter;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
@@ -57,9 +58,9 @@ public class TicketController {
     * Get ticket list end filters
      */
     @PostMapping("/list")
-    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody TicketFilter filterObject) {
-
-        Pageable pageable = /*MethodUtils.makePageableFromFilter(filterObject);*/ null;
+    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody TicketFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+        FilterObject filter = new FilterObject(page, size);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {

@@ -82,26 +82,20 @@ public class MethodUtils {
     }
 
     public static Pageable makePageableFromFilter(FilterObject filterObject) {
-        log.info("makePageableFromFilter: " + filterObject);
-        System.out.println("makePageableFromFilter: " + filterObject);
+
         if (filterObject.getPage() == null && filterObject.getSize() == null) {
-            log.info("ENTRO IN NULLLLLLLLLL");
-            System.out.println("ENTRO IN NULLLLLLLLLL");
+
             return PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
         } else {
-            log.info("ENTRO IN ELSE");
-            System.out.println("ENTRO IN ELSE");
+
             if (filterObject.getPage() != null && filterObject.getSize() != null) {
-                log.info("ENTRO IN IF");
-                System.out.println("ENTRO IN IF");
+
                 return PageRequest.of(filterObject.getPage(), filterObject.getSize());
             } else if (filterObject.getPage() != null) {
-                log.info("ENTRO IN IF 2");
-                System.out.println("ENTRO IN IF 2");
+
                 return PageRequest.of(filterObject.getPage(), PAGE_SIZE);
             } else {
-                log.info("ENTRO IN ELSE 2");
-                System.out.println("ENTRO IN ELSE 2");
+
                 return PageRequest.of(PAGE_NUMBER, filterObject.getSize());
             }
         }
