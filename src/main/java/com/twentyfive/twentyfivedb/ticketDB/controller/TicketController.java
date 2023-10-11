@@ -41,6 +41,15 @@ public class TicketController {
         this.exportService = exportService;
     }
 
+    @GetMapping("/find/all")
+    public ResponseEntity<List<Ticket>> getAll(){
+        List<TicketDocumentDB> ticketList = ticketService.findAll();
+        List<Ticket> mapList = new ArrayList<>();
+        for (TicketDocumentDB ticketDocumentDB : ticketList) {
+            mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
+        }
+        return ResponseEntity.ok(mapList);
+    }
 
     /*
     * Generate ticket
