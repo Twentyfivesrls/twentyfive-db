@@ -70,6 +70,7 @@ public class TicketController {
     public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam String username) {
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
+        System.out.println("USERNAMEEEEEE" + username);
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject, username);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
