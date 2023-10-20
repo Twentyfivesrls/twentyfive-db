@@ -99,7 +99,14 @@ public class TicketService {
      */
 
     public List<TicketDocumentDB> ticketsSearch(Ticket filterObject, String userId) {
+
+        System.out.println("SONO QUI :" + userId);
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
+
+        System.out.println("SONO DOPO LA LISTA ");
+
+
         if (StringUtils.isNotBlank(filterObject.getEventName())) {
             Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("eventName").regex(namePattern));
@@ -120,10 +127,10 @@ public class TicketService {
         if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
             criteriaList.add(Criteria.where("eventDateEnd").lte(filterObject.getEventDateEnd()));
         }
-        criteriaList.add(Criteria.where("userId").is(userId));
 
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
+            System.out.println("SONO NELLA QQUERY");
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
         }
         return mongoTemplate.find(query, TicketDocumentDB.class);
