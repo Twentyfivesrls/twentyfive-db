@@ -43,7 +43,7 @@ public class TicketController {
 
     @GetMapping("/find/all")
     public ResponseEntity<List<Ticket>> getAll(@RequestParam("username") String username){
-        List<TicketDocumentDB> ticketList = ticketService.findAll();
+        List<TicketDocumentDB> ticketList = ticketService.findAllByUserId(username);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
             mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
