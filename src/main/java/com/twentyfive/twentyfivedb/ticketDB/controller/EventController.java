@@ -56,8 +56,8 @@ public class EventController {
 
      */
     @GetMapping("/list")
-    public ResponseEntity<List<Event>> getEventList() {
-        List<EventDocumentDB> eventList = eventService.findAll();
+    public ResponseEntity<List<Event>> getEventList(@RequestParam("username") String username) {
+        List<EventDocumentDB> eventList = eventService.findAllByUsername(username);
         List<Event> mapList = new ArrayList<>();
         for (EventDocumentDB eventDocumentDB : eventList) {
             mapList.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));

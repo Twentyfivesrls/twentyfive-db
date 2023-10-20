@@ -4,9 +4,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 
+import java.util.List;
+
 
 @Repository
 public interface EventRepository extends MongoRepository<EventDocumentDB, String> {
 
 
+    List<EventDocumentDB> findAllByUserId(String username);
 }

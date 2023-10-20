@@ -102,6 +102,10 @@ public class EventService {
         return eventRepository.findAll();
     }
 
+    public List<EventDocumentDB> findAllByUsername(String username){
+        return eventRepository.findAllByUserId(username);
+    }
+
     public EventDocumentDB updateEvent(String id, Event event) {
         if (StringUtils.isBlank(id)) {
             log.error("Id is null or empty");
