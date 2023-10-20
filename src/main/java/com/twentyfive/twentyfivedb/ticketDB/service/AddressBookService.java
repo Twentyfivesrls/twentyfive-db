@@ -104,6 +104,7 @@ public class AddressBookService {
 
         List<Criteria> criteriaList = new ArrayList<>();
 
+
         if(StringUtils.isNotBlank(filterObject.getFirstName())){
             Pattern pattern = Pattern.compile(filterObject.getFirstName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("firstName").regex(pattern));

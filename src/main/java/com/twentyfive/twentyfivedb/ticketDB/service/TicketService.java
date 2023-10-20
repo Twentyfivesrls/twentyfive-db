@@ -101,11 +101,9 @@ public class TicketService {
 
     public List<TicketDocumentDB> ticketsSearch(Ticket filterObject, String userId) {
 
-        System.out.println("SONO QUI :" + userId);
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
 
-        System.out.println("SONO DOPO LA LISTA ");
 
 
         if (StringUtils.isNotBlank(filterObject.getEventName())) {
@@ -131,7 +129,6 @@ public class TicketService {
 
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
-            System.out.println("SONO NELLA QQUERY");
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
         }
         return mongoTemplate.find(query, TicketDocumentDB.class);
