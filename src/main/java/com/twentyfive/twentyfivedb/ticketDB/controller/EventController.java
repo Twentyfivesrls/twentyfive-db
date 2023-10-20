@@ -37,11 +37,11 @@ public class EventController {
      * Get event list end filters
      */
     @PostMapping("/filter")
-    public ResponseEntity<Page<Event>> getEventList(@RequestBody EventFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Page<Event>> getEventList(@RequestBody EventFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<EventDocumentDB> eventPage = eventService.eventSearch(filterObject);
+        List<EventDocumentDB> eventPage = eventService.eventSearch(filterObject,username);
         List<Event> eventList = new ArrayList<>();
         for (EventDocumentDB eventDocumentDB : eventPage) {
               eventList.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));

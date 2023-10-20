@@ -49,8 +49,10 @@ public class EventService {
         return event;
     }
 
-    public List<EventDocumentDB> eventSearch(EventFilter filterObject) {
+    public List<EventDocumentDB> eventSearch(EventFilter filterObject, String userId) {
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
+
 
         if (StringUtils.isNotBlank(filterObject.getName())) {
             Pattern namePattern = Pattern.compile(filterObject.getName(), Pattern.CASE_INSENSITIVE);
