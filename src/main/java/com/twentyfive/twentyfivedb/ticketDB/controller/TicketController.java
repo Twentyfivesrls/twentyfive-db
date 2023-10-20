@@ -67,10 +67,10 @@ public class TicketController {
     * Get ticket list end filters
      */
     @PostMapping("/list")
-    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam String username) {
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject);
+        List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject, username);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
             mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
