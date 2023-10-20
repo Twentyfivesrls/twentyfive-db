@@ -192,4 +192,9 @@ public class TicketService {
     public List<TicketDocumentDB> findAll() {
         return ticketRepository.findAll();
     }
-}
+
+    public List<TicketDocumentDB> findAllByUserId(String username) {
+        return ticketRepository.findAllByUserId(username);
+    }
+
+    }

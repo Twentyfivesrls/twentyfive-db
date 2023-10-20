@@ -42,7 +42,7 @@ public class TicketController {
     }
 
     @GetMapping("/find/all")
-    public ResponseEntity<List<Ticket>> getAll(){
+    public ResponseEntity<List<Ticket>> getAll(@RequestParam("username") String username){
         List<TicketDocumentDB> ticketList = ticketService.findAll();
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
