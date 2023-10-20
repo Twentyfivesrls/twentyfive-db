@@ -67,7 +67,7 @@ public class TicketController {
     * Get ticket list end filters
      */
     @PostMapping("/list")
-    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody TicketFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject);

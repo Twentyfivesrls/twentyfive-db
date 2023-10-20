@@ -98,8 +98,9 @@ public class TicketService {
      * Search for tickets by event name, event date start, event date end
      */
 
-    public List<TicketDocumentDB> ticketsSearch(TicketFilter filterObject) {
+    public List<TicketDocumentDB> ticketsSearch(Ticket filterObject) {
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(filterObject.getUserId()));
         if (StringUtils.isNotBlank(filterObject.getEventName())) {
             Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("eventName").regex(namePattern));
