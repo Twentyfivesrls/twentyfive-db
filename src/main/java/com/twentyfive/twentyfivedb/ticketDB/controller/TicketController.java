@@ -72,7 +72,7 @@ public class TicketController {
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         System.out.println("USERNAME: " + username);
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject, username);
-        System.out.println("Lista: " + ticketList);
+        System.out.println("Lista: " + ticketList.size());
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
             mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
