@@ -88,12 +88,12 @@ public class AddressBookService {
     }
 
 
-    public AddressBook saveAddressBook(AddressBook addressBook) {
+    public AddressBookDocumentDB saveAddressBook(AddressBookDocumentDB addressBook) {
         if (addressBook == null) {
             log.error("AddressBook is null or empty");
             throw new IllegalArgumentException("AddressBook is null or empty");
         }
-        addressBookRepository.save(TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook));
+        addressBookRepository.save(addressBook);
         return addressBook;
     }
 

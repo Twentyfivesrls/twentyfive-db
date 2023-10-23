@@ -64,7 +64,7 @@ public class TicketService {
             addressBook.setLastName(lastName);
             addressBook.setEmail(email);
             addressBook.setUserId(username);
-            addressBookService.saveAddressBook(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBook));
+            addressBookService.saveAddressBook(addressBook);
         }
         else{
             addressBook = addressBookControll;
