@@ -6,6 +6,7 @@ import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
+import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,16 @@ public class AddressBookController {
     public ResponseEntity<AddressBook> deleteAddressBook(@PathVariable String id){
         addressBookService.deleteAddressBookById(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/total-list")
+    public ResponseEntity<List<AddressBook>> getEventList(@RequestParam("username") String username) {
+        List<AddressBookDocumentDB> list = addressBookService.findAllByUsername(username);
+        List<AddressBook> mapList = new ArrayList<>();
+        for (AddressBookDocumentDB addressBookDocumentDB : list) {
+            mapList.add(TwentyFiveMapper.INSTANCE.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
+        }
+        return ResponseEntity.ok(mapList);
     }
 
     /*
@@ -87,16 +99,13 @@ public class AddressBookController {
      * Get address book list end filters
      */
     @PostMapping("/list")
-    public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size){
+    public ResponseEntity<Page<AddressBook>> getAddressBookList(@RequestBody AddressBookFilter filter, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username){
 
         FilterObject filterObject = new FilterObject(page,size);
-        log.info("filter: {}", filterObject);
-        System.out.println("filter: " + filterObject);
 
         Pageable pageable = MethodUtils.makePageableFromFilter(filterObject);
-        List<AddressBookDocumentDB> addressBookList = addressBookService.findContactByCriteria(filter);
-        log.info("addressBookList: {}", addressBookList);
-        System.out.println("addressBookList: " + addressBookList);
+        List<AddressBookDocumentDB> addressBookList = addressBookService.findContactByCriteria(filter, username);
+
         List<AddressBook> mapList = new ArrayList<>();
         for (AddressBookDocumentDB addressBookDocumentDB : addressBookList) {
             mapList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));

@@ -99,10 +99,12 @@ public class AddressBookService {
     }
 
 
-    public List<AddressBookDocumentDB> findContactByCriteria(AddressBookFilter filterObject) {
+    public List<AddressBookDocumentDB> findContactByCriteria(AddressBookFilter filterObject, String userId) {
 
 
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
+
 
 
         if(StringUtils.isNotBlank(filterObject.getFirstName())){
@@ -172,5 +174,9 @@ public class AddressBookService {
             throw new IllegalArgumentException("Email is null or empty");
         }
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookRepository.findByEmail(email));
+    }
+
+    public List<AddressBookDocumentDB> findAllByUsername(String username) {
+        return addressBookRepository.findAllByUserId(username);
     }
 }
