@@ -55,8 +55,8 @@ public class TicketController {
     * Generate ticket
     */
     @PostMapping("/generate")
-    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email) {
-        ticketService.saveTicket(ticket, name, lastName, email);
+    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("username") String username) {
+        ticketService.saveTicket(ticket, name, lastName, email, username);
         return ResponseEntity.ok(ticket);
     }
 

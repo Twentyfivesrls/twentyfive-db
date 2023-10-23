@@ -37,7 +37,7 @@ public class TicketService {
 
 
 
-    public void saveTicket(Ticket ticket, String firstName, String lastName, String email) {
+    public void saveTicket(Ticket ticket, String firstName, String lastName, String email, String username) {
         if (ticket == null) {
             log.error("Ticket cannot be null");
             throw new IllegalArgumentException("Ticket cannot be null");
@@ -63,6 +63,7 @@ public class TicketService {
             addressBook.setFirstName(firstName);
             addressBook.setLastName(lastName);
             addressBook.setEmail(email);
+            addressBook.setUserId(username);
             addressBookService.saveAddressBook(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBook));
         }
         else{
