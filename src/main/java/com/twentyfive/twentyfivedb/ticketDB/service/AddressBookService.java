@@ -177,6 +177,6 @@ public class AddressBookService {
     }
 
     public List<AddressBookDocumentDB> findAllByUsername(String username) {
-        return addressBookRepository.findAllByUserId(username);
+        return addressBookRepository.findByUserId(username);
     }
 }

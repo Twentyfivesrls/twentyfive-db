@@ -44,7 +44,7 @@ public class AddressBookController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/total-list")
+   /* @GetMapping("/total-list")
     public ResponseEntity<List<AddressBook>> getEventList(@RequestParam("username") String username) {
         List<AddressBookDocumentDB> list = addressBookService.findAllByUsername(username);
         List<AddressBook> mapList = new ArrayList<>();
@@ -52,7 +52,7 @@ public class AddressBookController {
             mapList.add(TwentyFiveMapper.INSTANCE.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
         }
         return ResponseEntity.ok(mapList);
-    }
+    }*/
 
     /*
         get address book by id
