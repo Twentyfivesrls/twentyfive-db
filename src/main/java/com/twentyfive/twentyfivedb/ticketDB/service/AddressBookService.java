@@ -54,7 +54,6 @@ public class AddressBookService {
     }
 
 
-
     public List<AddressBook> getAddressBookByFirstName(String firstName) {
         if (StringUtils.isBlank(firstName)) {
             log.error("FirstName is null or empty");
@@ -106,16 +105,15 @@ public class AddressBookService {
         criteriaList.add(Criteria.where("userId").is(userId));
 
 
-
-        if(StringUtils.isNotBlank(filterObject.getFirstName())){
+        if (StringUtils.isNotBlank(filterObject.getFirstName())) {
             Pattern pattern = Pattern.compile(filterObject.getFirstName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("firstName").regex(pattern));
         }
-        if(StringUtils.isNotBlank(filterObject.getLastName())){
+        if (StringUtils.isNotBlank(filterObject.getLastName())) {
             Pattern pattern = Pattern.compile(filterObject.getLastName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("lastName").regex(pattern));
         }
-        if(StringUtils.isNotBlank(filterObject.getEmail())){
+        if (StringUtils.isNotBlank(filterObject.getEmail())) {
             Pattern pattern = Pattern.compile(filterObject.getEmail(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("email").regex(pattern));
         }
@@ -125,7 +123,6 @@ public class AddressBookService {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
             return mongoTemplate.find(query, AddressBookDocumentDB.class);
         }
-
 
 
         return mongoTemplate.findAll(AddressBookDocumentDB.class);
@@ -145,7 +142,7 @@ public class AddressBookService {
         AddressBookDocumentDB findAddressBook = addressBookRepository.findById(id).orElse(null);
 
 
-        if(findAddressBook == null){
+        if (findAddressBook == null) {
             log.error("AddressBook not found");
             throw new IllegalArgumentException("AddressBook not found");
         }
@@ -156,8 +153,6 @@ public class AddressBookService {
 
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(findAddressBook);
     }
-
-
 
 
     public AddressBookDocumentDB findByEmail(String email) {
@@ -176,7 +171,6 @@ public class AddressBookService {
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookRepository.findByEmail(email));
     }
 
-    public List<AddressBookDocumentDB> findAllByUsername(String username) {
-        return addressBookRepository.findByUserId(username);
-    }
 }
+
+
