@@ -116,7 +116,7 @@ public class TicketController {
     /*
     * Delete ticket
      */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{code}")
     public ResponseEntity<Ticket> deleteTicket(@PathVariable String code) {
 
         ticketService.deleteTicket(code);
