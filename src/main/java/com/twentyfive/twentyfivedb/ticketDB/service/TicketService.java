@@ -3,7 +3,6 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
-import com.twentyfive.twentyfivemodel.filterTicket.TicketFilter;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -197,5 +194,9 @@ public class TicketService {
     public List<TicketDocumentDB> findAllByUserId(String username) {
         return ticketRepository.findAllByUserId(username);
     }
+
+   public List<TicketDocumentDB> findByCode(String code){
+        return ticketRepository.findAllByCode(code);
+   }
 
     }

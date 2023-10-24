@@ -31,8 +31,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/ticket")
 public class TicketController {
+
     @Autowired
-    private final TicketService ticketService;
+    private  TicketService ticketService;
 
     private final ExcelExportService exportService;
 
@@ -171,5 +172,17 @@ public class TicketController {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=qrCode.png")
                 .body(qrCode);
+    }
+
+    @GetMapping("getTicket/byCode/{code}")
+    public ResponseEntity<List<Ticket>> getTicketByCode(@PathVariable String code) {
+
+        List<Ticket> mapList = new ArrayList<>();
+
+        List<TicketDocumentDB> ticket = ticketService.findByCode(code);
+        for (TicketDocumentDB ticketDocumentDB : ticket) {
+            mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
+        }
+        return ResponseEntity.ok(mapList);
     }
 }

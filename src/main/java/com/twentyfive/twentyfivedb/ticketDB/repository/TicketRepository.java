@@ -15,4 +15,6 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
     List<TicketDocumentDB> findByUsed(Boolean status);
 
     List<TicketDocumentDB> findAllByUserId(String username);
+
+    List<TicketDocumentDB> findAllByCode(String code);
 }
