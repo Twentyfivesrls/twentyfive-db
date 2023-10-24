@@ -174,7 +174,7 @@ public class TicketController {
                 .body(qrCode);
     }
 
-    @GetMapping("getTicketByCode/{code}")
+    @GetMapping("getTicket/byCode/{code}")
     public ResponseEntity<Ticket> getTicketByCode(@PathVariable String code) {
 
         TicketDocumentDB ticket = ticketService.findByCode(code);
