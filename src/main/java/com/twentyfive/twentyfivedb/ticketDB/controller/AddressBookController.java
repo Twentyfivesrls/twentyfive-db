@@ -86,8 +86,8 @@ public class AddressBookController {
     @GetMapping("/get/addressBook/by/email")
     public ResponseEntity<AddressBook> getAddressBookByEmail(@RequestParam String email){
 
-        AddressBook addressBookList = addressBookService.getAddressBookByEmail(email);
-        return ResponseEntity.ok(addressBookList);
+        AddressBook addressBook = addressBookService.getAddressBookByEmail(email);
+        return ResponseEntity.ok(addressBook);
     }
 
 
