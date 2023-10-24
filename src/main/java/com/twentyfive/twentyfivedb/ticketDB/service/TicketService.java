@@ -147,12 +147,16 @@ public class TicketService {
     }
 
 
-    public void deleteTicket(String id) {
-        if (StringUtils.isBlank(id)) {
+    public void deleteTicket(String code) {
+        if (StringUtils.isBlank(code)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        ticketRepository.findById(id).ifPresent(ticketRepository::delete);
+        TicketDocumentDB ticketDocumentDB =  ticketRepository.findByCode(code);
+        if(ticketDocumentDB != null){
+            ticketRepository.deleteByCode(code);
+        }
+
     }
 
 
@@ -195,8 +199,8 @@ public class TicketService {
         return ticketRepository.findAllByUserId(username);
     }
 
-   public List<TicketDocumentDB> findByCode(String code){
-        return ticketRepository.findAllByCode(code);
+   public TicketDocumentDB findByCode(String code){
+        return ticketRepository.findByCode(code);
    }
 
     }

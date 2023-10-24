@@ -117,9 +117,9 @@ public class TicketController {
     * Delete ticket
      */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Ticket> deleteTicket(@PathVariable String id) {
+    public ResponseEntity<Ticket> deleteTicket(@PathVariable String code) {
 
-        ticketService.deleteTicket(id);
+        ticketService.deleteTicket(code);
         return ResponseEntity.ok().build();
     }
 
@@ -174,15 +174,11 @@ public class TicketController {
                 .body(qrCode);
     }
 
-    @GetMapping("getTicket/byCode/{code}")
-    public ResponseEntity<List<Ticket>> getTicketByCode(@PathVariable String code) {
+    @GetMapping("getTicketByCode/{code}")
+    public ResponseEntity<Ticket> getTicketByCode(@PathVariable String code) {
 
-        List<Ticket> mapList = new ArrayList<>();
+        TicketDocumentDB ticket = ticketService.findByCode(code);
 
-        List<TicketDocumentDB> ticket = ticketService.findByCode(code);
-        for (TicketDocumentDB ticketDocumentDB : ticket) {
-            mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
-        }
-        return ResponseEntity.ok(mapList);
+        return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticket));
     }
 }
