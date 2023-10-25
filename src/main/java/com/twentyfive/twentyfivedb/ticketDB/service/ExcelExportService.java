@@ -31,8 +31,8 @@ public class ExcelExportService {
     }
 
 
-    public byte[] eventExportToExcel() {
-        List<EventDocumentDB> data = eventService.findAll();
+    public byte[] eventExportToExcel(String userId) {
+        List<EventDocumentDB> data = eventService.findAllByUsername(userId);
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Data");
@@ -63,8 +63,8 @@ public class ExcelExportService {
     }
 
 
-    public byte[] ticketExportToExcel() {
-        List<TicketDocumentDB> data = ticketService.findAll();
+    public byte[] ticketExportToExcel(String userId) {
+        List<TicketDocumentDB> data = ticketService.findAllByUserId(userId);
 
 
         try (Workbook workbook = new XSSFWorkbook()) {

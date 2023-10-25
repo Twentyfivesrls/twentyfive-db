@@ -89,9 +89,9 @@ public class EventController {
     /*
      * Export event to excel
      */
-    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel() {
-        byte[] excelData = exportService.eventExportToExcel();
+    @GetMapping(value = "/export/excel/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String userId) {
+        byte[] excelData = exportService.eventExportToExcel(userId);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=exported_data.xlsx")
                 .body(excelData);

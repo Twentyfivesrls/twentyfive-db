@@ -127,9 +127,9 @@ public class TicketController {
     /*
     * Export ticket list to excel
      */
-    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel() {
-        byte[] excelData = exportService.ticketExportToExcel();
+    @GetMapping(value = "/export/excel/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String userId) {
+        byte[] excelData = exportService.ticketExportToExcel(userId);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=exported_data.xlsx")
                 .body(excelData);
