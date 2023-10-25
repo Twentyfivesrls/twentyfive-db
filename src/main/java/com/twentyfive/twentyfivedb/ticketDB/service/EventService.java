@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -128,6 +129,10 @@ public class EventService {
         eventToUpdate.setLocation(event.getLocation());
 
         return eventRepository.save(eventToUpdate);
+    }
+
+    public EventDocumentDB  getEventByField(String name, String description, LocalDateTime date, String location, Boolean enabled) {
+        return  eventRepository.findByNameAndDescriptionAndDateAndLocationAndEnabled(name, description, date, location, enabled);
     }
 
 }

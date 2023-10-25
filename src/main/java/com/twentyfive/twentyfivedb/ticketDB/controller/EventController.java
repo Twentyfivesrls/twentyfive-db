@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,6 +112,12 @@ public class EventController {
 
         eventService.updateEvent(id, event);
         return ResponseEntity.ok(event);
+    }
+
+    @GetMapping("/get/event/byFields")
+    public  ResponseEntity<Event> getEventByField(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("date") LocalDateTime date,@RequestParam("location") String location, @RequestParam("enabled") Boolean enabled){
+        EventDocumentDB event = eventService.getEventByField(name, description, date, location, enabled);
+        return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(event));
     }
 
 }
