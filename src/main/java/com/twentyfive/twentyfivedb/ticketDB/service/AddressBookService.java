@@ -148,7 +148,6 @@ public class AddressBookService {
         }
         findAddressBook.setFirstName(addressBook.getFirstName());
         findAddressBook.setLastName(addressBook.getLastName());
-        findAddressBook.setEmail(addressBook.getEmail());
         addressBookRepository.save(findAddressBook);
 
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(findAddressBook);
