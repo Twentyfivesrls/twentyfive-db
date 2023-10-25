@@ -11,6 +11,7 @@ import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -115,7 +116,8 @@ public class EventController {
     }
 
     @GetMapping("/get/event/byFields")
-    public  ResponseEntity<Event> getEventByField(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("date") LocalDateTime date,@RequestParam("location") String location, @RequestParam("enabled") Boolean enabled){
+    public  ResponseEntity<Event> getEventByField(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("date") @DateTimeFormat(pattern="dd/MM/yy, HH:mm") LocalDateTime date,
+            @RequestParam("location") String location, @RequestParam("enabled") Boolean enabled){
         System.out.println("Data  db " +date);
 
         EventDocumentDB event = eventService.getEventByField(name, description, date, location, enabled);
