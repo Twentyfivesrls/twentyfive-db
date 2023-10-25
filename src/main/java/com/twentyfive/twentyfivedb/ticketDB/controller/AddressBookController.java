@@ -110,10 +110,10 @@ public class AddressBookController {
         return ResponseEntity.ok(addressBookPage);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<AddressBook> updateAddressBook(@PathVariable String id, @RequestBody AddressBook addressBook){
+    @PutMapping("/update/{email}")
+    public ResponseEntity<AddressBook> updateAddressBook(@PathVariable String email, @RequestBody AddressBook addressBook){
 
-        AddressBook addressBook1 = addressBookService.updateAddressBook(id, addressBook);
+        AddressBook addressBook1 = addressBookService.updateAddressBook(email, addressBook);
         return ResponseEntity.ok(addressBook1);
     }
 

@@ -129,9 +129,9 @@ public class AddressBookService {
     }
 
 
-    public AddressBook updateAddressBook(String id, AddressBook addressBook) {
-        if (StringUtils.isBlank(id)) {
-            log.error("Id is null or empty");
+    public AddressBook updateAddressBook(String email, AddressBook addressBook) {
+        if (StringUtils.isBlank(email)) {
+            log.error("email is null or empty");
             throw new IllegalArgumentException("Id is null or empty");
         }
         if (addressBook == null) {
@@ -139,7 +139,7 @@ public class AddressBookService {
             throw new IllegalArgumentException("AddressBook is null or empty");
         }
 
-        AddressBookDocumentDB findAddressBook = addressBookRepository.findById(id).orElse(null);
+        AddressBookDocumentDB findAddressBook = addressBookRepository.findByEmail(email);
 
 
         if (findAddressBook == null) {
