@@ -95,21 +95,21 @@ public class TicketController {
     /*
     * Update ticket status(ublity or not)
      */
-    @PutMapping("/setStatus/{id}/{status}")
-    public ResponseEntity<Ticket> setStatus(@PathVariable String id, @PathVariable Boolean status) {
+    @PutMapping("/setStatus/{code}/{status}")
+    public ResponseEntity<Ticket> setStatus(@PathVariable String code, @PathVariable Boolean status) {
 
 
-        ticketService.pdateTicketValidity(id, status);
+        ticketService.updateTicketValidity(code, status);
         return ResponseEntity.ok().build();
     }
 
     /*
     * Update ticket used or not
      */
-    @PutMapping("/update/usedTicket/{id}/{used}")
-    public ResponseEntity<Ticket> setUsed(@PathVariable String id, @PathVariable Boolean used) {
+    @PutMapping("/update/usedTicket/{code}/{used}")
+    public ResponseEntity<Ticket> setUsed(@PathVariable String code, @PathVariable Boolean used) {
 
-        ticketService.updateUsedTicket(id, used);
+        ticketService.updateUsedTicket(code, used);
         return ResponseEntity.ok().build();
     }
 

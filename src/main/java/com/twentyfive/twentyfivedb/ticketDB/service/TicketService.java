@@ -134,12 +134,12 @@ public class TicketService {
     }
 
 
-    public void pdateTicketValidity(String id, Boolean status) {
-        if (StringUtils.isBlank(id)) {
+    public void updateTicketValidity(String code, Boolean status) {
+        if (StringUtils.isBlank(code)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
+        TicketDocumentDB ticket = ticketRepository.findByCode(code);
         if (ticket != null) {
             ticket.setActive(status);
             ticketRepository.save(ticket);
@@ -160,12 +160,12 @@ public class TicketService {
     }
 
 
-    public void updateUsedTicket(String id, Boolean status) {
-        if (StringUtils.isBlank(id)) {
+    public void updateUsedTicket(String code, Boolean status) {
+        if (StringUtils.isBlank(code)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
+        TicketDocumentDB ticket = ticketRepository.findByCode(code);
         if (ticket != null) {
             ticket.setUsed(status);
             ticketRepository.save(ticket);
