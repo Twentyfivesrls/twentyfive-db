@@ -200,6 +200,7 @@ public class TicketService {
     }
 
    public TicketDocumentDB findByCode(String code){
+
         return ticketRepository.findByCode(code);
    }
 
