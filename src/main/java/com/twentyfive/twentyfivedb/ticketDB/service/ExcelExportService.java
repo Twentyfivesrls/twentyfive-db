@@ -65,7 +65,7 @@ public class ExcelExportService {
 
     public byte[] ticketExportToExcel(String userId) {
         List<TicketDocumentDB> data = ticketService.findAllByUserId(userId);
-
+        System.out.println("TICKET LIST :"+ data);
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Data");
