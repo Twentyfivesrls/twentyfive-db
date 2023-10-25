@@ -135,4 +135,8 @@ public class EventService {
         return  eventRepository.findByNameAndDescriptionAndDateAndLocationAndEnabled(name, description, date, location, enabled);
     }
 
+    public void delete(String id) {
+        eventRepository.deleteById(id);
+    }
+
 }

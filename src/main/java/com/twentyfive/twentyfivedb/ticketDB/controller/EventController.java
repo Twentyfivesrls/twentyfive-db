@@ -125,4 +125,10 @@ public class EventController {
         return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(event));
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Event> deleteEvent(@PathVariable String id){
+        eventService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
