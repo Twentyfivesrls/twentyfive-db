@@ -22,7 +22,6 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,9 +68,7 @@ public class TicketController {
     public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        System.out.println("USERNAME: " + username);
         List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject, username);
-        System.out.println("Lista: " + ticketList.size());
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
             mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
@@ -116,8 +113,8 @@ public class TicketController {
     /*
     * Delete ticket
      */
-    @DeleteMapping("/delete/{code}")
-    public ResponseEntity<Ticket> deleteTicket(@PathVariable String code) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<Ticket> deleteTicket(@RequestParam("code") String code) {
 
         ticketService.deleteTicket(code);
         return ResponseEntity.ok().build();
