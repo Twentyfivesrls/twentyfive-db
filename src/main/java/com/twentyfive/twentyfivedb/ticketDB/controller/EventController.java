@@ -54,7 +54,7 @@ public class EventController {
 
 
     @PostMapping("/filter/event/autocomplite")
-    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestBody EventFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
+    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestBody String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
