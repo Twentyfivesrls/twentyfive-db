@@ -91,17 +91,8 @@ public class EventService {
         if (StringUtils.isNotBlank(filterObject)) {
             Pattern namePattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("name").regex(namePattern));
-
             Pattern descriptionPattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("description").regex(descriptionPattern));
-
-            Pattern locationPattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("location").regex(locationPattern));
-
-            criteriaList.add(Criteria.where("date").gte(filterObject));
-
-
-            criteriaList.add(Criteria.where("date").lte(filterObject));
         }
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
