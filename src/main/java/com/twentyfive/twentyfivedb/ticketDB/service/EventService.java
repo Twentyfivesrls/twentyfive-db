@@ -76,7 +76,7 @@ public class EventService {
         }
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().norOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
             return mongoTemplate.find(query, EventDocumentDB.class);
         }
         return mongoTemplate.findAll(EventDocumentDB.class);
@@ -92,20 +92,13 @@ public class EventService {
         if (StringUtils.isNotBlank(filterObject)) {
             Pattern namePattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("name").regex(namePattern));
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-            mapList =  mongoTemplate.find(query, EventDocumentDB.class);
-            return mapList;
-        }
-
-        if (StringUtils.isNotBlank(filterObject) && mapList == null) {
-
             Pattern descriptionPattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("description").regex(descriptionPattern));
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-            return mongoTemplate.find(query, EventDocumentDB.class);
         }
 
-        return mongoTemplate.findAll(EventDocumentDB.class);
+        Query res = query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+        return mongoTemplate.find(res, EventDocumentDB.class);
+
     }
 
     public void disableEvent(String id, Boolean isDisabled) {
