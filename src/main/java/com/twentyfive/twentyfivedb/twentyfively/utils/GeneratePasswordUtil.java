@@ -1,4 +1,4 @@
-package com.twentyfive.twentyfivedb.twentyfiveli.utils;
+package com.twentyfive.twentyfivedb.twentyfively.utils;
 
 import java.util.Random;
 

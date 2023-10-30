@@ -1,8 +1,8 @@
-package com.twentyfive.twentyfivedb.twentyfiveli.service;
+package com.twentyfive.twentyfivedb.twentyfively.service;
 
 
-import com.twentyfive.twentyfivedb.twentyfiveli.repository.ShortenLinkRepository;
-import com.twentyfive.twentyfivedb.twentyfiveli.utils.GeneratePasswordUtil;
+import com.twentyfive.twentyfivedb.twentyfively.repository.ShortenLinkRepository;
+import com.twentyfive.twentyfivedb.twentyfively.utils.GeneratePasswordUtil;
 import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.RequestValue;
 import com.twentyfive.twentyfivemodel.models.twentyfiveLyModels.ShortenLink;
 import io.micrometer.common.util.StringUtils;
@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.twentyfive.twentyfivedb.twentyfiveli.constants.ShortenLinkConstants.DEFAULT_SHORTEN_LINK_LENGTH;
+import static com.twentyfive.twentyfivedb.twentyfively.constants.ShortenLinkConstants.DEFAULT_SHORTEN_LINK_LENGTH;
 
 
 @Slf4j

@@ -1,6 +1,6 @@
-package com.twentyfive.twentyfivedb.twentyfiveli.controller;
+package com.twentyfive.twentyfivedb.twentyfively.controller;
 
-import com.twentyfive.twentyfivedb.twentyfiveli.service.ShortenLinkService;
+import com.twentyfive.twentyfivedb.twentyfively.service.ShortenLinkService;
 import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.RequestValue;
 import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.ResponseValue;
 import com.twentyfive.twentyfivemodel.models.twentyfiveLyModels.ShortenLink;

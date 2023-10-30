@@ -1,7 +1,6 @@
-package com.twentyfive.twentyfivedb.twentyfiveli.controller;
+package com.twentyfive.twentyfivedb.twentyfively.controller;
 
-import org.springframework.ui.Model;
-import com.twentyfive.twentyfivedb.twentyfiveli.service.ShortenLinkService;
+import com.twentyfive.twentyfivedb.twentyfively.service.ShortenLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

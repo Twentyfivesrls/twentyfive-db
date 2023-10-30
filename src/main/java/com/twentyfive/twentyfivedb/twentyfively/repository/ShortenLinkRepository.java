@@ -1,4 +1,4 @@
-package com.twentyfive.twentyfivedb.twentyfiveli.repository;
+package com.twentyfive.twentyfivedb.twentyfively.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import twentyfive.twentyfiveadapter.adapter.Document.ShortenLinkDocumentDB.ShortenLinkDocumentDB;

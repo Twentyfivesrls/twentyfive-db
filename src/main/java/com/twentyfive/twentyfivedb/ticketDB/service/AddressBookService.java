@@ -62,7 +62,7 @@ public class AddressBookService {
 
         List<AddressBook> list = new ArrayList<>();
 
-        List<AddressBookDocumentDB> listDB = addressBookRepository.findByFirstName(firstName);
+        List<AddressBookDocumentDB> listDB = addressBookRepository.findAllByFirstName(firstName);
         for (AddressBookDocumentDB addressBookDocumentDB : listDB) {
             list.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
         }
@@ -78,7 +78,7 @@ public class AddressBookService {
 
         List<AddressBook> list = new ArrayList<>();
 
-        List<AddressBookDocumentDB> listDB = addressBookRepository.findByLastName(lastName);
+        List<AddressBookDocumentDB> listDB = addressBookRepository.findAllByLastName(lastName);
         for (AddressBookDocumentDB addressBookDocumentDB : listDB) {
             list.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
         }

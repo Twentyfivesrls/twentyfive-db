@@ -50,7 +50,7 @@ public class EventService {
         return event;
     }
 
-    public List<EventDocumentDB> eventSearch(EventFilter filterObject, String userId) {
+    public List<EventDocumentDB> paginationEvent(EventFilter filterObject, String userId) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
 
@@ -81,6 +81,38 @@ public class EventService {
         }
         return mongoTemplate.findAll(EventDocumentDB.class);
 
+    }
+
+    public List<EventDocumentDB> filterSearch(EventFilter filterObject, String userId){
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
+
+
+        if (StringUtils.isNotBlank(filterObject.getName())) {
+            Pattern namePattern = Pattern.compile(filterObject.getName(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("name").regex(namePattern));
+        }
+        if (StringUtils.isNotBlank(filterObject.getDescription())) {
+            Pattern descriptionPattern = Pattern.compile(filterObject.getDescription(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("description").regex(descriptionPattern));
+        }
+        if (StringUtils.isNotBlank(filterObject.getLocation())) {
+            Pattern locationPattern = Pattern.compile(filterObject.getLocation(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("location").regex(locationPattern));
+        }
+        if (filterObject.getStartDate() != null) {
+            criteriaList.add(Criteria.where("date").gte(filterObject.getStartDate()));
+
+        }
+        if (filterObject.getEndDate() != null) {
+            criteriaList.add(Criteria.where("date").lte(filterObject.getEndDate()));
+        }
+        Query query = new Query();
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+            return mongoTemplate.find(query, EventDocumentDB.class);
+        }
+        return mongoTemplate.findAll(EventDocumentDB.class);
     }
 
     public void disableEvent(String id, Boolean isDisabled) {
