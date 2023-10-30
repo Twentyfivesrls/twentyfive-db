@@ -87,7 +87,6 @@ public class EventService {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
         Query query = new Query();
-        List<EventDocumentDB> mapList = new ArrayList<>();
 
         if (StringUtils.isNotBlank(filterObject)) {
             Pattern namePattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
@@ -96,7 +95,7 @@ public class EventService {
             criteriaList.add(Criteria.where("description").regex(descriptionPattern));
         }
 
-        Query res = query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+        Query res = query.addCriteria(new Criteria().orOperator(criteriaList));
         return mongoTemplate.find(res, EventDocumentDB.class);
 
     }

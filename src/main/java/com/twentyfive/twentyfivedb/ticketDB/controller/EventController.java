@@ -53,7 +53,7 @@ public class EventController {
     }
 
 
-    @PostMapping("/filter/event/autocomplite")
+    @PostMapping("/filter/event/autocomplete")
     public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 
         FilterObject filter = new FilterObject(page, size);
