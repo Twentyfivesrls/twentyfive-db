@@ -76,7 +76,7 @@ public class EventService {
         }
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+            query.addCriteria(new Criteria().norOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
             return mongoTemplate.find(query, EventDocumentDB.class);
         }
         return mongoTemplate.findAll(EventDocumentDB.class);
