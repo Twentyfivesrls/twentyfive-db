@@ -84,19 +84,22 @@ public class EventService {
     }
 
     public List<EventDocumentDB> filterSearch(String filterObject, String userId){
-        List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("userId").is(userId));
-        Query query = new Query();
+        Criteria criteriaUserId = Criteria.where("userId").is(userId);
+        Criteria criteriaFilter = new Criteria();
+
 
         if (StringUtils.isNotBlank(filterObject)) {
-            Pattern namePattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("name").regex(namePattern));
-            Pattern descriptionPattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("description").regex(descriptionPattern));
+            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
+            criteriaFilter.orOperator(
+                    Criteria.where("name").regex(pattern),
+                    Criteria.where("description").regex(pattern)
+            );
         }
 
-        Query res = query.addCriteria(new Criteria().orOperator(criteriaList));
-        return mongoTemplate.find(res, EventDocumentDB.class);
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
+
+        Query query = new Query(combinedCriteria);
+        return mongoTemplate.find(query, EventDocumentDB.class);
 
     }
 
