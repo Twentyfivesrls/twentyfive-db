@@ -192,6 +192,16 @@ public class AddressBookService {
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookRepository.findByEmail(email));
     }
 
+    public List<AddressBook> getAllAddressByUser(String userId) {
+        List<AddressBook> list = new ArrayList<>();
+
+        List<AddressBookDocumentDB> listDB = addressBookRepository.findAllByUserId(userId);
+        for (AddressBookDocumentDB addressBookDocumentDB : listDB) {
+            list.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
+        }
+        return list;
+    }
+
 }
 
 

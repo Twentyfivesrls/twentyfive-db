@@ -140,5 +140,10 @@ public class AddressBookController {
         return addressBookService.saveAddressBook(addressBookDocumentDB);
     }
 
+    @GetMapping("/get/addressbook")
+    public List<AddressBook> getAllByUser(@RequestParam("userId") String userId){
+        return addressBookService.getAllAddressByUser(userId);
+    }
+
 
 }
