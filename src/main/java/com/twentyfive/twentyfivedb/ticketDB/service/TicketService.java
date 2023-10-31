@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 
 import java.util.ArrayList;
@@ -129,6 +130,25 @@ public class TicketService {
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
         }
+        return mongoTemplate.find(query, TicketDocumentDB.class);
+
+    }
+
+    public List<TicketDocumentDB> filterSearch(String filterObject, String userId){
+        Criteria criteriaUserId = Criteria.where("userId").is(userId);
+        Criteria criteriaFilter = new Criteria();
+
+
+        if (StringUtils.isNotBlank(filterObject)) {
+            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
+            criteriaFilter.orOperator(
+                    Criteria.where("code").regex(pattern)
+            );
+        }
+
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
+
+        Query query = new Query(combinedCriteria);
         return mongoTemplate.find(query, TicketDocumentDB.class);
 
     }

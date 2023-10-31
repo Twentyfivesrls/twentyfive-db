@@ -6,6 +6,7 @@ import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
+import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
@@ -108,6 +110,20 @@ public class AddressBookController {
         }
         Page<AddressBook> addressBookPage = MethodUtils.convertListToPage(mapList, pageable);
         return ResponseEntity.ok(addressBookPage);
+    }
+
+    @PostMapping("/get/autocomplete")
+    public ResponseEntity<Page<AddressBook>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
+
+        FilterObject filter = new FilterObject(page, size);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
+        List<AddressBookDocumentDB> eventPage = addressBookService.filterSearch(filterObject,username);
+        List<AddressBook> aList = new ArrayList<>();
+        for (AddressBookDocumentDB addressBookDocumentDB : eventPage) {
+            aList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
+        }
+        Page<AddressBook> aRes = MethodUtils.convertListToPage(aList, pageable);
+        return ResponseEntity.ok(aRes);
     }
 
     @PutMapping("/update/{email}")

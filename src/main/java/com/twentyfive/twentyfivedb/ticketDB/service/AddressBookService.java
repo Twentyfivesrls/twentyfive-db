@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.time.LocalDateTime;
@@ -126,6 +127,27 @@ public class AddressBookService {
 
 
         return mongoTemplate.findAll(AddressBookDocumentDB.class);
+    }
+
+
+    public List<AddressBookDocumentDB> filterSearch(String filterObject, String userId){
+        Criteria criteriaUserId = Criteria.where("userId").is(userId);
+        Criteria criteriaFilter = new Criteria();
+
+
+        if (StringUtils.isNotBlank(filterObject)) {
+            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
+            criteriaFilter.orOperator(
+                    Criteria.where("firstName").regex(pattern),
+                    Criteria.where("lastName").regex(pattern)
+            );
+        }
+
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
+
+        Query query = new Query(combinedCriteria);
+        return mongoTemplate.find(query, AddressBookDocumentDB.class);
+
     }
 
 

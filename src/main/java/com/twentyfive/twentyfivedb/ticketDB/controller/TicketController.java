@@ -7,6 +7,7 @@ import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.filterTicket.TicketFilter;
+import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
@@ -75,6 +77,20 @@ public class TicketController {
         Page<Ticket> ticket = MethodUtils.convertListToPage(mapList, pageable);
         return ResponseEntity.ok(ticket);
 
+    }
+
+    @PostMapping("/get/autocomplete")
+    public ResponseEntity<Page<Ticket>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
+
+        FilterObject filter = new FilterObject(page, size);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
+        List<TicketDocumentDB> eventPage = ticketService.filterSearch(filterObject,username);
+        List<Ticket> aList = new ArrayList<>();
+        for (TicketDocumentDB ticketDocumentDB : eventPage) {
+            aList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
+        }
+        Page<Ticket> aRes = MethodUtils.convertListToPage(aList, pageable);
+        return ResponseEntity.ok(aRes);
     }
 
     /*
