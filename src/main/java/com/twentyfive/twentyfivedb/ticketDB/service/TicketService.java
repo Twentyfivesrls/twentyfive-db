@@ -154,12 +154,12 @@ public class TicketService {
     }
 
 
-    public void updateTicketValidity(String code, Boolean status) {
-        if (StringUtils.isBlank(code)) {
+    public void updateTicketValidity(String id, Boolean status) {
+        if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticket = ticketRepository.findByCode(code);
+        TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null) {
             ticket.setActive(status);
             ticketRepository.save(ticket);

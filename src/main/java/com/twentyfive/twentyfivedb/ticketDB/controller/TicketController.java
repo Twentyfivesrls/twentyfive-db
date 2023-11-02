@@ -103,11 +103,11 @@ public class TicketController {
     /*
     * Update ticket status(ublity or not)
      */
-    @PutMapping("/setStatus/{code}/{status}")
-    public ResponseEntity<Ticket> setStatus(@PathVariable String code, @PathVariable Boolean status) {
+    @PutMapping("/setStatus/{id}/{status}")
+    public ResponseEntity<Ticket> setStatus(@PathVariable String id, @PathVariable Boolean status) {
 
 
-        ticketService.updateTicketValidity(code, status);
+        ticketService.updateTicketValidity(id, status);
         return ResponseEntity.ok().build();
     }
 
