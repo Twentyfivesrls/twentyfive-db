@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,16 +155,20 @@ public class TicketService {
     }
 
 
-    public void updateTicketValidity(String id, Boolean status) {
+    public Ticket updateTicketValidity(String id, Boolean status) {
         if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
         TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null) {
+            System.out.println("ticket   :" +ticket);
             ticket.setActive(status);
             ticketRepository.save(ticket);
+            return TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticket);
         }
+
+        return null;
     }
 
 
