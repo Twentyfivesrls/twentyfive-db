@@ -6,10 +6,7 @@ import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
-import com.twentyfive.twentyfivemodel.filterTicket.TicketFilter;
-import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
@@ -118,10 +114,10 @@ public class TicketController {
     /*
     * Update ticket used or not
      */
-    @PutMapping("/update/usedTicket/{code}/{used}")
-    public ResponseEntity<Ticket> setUsed(@PathVariable String code, @PathVariable Boolean used) {
+    @PutMapping("/update/usedTicket/{id}/{used}")
+    public ResponseEntity<Ticket> setUsed(@PathVariable String id, @PathVariable Boolean used) {
 
-        ticketService.updateUsedTicket(code, used);
+        ticketService.updateUsedTicket(id, used);
         return ResponseEntity.ok().build();
     }
 
@@ -129,9 +125,9 @@ public class TicketController {
     * Delete ticket
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<Ticket> deleteTicket(@RequestParam("code") String code) {
+    public ResponseEntity<Ticket> deleteTicket(@RequestParam("id") String id) {
 
-        ticketService.deleteTicket(code);
+        ticketService.deleteTicket(id);
         return ResponseEntity.ok().build();
     }
 

@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 
 import java.util.ArrayList;
@@ -79,6 +78,7 @@ public class TicketService {
         finalTicket.setActive(ticket.getActive());
         finalTicket.setAddressBookId(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
+        finalTicket.setUrl(ticket.getUrl());
 
 
         ticketRepository.save(finalTicket);
@@ -167,25 +167,25 @@ public class TicketService {
     }
 
 
-    public void deleteTicket(String code) {
-        if (StringUtils.isBlank(code)) {
+    public void deleteTicket(String id) {
+        if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticketDocumentDB =  ticketRepository.findByCode(code);
+        TicketDocumentDB ticketDocumentDB =  ticketRepository.findById(id).orElse(null);
         if(ticketDocumentDB != null){
-            ticketRepository.deleteByCode(code);
+            ticketRepository.deleteById(id);
         }
 
     }
 
 
-    public void updateUsedTicket(String code, Boolean status) {
-        if (StringUtils.isBlank(code)) {
+    public void updateUsedTicket(String id, Boolean status) {
+        if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticket = ticketRepository.findByCode(code);
+        TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null) {
             ticket.setUsed(status);
             ticketRepository.save(ticket);
