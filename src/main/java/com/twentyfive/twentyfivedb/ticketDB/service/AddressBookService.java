@@ -34,12 +34,12 @@ public class AddressBookService {
     }
 
 
-    public void deleteAddressBookByEmail(String email) {
-        if (StringUtils.isBlank(email)) {
+    public void deleteAddressBookById(String id) {
+        if (StringUtils.isBlank(id)) {
             log.error("Id is null or empty");
             throw new IllegalArgumentException("Id is null or empty");
         }
-        addressBookRepository.deleteByEmail(email);
+        addressBookRepository.deleteById(id);
     }
 
     public void deleteAllAddressBook() {

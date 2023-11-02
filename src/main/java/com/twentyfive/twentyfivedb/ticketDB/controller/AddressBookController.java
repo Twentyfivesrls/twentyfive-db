@@ -36,9 +36,9 @@ public class AddressBookController {
     /*
         delete address book
      */
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity<AddressBook> deleteAddressBook(@PathVariable String email){
-        addressBookService.deleteAddressBookByEmail(email);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<AddressBook> deleteAddressBook(@PathVariable String id){
+        addressBookService.deleteAddressBookById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
