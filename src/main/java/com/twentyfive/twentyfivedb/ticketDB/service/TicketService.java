@@ -25,7 +25,7 @@ public class TicketService {
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
 
-    public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate, String url) {
+    public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate) {
         this.addressBookService = addressBookService;
         this.mongoTemplate = mongoTemplate;
         this.ticketRepository = ticketRepository;
