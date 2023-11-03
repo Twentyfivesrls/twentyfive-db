@@ -1,7 +1,7 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
-
+import java.util.UUID;
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
@@ -25,11 +25,13 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
+    private final String url;
 
-    public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate) {
+    public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate, String url) {
         this.addressBookService = addressBookService;
         this.mongoTemplate = mongoTemplate;
         this.ticketRepository = ticketRepository;
+        this.url = url;
     }
 
 
@@ -79,10 +81,14 @@ public class TicketService {
         finalTicket.setActive(ticket.getActive());
         finalTicket.setAddressBookId(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
-        finalTicket.setUrl(ticket.getUrl());
-
 
         ticketRepository.save(finalTicket);
+        UUID uuid = UUID.randomUUID();
+        finalTicket.setUrl("http://localhost:4200/dettaglio-ticket;id="+finalTicket.getId()+";eventName="+finalTicket.getEventName()+";code="+uuid+";eventDateStart="+finalTicket.getEventDateStart()+";eventDateEnd="+finalTicket.getEventDateEnd()+";active="+finalTicket.getActive()+";used="+finalTicket.getUsed()+";addressBookId="+finalTicket.getAddressBookId()+";userId="+finalTicket.getUserId()+"!");
+        ticketRepository.save(finalTicket);
+
+
+
     }
 
 
@@ -162,7 +168,6 @@ public class TicketService {
         }
         TicketDocumentDB ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null) {
-            System.out.println("ticket   :" +ticket);
             ticket.setActive(status);
             ticketRepository.save(ticket);
             return TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticket);
