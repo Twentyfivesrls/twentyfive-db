@@ -83,9 +83,9 @@ public class TicketService {
         finalTicket.setUserId(ticket.getUserId());
 
         ticketRepository.save(finalTicket);
-        UUID uuid = UUID.randomUUID();
+       /* UUID uuid = UUID.randomUUID();
         finalTicket.setUrl("http://localhost:4200/dettaglio-ticket;id="+finalTicket.getId()+";eventName="+finalTicket.getEventName()+";code="+uuid+";eventDateStart="+finalTicket.getEventDateStart()+";eventDateEnd="+finalTicket.getEventDateEnd()+";active="+finalTicket.getActive()+";used="+finalTicket.getUsed()+";addressBookId="+finalTicket.getAddressBookId()+";userId="+finalTicket.getUserId()+"!");
-        ticketRepository.save(finalTicket);
+        ticketRepository.save(finalTicket);*/
 
 
 
