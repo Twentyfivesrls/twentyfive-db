@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
+import java.util.UUID;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,10 +70,10 @@ public class TicketService {
         }
 
 
-
+        UUID uuid = UUID.randomUUID();
         TicketDocumentDB finalTicket = new TicketDocumentDB();
         finalTicket.setEventName(ticket.getEventName());
-        finalTicket.setCode(ticket.getCode());
+        finalTicket.setCode(uuid.toString());
         finalTicket.setEventDateStart(ticket.getEventDateStart());
         finalTicket.setEventDateEnd(ticket.getEventDateEnd());
         finalTicket.setUsed(ticket.getUsed());
