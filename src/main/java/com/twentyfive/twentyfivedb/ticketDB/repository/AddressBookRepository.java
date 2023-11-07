@@ -19,6 +19,6 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
 
     List<AddressBookDocumentDB> findAllByUserId(String userId);
 
-    Optional<AddressBookDocumentDB> findByUserId(String userId);
+    AddressBookDocumentDB findByUserId(String userId);
     void deleteByEmail(String email);
 }

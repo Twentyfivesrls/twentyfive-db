@@ -3,7 +3,6 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
-import com.twentyfive.twentyfivemodel.models.linktreeModels.UserLink;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +11,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Document.UserLinkDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,9 +25,8 @@ public class AddressBookService {
 
     private final MongoTemplate mongoTemplate;
 
-    public AddressBook findByUsername(String username){
-        AddressBookDocumentDB addressBook = addressBookRepository.findByUserId(username).orElse(null);
-        return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBook);
+    public AddressBookDocumentDB findByUsername(String username){
+        return addressBookRepository.findByUserId(username);
     }
 
     public AddressBookService(AddressBookRepository addressBookRepository, MongoTemplate mongoTemplate) {
