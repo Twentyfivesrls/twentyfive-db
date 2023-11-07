@@ -21,9 +21,7 @@ public class UserLinkService {
     private final UserLinkRepository userLinkRepository;
 
     public UserLink findByUsername(String username){
-
         UserLinkDocumentDB userLink = userLinkRepository.findByUserId(username).orElse(null);
-
         return TwentyFiveMapper.INSTANCE.userLinkDocumentDBToUserLink(userLink);
     }
 

@@ -3,7 +3,10 @@ package com.twentyfive.twentyfivedb.ticketDB.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.UserLinkDocumentDB;
+
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AddressBookRepository extends MongoRepository<AddressBookDocumentDB, String> {
@@ -16,5 +19,6 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
 
     List<AddressBookDocumentDB> findAllByUserId(String userId);
 
+    Optional<AddressBookDocumentDB> findByUserId(String userId);
     void deleteByEmail(String email);
 }
