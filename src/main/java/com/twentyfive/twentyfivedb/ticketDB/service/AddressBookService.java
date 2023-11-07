@@ -30,9 +30,7 @@ public class AddressBookService {
     private final MongoTemplate mongoTemplate;
 
     public AddressBook findByUsername(String username){
-
         AddressBookDocumentDB addressBook = addressBookRepository.findByUserId(username).orElse(null);
-
         return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBook);
     }
 

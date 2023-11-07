@@ -96,9 +96,8 @@ public class AddressBookController {
         get address book by username
      */
     @GetMapping("/findByUsername")
-    public ResponseEntity<AddressBook> findByUsername(@RequestParam("username") String username){
-        AddressBook addressBook = addressBookService.findByUsername(username);
-        return ResponseEntity.ok(addressBook);
+    public ResponseEntity<AddressBookDocumentDB> findByUsername(@RequestParam("username") String username){
+        return new ResponseEntity(addressBookService.findByUsername(username), HttpStatus.OK);
     }
 
     /*
