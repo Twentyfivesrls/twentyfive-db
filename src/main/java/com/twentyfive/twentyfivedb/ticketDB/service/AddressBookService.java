@@ -34,6 +34,11 @@ public class AddressBookService {
     }
 
 
+    public List<AddressBookDocumentDB> findAllByUsername(String username){
+        return addressBookRepository.findAllByUserId(username);
+    }
+
+
     public void deleteAddressBookById(String id) {
         if (StringUtils.isBlank(id)) {
             log.error("Id is null or empty");
