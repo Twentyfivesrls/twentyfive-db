@@ -80,12 +80,12 @@ public class ExcelExportService {
                 row.createCell(0).setCellValue(item.getId());
                 row.createCell(1).setCellValue(item.getEventName());
                 row.createCell(2).setCellValue(item.getCode());
-                if (item.getEventDateStart() != null) {
+              /*  if (item.getEventDateStart() != null) {
                     row.createCell(3).setCellValue(MethodUtils.formatDate(item.getEventDateStart()));
                 }
                 if (item.getEventDateEnd() != null) {
                     row.createCell(4).setCellValue(MethodUtils.formatDate(item.getEventDateEnd()));
-                }
+                }*/
                 if (item.getActive() != null) {
                     row.createCell(5).setCellValue(item.getActive().toString());
                 }
