@@ -69,6 +69,7 @@ public class TicketService {
             addressBook = addressBookControll;
         }
 
+        System.out.println("ADDRESSBOOK :" + addressBook);
         UUID uuid = UUID.randomUUID();
         TicketDocumentDB finalTicket = new TicketDocumentDB();
         finalTicket.setEventName(ticket.getEventName());
@@ -77,7 +78,7 @@ public class TicketService {
         finalTicket.setEventDateEnd(ticket.getEventDateEnd());
         finalTicket.setUsed(ticket.getUsed());
         finalTicket.setActive(ticket.getActive());
-        finalTicket.setAddressBookId(addressBook.getId());
+        //finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setUserId(ticket.getUserId());
 
         ticketRepository.save(finalTicket);
