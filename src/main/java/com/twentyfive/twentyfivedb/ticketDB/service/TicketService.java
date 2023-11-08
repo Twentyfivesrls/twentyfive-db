@@ -70,7 +70,7 @@ public class TicketService {
             addressBook = addressBookControll;
         }
 
-
+        System.out.println("ADDRESSBOOK :" + addressBook);
         UUID uuid = UUID.randomUUID();
         TicketDocumentDB finalTicket = new TicketDocumentDB();
         finalTicket.setEventName(ticket.getEventName());
