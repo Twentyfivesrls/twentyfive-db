@@ -11,10 +11,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,6 +25,10 @@ public class AddressBookService {
 
     private final MongoTemplate mongoTemplate;
 
+    public AddressBook findByUsername(String username){
+        return TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookRepository.findByUserId(username));
+
+    }
 
     public AddressBookService(AddressBookRepository addressBookRepository, MongoTemplate mongoTemplate) {
         this.addressBookRepository = addressBookRepository;

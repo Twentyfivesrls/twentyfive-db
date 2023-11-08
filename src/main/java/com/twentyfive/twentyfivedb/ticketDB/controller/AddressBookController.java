@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.UserLinkDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
@@ -83,15 +84,21 @@ public class AddressBookController {
     }
 
     /*
-        get address book by date of birth
+        get address book by email
      */
     @GetMapping("/get/addressBook/by/email")
     public ResponseEntity<AddressBook> getAddressBookByEmail(@RequestParam String email){
-
         AddressBook addressBook = addressBookService.getAddressBookByEmail(email);
         return ResponseEntity.ok(addressBook);
     }
 
+    /*
+        get address book by username
+     */
+    @GetMapping("/findByUsername")
+    public ResponseEntity<AddressBookDocumentDB> findByUsername(@RequestParam("username") String username){
+        return new ResponseEntity(addressBookService.findByUsername(username), HttpStatus.OK);
+    }
 
     /*
      * Get address book list end filters
