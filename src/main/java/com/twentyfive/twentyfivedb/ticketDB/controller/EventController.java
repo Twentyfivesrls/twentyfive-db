@@ -131,11 +131,10 @@ public class EventController {
     }
 
     @GetMapping("/get/event/byFields")
-    public  ResponseEntity<Event> getEventByField(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("date") @DateTimeFormat(pattern="dd/MM/yy, HH:mm") LocalDateTime date,
-            @RequestParam("location") String location, @RequestParam("enabled") Boolean enabled){
-        System.out.println("Data  db " +date);
+    public  ResponseEntity<Event> getEventByField(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("dateStart") @DateTimeFormat(pattern="dd/MM/yy, HH:mm") LocalDateTime dateStart,
+                                                  @RequestParam("dateEnd") @DateTimeFormat(pattern="dd/MM/yy, HH:mm") LocalDateTime dateEnd, @RequestParam("location") String location, @RequestParam("enabled") Boolean enabled){
 
-        EventDocumentDB event = eventService.getEventByField(name, description, date, location, enabled);
+        EventDocumentDB event = eventService.getEventByField(name, description, dateStart, dateEnd, location, enabled);
         System.out.println("evento" +event);
         return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(event));
     }

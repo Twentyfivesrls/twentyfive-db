@@ -152,8 +152,8 @@ public class EventService {
         return eventRepository.save(eventToUpdate);
     }
 
-    public EventDocumentDB  getEventByField(String name, String description, LocalDateTime date, String location, Boolean enabled) {
-        return  eventRepository.findByNameAndDescriptionAndDateAndLocationAndEnabled(name, description, date, location, enabled);
+    public EventDocumentDB  getEventByField(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled) {
+        return  eventRepository.findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(name, description, dateStart, dateEnd, location, enabled);
     }
 
     public void delete(String id) {

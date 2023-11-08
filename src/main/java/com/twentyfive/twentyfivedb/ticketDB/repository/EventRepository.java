@@ -12,5 +12,6 @@ import java.util.List;
 public interface EventRepository extends MongoRepository<EventDocumentDB, String> {
 
     List<EventDocumentDB> findAllByUserId(String username);
-    EventDocumentDB findByNameAndDescriptionAndDateAndLocationAndEnabled(String name, String description, LocalDateTime date, String location, Boolean enabled);
+
+    EventDocumentDB findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled);
 }
