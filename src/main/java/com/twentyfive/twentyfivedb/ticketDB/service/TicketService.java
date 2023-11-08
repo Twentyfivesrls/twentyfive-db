@@ -1,7 +1,6 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
-import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
@@ -70,7 +69,6 @@ public class TicketService {
             addressBook = addressBookControll;
         }
 
-        System.out.println("ADDRESSBOOK :" + addressBook);
         UUID uuid = UUID.randomUUID();
         TicketDocumentDB finalTicket = new TicketDocumentDB();
         finalTicket.setEventName(ticket.getEventName());
