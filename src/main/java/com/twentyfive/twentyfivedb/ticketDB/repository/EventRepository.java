@@ -13,5 +13,5 @@ public interface EventRepository extends MongoRepository<EventDocumentDB, String
 
     List<EventDocumentDB> findAllByUserId(String username);
 
-    EventDocumentDB findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled);
+   // EventDocumentDB findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled);
 }

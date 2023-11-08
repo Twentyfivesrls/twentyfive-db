@@ -145,16 +145,16 @@ public class EventService {
 
         eventToUpdate.setName(event.getName());
         eventToUpdate.setDescription(event.getDescription());
-        //eventToUpdate.setDateStart(event.getDateStart());
-        //eventToUpdate.setDateEnd(event.getDateEnd());
+        eventToUpdate.setDateStart(event.getDateStart());
+        eventToUpdate.setDateEnd(event.getDateEnd());
         eventToUpdate.setLocation(event.getLocation());
 
         return eventRepository.save(eventToUpdate);
     }
 
-    public EventDocumentDB  getEventByField(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled) {
+  /*  public EventDocumentDB  getEventByField(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled) {
         return  eventRepository.findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(name, description, dateStart, dateEnd, location, enabled);
-    }
+    }*/
 
     public void delete(String id) {
         eventRepository.deleteById(id);
