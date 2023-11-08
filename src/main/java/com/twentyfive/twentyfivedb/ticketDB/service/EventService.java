@@ -145,8 +145,8 @@ public class EventService {
 
         eventToUpdate.setName(event.getName());
         eventToUpdate.setDescription(event.getDescription());
-        eventToUpdate.setDateStart(event.getDateStart());
-        eventToUpdate.setDateEnd(event.getDateEnd());
+        //eventToUpdate.setDateStart(event.getDateStart());
+        //eventToUpdate.setDateEnd(event.getDateEnd());
         eventToUpdate.setLocation(event.getLocation());
 
         return eventRepository.save(eventToUpdate);
