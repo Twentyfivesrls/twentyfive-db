@@ -43,12 +43,15 @@ public class ExcelExportService {
                 row.createCell(0).setCellValue(item.getId());
                 row.createCell(1).setCellValue(item.getName());
                 row.createCell(2).setCellValue(item.getDescription());
-                if (item.getDate() != null) {
-                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getDate()));
+                if (item.getDateStart() != null) {
+                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getDateStart()));
                 }
-                row.createCell(4).setCellValue(item.getLocation());
+                if (item.getDateEnd() != null) {
+                    row.createCell(4).setCellValue(MethodUtils.formatDate(item.getDateEnd()));
+                }
+                row.createCell(5).setCellValue(item.getLocation());
                 if (item.getEnabled() != null) {
-                    row.createCell(5).setCellValue(item.getEnabled().toString());
+                    row.createCell(6).setCellValue(item.getEnabled().toString());
                 }
 
                 // Aggiungi colonne in base alle tue esigenze
