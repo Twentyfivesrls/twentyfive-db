@@ -79,7 +79,7 @@ public class TicketService {
         finalTicket.setEventDateEnd(ticket.getEventDateEnd());
         finalTicket.setUsed(ticket.getUsed());
         finalTicket.setActive(ticket.getActive());
-        finalTicket.setAddressBookId(addressBook.getEmail());
+        finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setUserId(ticket.getUserId());
 
         ticketRepository.save(finalTicket);
