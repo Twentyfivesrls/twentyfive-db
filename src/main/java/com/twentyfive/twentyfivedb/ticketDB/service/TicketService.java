@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
+import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
@@ -36,7 +37,7 @@ public class TicketService {
 
 
 
-    public void saveTicket(Ticket ticket, String firstName, String lastName, String email, String username) {
+    public void saveTicket(Ticket ticket, String id, String firstName, String lastName, String email, String username) {
         if (ticket == null) {
             log.error("Ticket cannot be null");
             throw new IllegalArgumentException("Ticket cannot be null");
@@ -55,7 +56,7 @@ public class TicketService {
         }
 
 
-        AddressBookDocumentDB addressBookControll = addressBookService.findByEmail(email);
+        AddressBookDocumentDB addressBookControll = TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBookService.getAddressBookById(id));
         AddressBookDocumentDB addressBook = new AddressBookDocumentDB();
 
         if(addressBookControll == null) {
