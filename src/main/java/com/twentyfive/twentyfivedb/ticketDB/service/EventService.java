@@ -67,13 +67,22 @@ public class EventService {
             Pattern locationPattern = Pattern.compile(filterObject.getLocation(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("location").regex(locationPattern));
         }
-        if (filterObject.getDateStart() != null) {
-            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
-
+        //date range
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
+            Criteria dateCriteria1 = Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
+            criteriaList.add(dateCriteria1);
+            Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
+            criteriaList.add(dateCriteria2);
         }
-        if (filterObject.getDateEnd() != null) {
+        //date start
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() == null) {
+            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
+        }
+        //date end
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
             criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
         }
+
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
