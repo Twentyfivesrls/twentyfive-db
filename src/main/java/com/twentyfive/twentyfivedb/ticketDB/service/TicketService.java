@@ -81,6 +81,7 @@ public class TicketService {
         finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setEmail(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
+        finalTicket.setUrl("http://localhost:4200/dettaglio-ticket/"+uuid.toString());
 
         ticketRepository.save(finalTicket);
 
