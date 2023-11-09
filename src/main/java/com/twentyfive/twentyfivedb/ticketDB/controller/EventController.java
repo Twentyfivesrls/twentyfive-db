@@ -39,7 +39,7 @@ public class EventController {
      * Get event list end filters
      */
     @PostMapping("/filter")
-    public ResponseEntity<Page<Event>> getEventListPagination(@RequestBody EventFilter filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
+    public ResponseEntity<Page<Event>> getEventListPagination(@RequestBody Event filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);

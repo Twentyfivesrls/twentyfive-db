@@ -50,7 +50,7 @@ public class EventService {
         return event;
     }
 
-    public List<EventDocumentDB> paginationEvent(EventFilter filterObject, String userId) {
+    public List<EventDocumentDB> paginationEvent(Event filterObject, String userId) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
 
@@ -67,12 +67,12 @@ public class EventService {
             Pattern locationPattern = Pattern.compile(filterObject.getLocation(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("location").regex(locationPattern));
         }
-        if (filterObject.getStartDate() != null) {
-            criteriaList.add(Criteria.where("date").gte(filterObject.getStartDate()));
+        if (filterObject.getDateStart() != null) {
+            criteriaList.add(Criteria.where("date").gte(filterObject.getDateStart()));
 
         }
-        if (filterObject.getEndDate() != null) {
-            criteriaList.add(Criteria.where("date").lte(filterObject.getEndDate()));
+        if (filterObject.getDateEnd() != null) {
+            criteriaList.add(Criteria.where("date").lte(filterObject.getDateEnd()));
         }
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
