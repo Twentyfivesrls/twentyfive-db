@@ -68,11 +68,11 @@ public class EventService {
             criteriaList.add(Criteria.where("location").regex(locationPattern));
         }
         if (filterObject.getDateStart() != null) {
-            criteriaList.add(Criteria.where("date").gte(filterObject.getDateStart()));
+            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
 
         }
         if (filterObject.getDateEnd() != null) {
-            criteriaList.add(Criteria.where("date").lte(filterObject.getDateEnd()));
+            criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
         }
         Query query = new Query();
         if (!criteriaList.isEmpty()) {
