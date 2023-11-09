@@ -174,7 +174,7 @@ public class TicketController {
     /*
     qrcode generator
      */
-    @GetMapping("generate/qrCode/ticket/number/{url}")
+    @GetMapping("generate/qrCode/ticket/number")
     public ResponseEntity<byte[]> generateQrCode(@RequestParam("url") String url) throws IOException, WriterException {
         byte[] qrCode = MethodUtils.generateQrCodeImage(url,350,350);
         return ResponseEntity.ok()
