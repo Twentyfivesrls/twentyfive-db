@@ -147,7 +147,7 @@ public class TicketService {
         if (StringUtils.isNotBlank(filterObject)) {
             Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaFilter.orOperator(
-                    Criteria.where("code").regex(pattern)
+                    Criteria.where("email").regex(pattern)
             );
         }
 
