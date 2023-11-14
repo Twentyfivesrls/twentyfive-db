@@ -2,7 +2,6 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
-import com.twentyfive.twentyfivemodel.filterTicket.EventFilter;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
