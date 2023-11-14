@@ -28,8 +28,6 @@ public class TicketService {
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
 
-    @Value("${my.url}")
-    private String url;
 
     public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate) {
         this.addressBookService = addressBookService;
@@ -86,7 +84,7 @@ public class TicketService {
         finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setEmail(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
-        finalTicket.setUrl(url+uuid.toString());
+        finalTicket.setUrl("http://localhost:4200/dettaglio-ticket/"+uuid.toString());
 
         ticketRepository.save(finalTicket);
 
