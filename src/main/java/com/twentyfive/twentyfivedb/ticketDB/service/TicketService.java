@@ -5,6 +5,7 @@ import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,6 +27,9 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
+
+    @Value("${my.url}")
+    private String url;
 
     public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate) {
         this.addressBookService = addressBookService;
@@ -73,6 +77,7 @@ public class TicketService {
         UUID uuid = UUID.randomUUID();
         TicketDocumentDB finalTicket = new TicketDocumentDB();
         finalTicket.setEventName(ticket.getEventName());
+        finalTicket.setEventId(ticket.getEventId());
         finalTicket.setCode(uuid.toString());
         finalTicket.setEventDateStart(ticket.getEventDateStart());
         finalTicket.setEventDateEnd(ticket.getEventDateEnd());
@@ -81,7 +86,7 @@ public class TicketService {
         finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setEmail(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
-        finalTicket.setUrl("http://localhost:4200/dettaglio-ticket/"+uuid.toString());
+        finalTicket.setUrl(url+uuid.toString());
 
         ticketRepository.save(finalTicket);
 
