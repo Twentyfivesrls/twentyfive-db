@@ -236,7 +236,8 @@ public class TicketService {
 
    public List<Ticket> getTicketsByIdEvent(String id){
         List<Ticket> list = new ArrayList<>();
-        List<TicketDocumentDB> documentList = ticketRepository.finAllByEventId(id);
+        List<TicketDocumentDB> documentList = new ArrayList<>();
+        //List<TicketDocumentDB> documentList = ticketRepository.finAllByEventId(id);
         for (TicketDocumentDB ticketDocumentDB : documentList){
             list.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
         }
