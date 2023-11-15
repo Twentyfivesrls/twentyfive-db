@@ -236,7 +236,7 @@ public class TicketService {
 
    public List<Ticket> getTicketsByIdEvent(String id, String username){
 
-       Criteria criteriaUserId = Criteria.where("userId").is(username);
+       Criteria criteriaUserId = Criteria.where("eventId").is(username);
        Criteria criteriaFilter = new Criteria();
 
 
