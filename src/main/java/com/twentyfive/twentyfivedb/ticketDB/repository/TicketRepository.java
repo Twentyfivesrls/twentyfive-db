@@ -1,5 +1,6 @@
 package com.twentyfive.twentyfivedb.ticketDB.repository;
 
+import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
@@ -19,4 +20,6 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
     TicketDocumentDB findByCode(String code);
 
     void deleteByCode(String code);
+
+    List<TicketDocumentDB> finAllByEventId(String id);
 }

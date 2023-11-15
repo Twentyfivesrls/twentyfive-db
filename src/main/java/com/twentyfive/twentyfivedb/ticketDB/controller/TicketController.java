@@ -89,6 +89,17 @@ public class TicketController {
         return ResponseEntity.ok(aRes);
     }
 
+
+    @GetMapping("/getALl/tickets/by/event")
+    public ResponseEntity<Page<Ticket>> getTicketsByIdEvent(@RequestParam("eventId") String eventId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size){
+        FilterObject filter = new FilterObject(page, size);
+        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
+        List<Ticket> list = ticketService.getTicketsByIdEvent(eventId);
+        Page<Ticket> aRes = MethodUtils.convertListToPage(list, pageable);
+        return ResponseEntity.ok(aRes);
+    }
+
+
     /*
     * Get ticket by id
      */
