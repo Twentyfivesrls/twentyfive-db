@@ -91,10 +91,10 @@ public class TicketController {
 
 
     @GetMapping("/getALl/tickets/by/event")
-    public ResponseEntity<Page<Ticket>> getTicketsByIdEvent(@RequestParam("eventId") String eventId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size){
+    public ResponseEntity<Page<Ticket>> getTicketsByIdEvent(@RequestParam("eventId") String eventId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username){
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<Ticket> list = ticketService.getTicketsByIdEvent(eventId);
+        List<Ticket> list = ticketService.getTicketsByIdEvent(eventId, username);
         Page<Ticket> aRes = MethodUtils.convertListToPage(list, pageable);
         return ResponseEntity.ok(aRes);
     }
