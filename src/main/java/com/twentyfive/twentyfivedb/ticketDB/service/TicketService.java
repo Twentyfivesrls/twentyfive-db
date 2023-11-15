@@ -236,21 +236,9 @@ public class TicketService {
 
    public List<Ticket> getTicketsByIdEvent(String id, String username){
 
-       Criteria criteriaUserId = Criteria.where("eventId").is(username);
-       Criteria criteriaFilter = new Criteria();
 
 
-       if (StringUtils.isNotBlank(id)) {
-           Pattern pattern = Pattern.compile(id, Pattern.CASE_INSENSITIVE);
-           criteriaFilter.orOperator(
-                   Criteria.where("eventId").regex(pattern)
-           );
-       }
-
-       Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
-
-       Query query = new Query(combinedCriteria);
-       List<TicketDocumentDB> documentList = mongoTemplate.find(query, TicketDocumentDB.class);
+       List<TicketDocumentDB> documentList = ticketRepository.findByEventId(id);
 
 
         List<Ticket> list = new ArrayList<>();
