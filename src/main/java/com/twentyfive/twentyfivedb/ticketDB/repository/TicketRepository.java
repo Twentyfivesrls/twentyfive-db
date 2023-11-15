@@ -21,5 +21,5 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
 
     void deleteByCode(String code);
 
-    //List<TicketDocumentDB> finAllByEventId(String id);
+    List<TicketDocumentDB> findByEventId(String id);
 }
