@@ -83,7 +83,7 @@ public class TicketService {
         finalTicket.setAddressBookId(addressBook.getId());
         finalTicket.setEmail(addressBook.getEmail());
         finalTicket.setUserId(ticket.getUserId());
-        finalTicket.setUrl("http://192.168.1.17:4200/dettaglio-ticket/"+uuid.toString());
+        finalTicket.setUrl("http://80.211.123.141:5557/dettaglio-ticket/"+uuid.toString());
 
         ticketRepository.save(finalTicket);
 
