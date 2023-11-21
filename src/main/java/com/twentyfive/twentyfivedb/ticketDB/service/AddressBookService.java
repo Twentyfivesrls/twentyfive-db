@@ -146,6 +146,7 @@ public class AddressBookService {
             Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
             criteriaFilter.orOperator(
                     Criteria.where("email").regex(pattern));
+
         }
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
