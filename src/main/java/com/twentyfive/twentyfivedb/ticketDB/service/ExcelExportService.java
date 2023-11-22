@@ -40,21 +40,15 @@ public class ExcelExportService {
             int rowNum = 0;
             for (EventDocumentDB item : data) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(item.getId());
-                row.createCell(1).setCellValue(item.getName());
-                row.createCell(2).setCellValue(item.getDescription());
+                row.createCell(0).setCellValue(item.getName());
+                row.createCell(1).setCellValue(item.getDescription());
                 if (item.getDateStart() != null) {
-                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getDateStart()));
+                    row.createCell(2).setCellValue(MethodUtils.formatDate(item.getDateStart()));
                 }
                 if (item.getDateEnd() != null) {
-                    row.createCell(4).setCellValue(MethodUtils.formatDate(item.getDateEnd()));
+                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getDateEnd()));
                 }
-                row.createCell(5).setCellValue(item.getLocation());
-                if (item.getEnabled() != null) {
-                    row.createCell(6).setCellValue(item.getEnabled().toString());
-                }
-
-                // Aggiungi colonne in base alle tue esigenze
+                row.createCell(4).setCellValue(item.getLocation());
             }
 
             return getBytes(workbook);
@@ -68,7 +62,6 @@ public class ExcelExportService {
 
     public byte[] ticketExportToExcel(String userId) {
         List<TicketDocumentDB> data = ticketService.findAllByUserId(userId);
-        System.out.println("TICKET LIST :"+ data.size() + "USERNAME excel :" + userId);
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Data");
@@ -77,20 +70,31 @@ public class ExcelExportService {
             int rowNum = 0;
             for (TicketDocumentDB item : data) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(item.getId());
-                row.createCell(1).setCellValue(item.getEventName());
-                row.createCell(2).setCellValue(item.getCode());
+                row.createCell(0).setCellValue(item.getEventName());
+                row.createCell(1).setCellValue(item.getCode());
                 if (item.getEventDateStart() != null) {
-                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getEventDateStart()));
+                    row.createCell(2).setCellValue(MethodUtils.formatDate(item.getEventDateStart()));
                 }
                 if (item.getEventDateEnd() != null) {
-                    row.createCell(4).setCellValue(MethodUtils.formatDate(item.getEventDateEnd()));
+                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getEventDateEnd()));
                 }
                 if (item.getActive() != null) {
-                    row.createCell(5).setCellValue(item.getActive().toString());
+                    if (item.getActive()){
+                        row.createCell(4).setCellValue("Biglietto Attivo");
+                    }
+                    else {
+                        row.createCell(4).setCellValue("Biglietto Non Attivo");
+
+                    }
                 }
                 if (item.getUsed() != null) {
-                    row.createCell(6).setCellValue(item.getUsed().toString());
+                    if (item.getUsed()){
+                        row.createCell(5).setCellValue("Biglietto Gia Utilizzato");
+                    }
+                    else{
+                        row.createCell(5).setCellValue("Biglietto Non Utilizzato");
+
+                    }
                 }
 
                 // Aggiungi colonne in base alle tue esigenze
