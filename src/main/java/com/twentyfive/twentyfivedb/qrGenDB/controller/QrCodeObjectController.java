@@ -5,6 +5,7 @@ import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
+import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -85,14 +86,13 @@ public class QrCodeObjectController {
     }
 
     @DeleteMapping("/delete/{idQrCode}")
-    public ResponseEntity<String> deleteQrCodeObject(@PathVariable String idQrCode) {
+    public ResponseEntity<QrCodeObject> deleteQrCodeObject(@PathVariable String idQrCode) {
 
-        if (idQrCode == null || idQrCode.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
         qrCodeObjectService.deleteQrCodeObjectAndStats(idQrCode);
-        return ResponseEntity.status(HttpStatus.OK).body(idQrCode);
+        return ResponseEntity.ok().build();
     }
+
+
 
 
     @PostMapping(value = "/generateAndDownloadQRCode")
