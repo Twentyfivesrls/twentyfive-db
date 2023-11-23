@@ -73,8 +73,7 @@ public class QrCodeObjectService {
             log.error("IdUser is null or empty");
             throw new IllegalArgumentException("IdUser is null or empty");
         }
-        Sort sort = Sort.by(Sort.Direction.ASC, "link");
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<QrCodeObjectDocumentDB> qrCodeObjectDocumentDBPage = qrCodeObjectRepository.findByUsername(username, pageable);
         List<QrCodeObject> mapList = new ArrayList<>();
         for (QrCodeObjectDocumentDB qrCodeObjectDocumentDB : qrCodeObjectDocumentDBPage.getContent()) {
