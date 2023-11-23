@@ -59,8 +59,8 @@ public class QrCodeObjectService {
         return TwentyFiveMapper.INSTANCE.qrCodeObjectDocumentDBToQrCodeObject(qrDocument);
     }
 
-    public List<QrCodeObject> getAllQrCodeObject() {
-        List<QrCodeObjectDocumentDB> qrCodeObjectDocumentDBList = qrCodeObjectRepository.findAll();
+    public List<QrCodeObject> getAllQrCodeObject(String username) {
+        List<QrCodeObjectDocumentDB> qrCodeObjectDocumentDBList = qrCodeObjectRepository.findAllByUsername(username);
         List<QrCodeObject> mapList = new ArrayList<>();
         for (QrCodeObjectDocumentDB qrCodeObjectDocumentDB : qrCodeObjectDocumentDBList) {
             mapList.add(TwentyFiveMapper.INSTANCE.qrCodeObjectDocumentDBToQrCodeObject(qrCodeObjectDocumentDB));

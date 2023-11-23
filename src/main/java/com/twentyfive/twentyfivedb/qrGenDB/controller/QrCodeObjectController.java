@@ -67,10 +67,10 @@ public class QrCodeObjectController {
 
 
     @GetMapping(value = "/generateQRCode/{codeText}/{description}")
-    public ResponseEntity<byte[]> generateQRCode(@PathVariable("codeText") String codeText, @PathVariable("description") String description) throws Exception {
+    public ResponseEntity<byte[]> generateQRCode(@PathVariable String codeText, @PathVariable String description, @PathVariable String username) throws Exception {
 
         String directory;
-        List<QrCodeObject> qrCodeObjectList = qrCodeObjectService.getAllQrCodeObject();
+        List<QrCodeObject> qrCodeObjectList = qrCodeObjectService.getAllQrCodeObject(username);
         int sizeOfList = qrCodeObjectList.size();
 
         if (StringUtils.isBlank(codeText)) {
@@ -143,8 +143,8 @@ public class QrCodeObjectController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<QrCodeObject>> getAllQrCodeObject() {
-        return ResponseEntity.status(HttpStatus.OK).body(qrCodeObjectService.getAllQrCodeObject());
+    public ResponseEntity<List<QrCodeObject>> getAllQrCodeObject(@RequestParam("username") String username) {
+        return ResponseEntity.status(HttpStatus.OK).body(qrCodeObjectService.getAllQrCodeObject(username));
     }
 
 }
