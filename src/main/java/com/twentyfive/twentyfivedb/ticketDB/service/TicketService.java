@@ -117,6 +117,11 @@ public class TicketService {
             criteriaList.add(Criteria.where("eventName").regex(namePattern));
         }
 
+        if (StringUtils.isNotBlank(filterObject.getEventName())) {
+            Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("email").regex(namePattern));
+        }
+
         //date range
         if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
             Criteria dateCriteria1 = Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
