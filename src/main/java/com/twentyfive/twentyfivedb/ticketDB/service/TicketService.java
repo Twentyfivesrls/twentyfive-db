@@ -117,8 +117,8 @@ public class TicketService {
             criteriaList.add(Criteria.where("eventName").regex(namePattern));
         }
 
-        if (StringUtils.isNotBlank(filterObject.getEventName())) {
-            Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
+        if (StringUtils.isNotBlank(filterObject.getEmail())) {
+            Pattern namePattern = Pattern.compile(filterObject.getEmail(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("email").regex(namePattern));
         }
 
