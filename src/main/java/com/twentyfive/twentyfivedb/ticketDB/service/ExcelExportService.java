@@ -88,16 +88,16 @@ public class ExcelExportService {
 
             Sheet sheet = workbook.createSheet(sheetName);
 
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Evento Associato");
-            headerRow.createCell(1).setCellValue("Codice");
-            headerRow.createCell(2).setCellValue("Data Inizio");
-            headerRow.createCell(3).setCellValue("Data Fine");
-            headerRow.createCell(4).setCellValue("Stato abilitazione");
-            headerRow.createCell(5).setCellValue("Stato utilizzo");
-            int rowNum = 0;
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("Evento Associato");
+            row.createCell(1).setCellValue("Codice");
+            row.createCell(2).setCellValue("Data Inizio");
+            row.createCell(3).setCellValue("Data Fine");
+            row.createCell(4).setCellValue("Stato abilitazione");
+            row.createCell(5).setCellValue("Stato utilizzo");
+            int rowNum = 1;
             for (TicketDocumentDB item : data) {
-                Row row = sheet.createRow(rowNum++);
+                row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(item.getEventName());
                 row.createCell(1).setCellValue(item.getCode());
                 if (item.getEventDateStart() != null) {
@@ -108,19 +108,19 @@ public class ExcelExportService {
                 }
                 if (item.getActive() != null) {
                     if (item.getActive()){
-                        row.createCell(4).setCellValue("Biglietto Attivo");
+                        row.createCell(4).setCellValue("Abilitato");
                     }
                     else {
-                        row.createCell(4).setCellValue("Biglietto Non Attivo");
+                        row.createCell(4).setCellValue("Non abilitato");
 
                     }
                 }
                 if (item.getUsed() != null) {
                     if (item.getUsed()){
-                        row.createCell(5).setCellValue("Biglietto Gia Utilizzato");
+                        row.createCell(5).setCellValue("Utilizzato");
                     }
                     else{
-                        row.createCell(5).setCellValue("Biglietto Non Utilizzato");
+                        row.createCell(5).setCellValue("Non utilizzato");
 
                     }
                 }
