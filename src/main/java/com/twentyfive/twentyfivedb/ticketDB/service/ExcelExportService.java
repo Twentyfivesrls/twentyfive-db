@@ -14,6 +14,8 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -35,7 +37,21 @@ public class ExcelExportService {
         List<EventDocumentDB> data = eventService.findAllByUsername(userId);
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Data");
+            String currentDateTime = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+
+            String sheetName = "Lista_Eventi_" + currentDateTime;
+
+            sheetName = sheetName.replace(" ", "_");
+
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Titolo");
+            headerRow.createCell(1).setCellValue("Descrizione");
+            headerRow.createCell(2).setCellValue("Data Inizio");
+            headerRow.createCell(3).setCellValue("Data Fine");
+            headerRow.createCell(4).setCellValue("Luogo");
 
             int rowNum = 0;
             for (EventDocumentDB item : data) {
@@ -64,9 +80,22 @@ public class ExcelExportService {
         List<TicketDocumentDB> data = ticketService.findAllByUserId(userId);
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Data");
+            String currentDateTime = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
+            String sheetName = "Lista_Ticket_" + currentDateTime;
 
+            sheetName = sheetName.replace(" ", "_");
+
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Evento Associato");
+            headerRow.createCell(1).setCellValue("Codice");
+            headerRow.createCell(2).setCellValue("Data Inizio");
+            headerRow.createCell(3).setCellValue("Data Fine");
+            headerRow.createCell(4).setCellValue("Stato abilitazione");
+            headerRow.createCell(5).setCellValue("Stato utilizzo");
             int rowNum = 0;
             for (TicketDocumentDB item : data) {
                 Row row = sheet.createRow(rowNum++);
