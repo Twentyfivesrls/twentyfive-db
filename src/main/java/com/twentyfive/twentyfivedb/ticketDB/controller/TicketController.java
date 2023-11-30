@@ -19,6 +19,8 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,8 +151,11 @@ public class TicketController {
     @GetMapping(value = "/export/excel/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> downloadExcel(@PathVariable String userId) {
         byte[] excelData = exportService.ticketExportToExcel(userId);
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String formattedDateTime = dateTime.format(formatter);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=exported_data.xlsx")
+                .header("Content-Disposition", "attachment; filename=Lista_Ticket_" + formattedDateTime + ".xlsx")
                 .body(excelData);
     }
 
