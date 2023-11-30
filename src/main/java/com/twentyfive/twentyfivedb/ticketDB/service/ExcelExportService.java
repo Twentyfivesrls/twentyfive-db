@@ -45,17 +45,16 @@ public class ExcelExportService {
             sheetName = sheetName.replace(" ", "_");
 
             Sheet sheet = workbook.createSheet(sheetName);
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("Titolo");
+            row.createCell(1).setCellValue("Descrizione");
+            row.createCell(2).setCellValue("Data Inizio");
+            row.createCell(3).setCellValue("Data Fine");
+            row.createCell(4).setCellValue("Luogo");
 
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Titolo");
-            headerRow.createCell(1).setCellValue("Descrizione");
-            headerRow.createCell(2).setCellValue("Data Inizio");
-            headerRow.createCell(3).setCellValue("Data Fine");
-            headerRow.createCell(4).setCellValue("Luogo");
-
-            int rowNum = 0;
+            int rowNum = 1;
             for (EventDocumentDB item : data) {
-                Row row = sheet.createRow(rowNum++);
+                 row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(item.getName());
                 row.createCell(1).setCellValue(item.getDescription());
                 if (item.getDateStart() != null) {
