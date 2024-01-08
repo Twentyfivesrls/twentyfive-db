@@ -27,7 +27,7 @@ public class ShortenLinkController {
     @GetMapping("/get-complete-link/{shortUrl}")
     public ResponseEntity<String> getCompleteShortenLink(@PathVariable String shortUrl) {
         String result = shortenLinkService.getCompleteShortenLink(shortUrl);
-        return ResponseEntity.ok(new String(result));
+        return ResponseEntity.ok(result);
     }
 
 
