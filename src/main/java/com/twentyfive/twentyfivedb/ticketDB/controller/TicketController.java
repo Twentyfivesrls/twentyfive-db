@@ -78,8 +78,14 @@ public class TicketController {
     }
 
     @PostMapping("/testing")
-    public ResponseEntity<Page<Ticket>> testaggioMatto(@RequestBody Ticket filterObject, @RequestParam("page") int page, @RequestParam("dimension") int dimension, @RequestParam("username") String username){
-       return new ResponseEntity<>(ticketService.getTicketFiltered(filterObject,page,dimension), HttpStatus.OK);
+    public ResponseEntity<Page<Ticket>> testaggioMatto(@RequestParam String userId,
+                                                       @RequestParam(required = false) String email,
+                                                       @RequestParam(required = false) String eventName,
+                                                       @RequestParam(required = false) LocalDateTime startDate,
+                                                       @RequestParam(required = false) LocalDateTime endDate,
+                                                       @RequestParam("page") int page,
+                                                       @RequestParam("dimension") int dimension){
+       return new ResponseEntity<>(ticketService.getTicketFiltered(userId,email,eventName,startDate,endDate,page,dimension), HttpStatus.OK);
     }
     @PostMapping("/get/autocomplete")
     public ResponseEntity<Page<Ticket>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {

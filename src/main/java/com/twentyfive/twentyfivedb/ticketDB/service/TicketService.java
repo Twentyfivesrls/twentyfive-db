@@ -16,6 +16,7 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.Address
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -257,9 +258,9 @@ public class TicketService {
         return list;
    }
 
-   public Page<Ticket> getTicketFiltered(Ticket ticket, int nPage, int nDimension){
+   public Page<Ticket> getTicketFiltered(String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate,int nPage, int nDimension){
        Pageable pageable= PageRequest.of(nPage, nDimension);
-       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findCustomByTwoDatesAndConditions(ticket.getEventDateStart(),ticket.getEventDateEnd(),ticket.getUserId(),ticket.getEmail(),ticket.getEventName(),pageable);
+       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findCustomByFilters(userId,email,eventName,startDate,endDate,pageable);
        return ticketDocumentDBPage.map(TwentyFiveMapper.INSTANCE::ticketDocumentDBToTicket);
    }
 }
