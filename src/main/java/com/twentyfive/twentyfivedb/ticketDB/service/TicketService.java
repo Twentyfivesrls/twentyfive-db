@@ -260,7 +260,7 @@ public class TicketService {
 
    public Page<Ticket> getTicketFiltered(String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate,int nPage, int nDimension){
        Pageable pageable= PageRequest.of(nPage, nDimension);
-       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(userId,email,eventName,startDate,endDate,pageable);
+       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findByFilters(userId,email,eventName,startDate,endDate,pageable);
        return ticketDocumentDBPage.map(TwentyFiveMapper.INSTANCE::ticketDocumentDBToTicket);
    }
 }
