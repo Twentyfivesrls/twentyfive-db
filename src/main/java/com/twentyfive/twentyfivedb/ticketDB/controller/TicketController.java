@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +31,7 @@ import java.util.List;
 @RequestMapping("/ticket")
 public class TicketController {
 
-    @Autowired
-    private  TicketService ticketService;
+    private final TicketService ticketService;
 
     private final ExcelExportService exportService;
 
@@ -77,6 +77,10 @@ public class TicketController {
 
     }
 
+    @PostMapping("/testing")
+    public ResponseEntity<Page<Ticket>> testaggioMatto(@RequestBody Ticket filterObject, @RequestParam("page") int page, @RequestParam("dimension") int dimension, @RequestParam("username") String username){
+       return new ResponseEntity<>(ticketService.getTicketFiltered(filterObject,page,dimension), HttpStatus.OK);
+    }
     @PostMapping("/get/autocomplete")
     public ResponseEntity<Page<Ticket>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 

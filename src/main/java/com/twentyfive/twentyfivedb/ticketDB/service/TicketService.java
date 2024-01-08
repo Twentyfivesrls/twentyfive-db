@@ -5,6 +5,9 @@ import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
+
 import java.util.UUID;
 
 
@@ -253,4 +257,9 @@ public class TicketService {
         return list;
    }
 
-    }
+   public Page<Ticket> getTicketFiltered(Ticket ticket, int nPage, int nDimension){
+       Pageable pageable= PageRequest.of(nPage, nDimension);
+       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findCustomByTwoDatesAndConditions(ticket.getEventDateStart(),ticket.getEventDateEnd(),ticket.getUserId(),ticket.getEmail(),ticket.getEventName(),pageable);
+       return ticketDocumentDBPage.map(TwentyFiveMapper.INSTANCE::ticketDocumentDBToTicket);
+   }
+}
