@@ -26,18 +26,7 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
     void deleteByCode(String code);
 
     List<TicketDocumentDB> findByEventId(String id);
-    @Query("SELECT t FROM TicketDocumentDB t " +
-            "WHERE (:userId IS NULL OR t.userId = :userId) " +
-            "AND (:email IS NULL OR t.email = :email) " +
-            "AND (:eventName IS NULL OR t.eventName = :eventName) " +
-            "AND (:startDate IS NULL OR t.eventDateStart >= :startDate) " +
-            "AND (:endDate IS NULL OR t.eventDateEnd <= :endDate)")
-    Page<TicketDocumentDB> findCustomByFilters(
-            @Param("userId") String userId,
-            @Param("email") String email,
-            @Param("eventName") String eventName,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            Pageable pageable);
+    Page<TicketDocumentDB> findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(
+            String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
 }
