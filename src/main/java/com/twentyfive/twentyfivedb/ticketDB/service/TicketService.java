@@ -111,7 +111,7 @@ public class TicketService {
      * Search for tickets by event name, event date start, event date end
      */
 
-    public List<TicketDocumentDB> ticketsSearch(Ticket filterObject, String userId) {
+    /*public List<TicketDocumentDB> ticketsSearch(Ticket filterObject, String userId) {
 
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
@@ -150,7 +150,7 @@ public class TicketService {
         }
         return mongoTemplate.find(query, TicketDocumentDB.class);
 
-    }
+    }*/
 
     public List<TicketDocumentDB> filterSearch(String filterObject, String userId){
         Criteria criteriaUserId = Criteria.where("userId").is(userId);

@@ -12,6 +12,7 @@ import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,15 +43,7 @@ public class EventController {
     @PostMapping("/filter")
     public ResponseEntity<Page<Event>> getEventListPagination(@RequestBody Event filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
 
-        FilterObject filter = new FilterObject(page, size);
-        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<EventDocumentDB> eventPage = eventService.paginationEvent(filterObject,username);
-        List<Event> eventList = new ArrayList<>();
-        for (EventDocumentDB eventDocumentDB : eventPage) {
-              eventList.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));
-        }
-        Page<Event> eventpageRes = MethodUtils.convertListToPage(eventList, pageable);
-        return ResponseEntity.ok(eventpageRes);
+        return new ResponseEntity<>(eventService.getEventFiltered(filterObject,page,size,username), HttpStatus.OK);
     }
 
 

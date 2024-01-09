@@ -2,14 +2,20 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
+import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
+import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
@@ -167,4 +173,49 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    public Page<Event> getEventFiltered(Event filterObject, int page, int dimension, String userId) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
+
+
+        if (StringUtils.isNotBlank(filterObject.getName())) {
+            Pattern namePattern = Pattern.compile(filterObject.getName(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("name").regex(namePattern));
+        }
+        if (StringUtils.isNotBlank(filterObject.getDescription())) {
+            Pattern descriptionPattern = Pattern.compile(filterObject.getDescription(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("description").regex(descriptionPattern));
+        }
+        if (StringUtils.isNotBlank(filterObject.getLocation())) {
+            Pattern locationPattern = Pattern.compile(filterObject.getLocation(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("location").regex(locationPattern));
+        }
+        //date range
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
+            Criteria dateCriteria1 = Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
+            criteriaList.add(dateCriteria1);
+            Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
+            criteriaList.add(dateCriteria2);
+        }
+        //date start
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() == null) {
+            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
+        }
+        //date end
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
+            criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
+        }
+
+        Query query = new Query();
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+        }
+        List<EventDocumentDB> eventsDB = mongoTemplate.find(query, EventDocumentDB.class);
+        List<Event> events = new ArrayList<>();
+        for (EventDocumentDB event : eventsDB){
+            events.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(event));
+        }
+        Pageable pageable= PageRequest.of(page,dimension);
+        return MethodUtils.convertListToPage(events, pageable);
+    }
 }

@@ -65,24 +65,8 @@ public class TicketController {
      */
     @PostMapping("/list")
     public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
-        FilterObject filter = new FilterObject(page, size);
-        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<TicketDocumentDB> ticketList = ticketService.ticketsSearch(filterObject, username);
-        List<Ticket> mapList = new ArrayList<>();
-        for (TicketDocumentDB ticketDocumentDB : ticketList) {
-            mapList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
-        }
-        Page<Ticket> ticket = MethodUtils.convertListToPage(mapList, pageable);
-        return ResponseEntity.ok(ticket);
+        return new ResponseEntity<>(ticketService.getTicketFiltered(filterObject,username,page,size), HttpStatus.OK);
 
-    }
-
-    @PostMapping("/testing")
-    public ResponseEntity<Page<Ticket>> testaggioMatto(@RequestBody Ticket ticket,
-                                                       @RequestParam("page") int page,
-                                                       @RequestParam("dimension") int dimension,
-                                                       @RequestParam("username") String username){
-       return new ResponseEntity<>(ticketService.getTicketFiltered(ticket,username,page,dimension), HttpStatus.OK);
     }
     @PostMapping("/get/autocomplete")
     public ResponseEntity<Page<Ticket>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
