@@ -284,7 +284,7 @@ public class TicketService {
             criteriaList.add(Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()));
         }
         //date end
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
+        if (filterObject.getEventDateStart() == null && filterObject.getEventDateEnd() != null) {
             criteriaList.add(Criteria.where("eventDateEnd").lte(filterObject.getEventDateEnd()));
         }
 
