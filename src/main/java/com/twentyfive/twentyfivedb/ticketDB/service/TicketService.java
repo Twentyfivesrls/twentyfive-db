@@ -261,7 +261,10 @@ public class TicketService {
     public Page<Ticket> getTicketFiltered(Ticket filterObject, String userId, int page, int dimension) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userId").is(userId));
-
+        if (StringUtils.isNotBlank(filterObject.getEventId())) {
+            Pattern namePattern = Pattern.compile(filterObject.getEventId(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("eventId").regex(namePattern));
+        }
         if (StringUtils.isNotBlank(filterObject.getEventName())) {
             Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("eventName").regex(namePattern));
