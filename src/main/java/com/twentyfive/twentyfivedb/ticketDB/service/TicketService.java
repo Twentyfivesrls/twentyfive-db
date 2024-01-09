@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
+import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -260,7 +261,11 @@ public class TicketService {
 
    public Page<Ticket> getTicketFiltered(String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate,int nPage, int nDimension){
        Pageable pageable= PageRequest.of(nPage, nDimension);
-       Page<TicketDocumentDB> ticketDocumentDBPage = ticketRepository.findByFilters(userId,email,eventName,startDate,endDate,pageable);
-       return ticketDocumentDBPage.map(TwentyFiveMapper.INSTANCE::ticketDocumentDBToTicket);
+       List<TicketDocumentDB> documentList = ticketRepository.findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(userId,email,eventName,startDate,endDate);
+       List<Ticket> list = new ArrayList<>();
+       for (TicketDocumentDB ticketDocumentDB : documentList){
+           list.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
+       }
+       return MethodUtils.convertListToPage(list, pageable);
    }
 }

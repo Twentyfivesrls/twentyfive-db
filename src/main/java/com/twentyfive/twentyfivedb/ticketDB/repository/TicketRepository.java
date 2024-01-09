@@ -26,13 +26,8 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
     void deleteByCode(String code);
 
     List<TicketDocumentDB> findByEventId(String id);
-    @Query("{" +
-            "'dataOra': {$gte: :startDate, $lte: :endDate}, " +
-            "'userId': {$eq: :userId}, " +
-            "'email': {$eq: :email}, " +
-            "'eventName': {$eq: :eventName}" +
-            "}")
-    Page<TicketDocumentDB> findByFilters(
-            String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    List<TicketDocumentDB> findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(
+            String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate);
 
 }
