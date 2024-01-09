@@ -258,14 +258,46 @@ public class TicketService {
         }
         return list;
    }
+    public Page<Ticket> getTicketFiltered(Ticket filterObject, String userId, int page, int dimension) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userId").is(userId));
 
-   public Page<Ticket> getTicketFiltered(String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate,int nPage, int nDimension){
-       Pageable pageable= PageRequest.of(nPage, nDimension);
-       List<TicketDocumentDB> documentList = ticketRepository.findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(userId,email,eventName,startDate,endDate);
-       List<Ticket> list = new ArrayList<>();
-       for (TicketDocumentDB ticketDocumentDB : documentList){
-           list.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
-       }
-       return MethodUtils.convertListToPage(list, pageable);
-   }
+        if (StringUtils.isNotBlank(filterObject.getEventName())) {
+            Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("eventName").regex(namePattern));
+        }
+
+        if (StringUtils.isNotBlank(filterObject.getEmail())) {
+            Pattern namePattern = Pattern.compile(filterObject.getEmail(), Pattern.CASE_INSENSITIVE);
+            criteriaList.add(Criteria.where("email").regex(namePattern));
+        }
+
+        //date range
+        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
+            Criteria dateCriteria1 = Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
+            criteriaList.add(dateCriteria1);
+            Criteria dateCriteria2 = Criteria.where("eventDateEnd").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
+            criteriaList.add(dateCriteria2);
+        }
+        //date start
+        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() == null) {
+            criteriaList.add(Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()));
+        }
+        //date end
+        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
+            criteriaList.add(Criteria.where("eventDateEnd").lte(filterObject.getEventDateEnd()));
+        }
+
+        Query query = new Query();
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
+        }
+        List<TicketDocumentDB> ticketDocumentDBList =mongoTemplate.find(query, TicketDocumentDB.class);
+        List<Ticket> tickets = new ArrayList<>();
+        for (TicketDocumentDB ticketDocumentDB : ticketDocumentDBList){
+            tickets.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
+        }
+        Pageable pageable=PageRequest.of(page,dimension);
+        return MethodUtils.convertListToPage(tickets, pageable);
+    }
 }

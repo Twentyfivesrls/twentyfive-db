@@ -27,7 +27,4 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
 
     List<TicketDocumentDB> findByEventId(String id);
 
-    List<TicketDocumentDB> findByUserIdAndEmailAndEventNameAndEventDateStartGreaterThanEqualAndEventDateEndLessThanEqual(
-            String userId, String email, String eventName, LocalDateTime startDate, LocalDateTime endDate);
-
 }
