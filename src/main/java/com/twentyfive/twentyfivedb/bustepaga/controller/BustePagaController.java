@@ -23,8 +23,8 @@ public class BustePagaController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Dipendente> createDipendente(@RequestParam("userId") String userId, @RequestBody Dipendente dipendente){
-        return ResponseEntity.ok(bustePagaService.createDipendente(userId, dipendente));
+    public ResponseEntity<Dipendente> createDipendente(@RequestBody Dipendente dipendente){
+        return ResponseEntity.ok(bustePagaService.createDipendente(dipendente));
     }
 
     @DeleteMapping("/delete/{id}")

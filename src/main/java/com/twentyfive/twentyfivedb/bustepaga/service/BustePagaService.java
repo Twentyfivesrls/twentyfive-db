@@ -20,8 +20,7 @@ public class BustePagaService {
         return this.bustePagaRepository.getAllByUserId(userId);
     }
 
-    public Dipendente createDipendente(String userId, Dipendente dipendente) {
-        dipendente.setUserId(userId);
+    public Dipendente createDipendente(Dipendente dipendente) {
         return this.bustePagaRepository.save(dipendente);
     }
 
