@@ -19,7 +19,8 @@ public class BustePagaService {
     }
 
     public Page<Dipendente> getAllDipendenti(String userId, int page, int size) {
-        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        //create a pageable object
+        PageRequest pageable = PageRequest.of(page, size);
         return this.bustePagaRepository.getAllByUserId(userId, pageable);
     }
 
