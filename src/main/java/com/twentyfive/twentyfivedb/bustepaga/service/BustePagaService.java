@@ -2,10 +2,12 @@ package com.twentyfive.twentyfivedb.bustepaga.service;
 
 import com.twentyfive.twentyfivedb.bustepaga.repository.BustePagaRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
-import java.util.List;
+import java.awt.print.Pageable;
 
 @Slf4j
 @Service
@@ -16,8 +18,9 @@ public class BustePagaService {
         this.bustePagaRepository = bustePagaRepository;
     }
 
-    public List<Dipendente> getAllDipendenti(String userId) {
-        return this.bustePagaRepository.getAllByUserId(userId);
+    public Page<Dipendente> getAllDipendenti(String userId, int page, int size) {
+        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        return this.bustePagaRepository.getAllByUserId(userId, pageable);
     }
 
     public Dipendente createDipendente(Dipendente dipendente) {

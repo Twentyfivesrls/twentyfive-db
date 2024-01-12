@@ -1,11 +1,11 @@
 package com.twentyfive.twentyfivedb.bustepaga.controller;
 
 import com.twentyfive.twentyfivedb.bustepaga.service.BustePagaService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/buste-paga")
@@ -17,18 +17,21 @@ public class BustePagaController {
         this.bustePagaService = bustePagaService;
     }
 
-    @GetMapping("/list/{userId}")
-    public ResponseEntity<List<Dipendente>> getAllDipendenti(@PathVariable String userId){
-        return ResponseEntity.ok(bustePagaService.getAllDipendenti(userId));
+    @GetMapping("/list")
+    public ResponseEntity<Page<Dipendente>> getAllDipendenti(
+            @RequestParam(name = "userId") String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(bustePagaService.getAllDipendenti(userId, page, size));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Dipendente> createDipendente(@RequestBody Dipendente dipendente){
+    public ResponseEntity<Dipendente> createDipendente(@RequestBody Dipendente dipendente) {
         return ResponseEntity.ok(bustePagaService.createDipendente(dipendente));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteDipendente(@PathVariable String id){
+    public ResponseEntity<Void> deleteDipendente(@PathVariable String id) {
         bustePagaService.deleteDipendente(id);
         return ResponseEntity.ok().build();
     }
