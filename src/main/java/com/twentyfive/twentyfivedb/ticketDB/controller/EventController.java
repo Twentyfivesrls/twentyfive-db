@@ -48,17 +48,18 @@ public class EventController {
 
 
     @PostMapping("/filter/event/autocomplete")
-    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
+    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username, @RequestParam("find") String find) {
 
-        FilterObject filter = new FilterObject(page, size);
+        return new ResponseEntity<>(eventService.filterSearch(find,page,size,username), HttpStatus.OK);
+        /*FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<EventDocumentDB> eventPage = eventService.filterSearch(filterObject,username);
+        List<EventDocumentDB> eventPage = eventService.filterSearch(page,size,username,find);
         List<Event> eventList = new ArrayList<>();
         for (EventDocumentDB eventDocumentDB : eventPage) {
             eventList.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));
         }
         Page<Event> eventpageRes = MethodUtils.convertListToPage(eventList, pageable);
-        return ResponseEntity.ok(eventpageRes);
+        return ResponseEntity.ok(eventpageRes);*/
     }
 
 

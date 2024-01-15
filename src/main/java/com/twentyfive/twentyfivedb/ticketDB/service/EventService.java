@@ -96,8 +96,15 @@ public class EventService {
 
     }
 
-    public List<EventDocumentDB> filterSearch(String filterObject, String userId){
-        Criteria criteriaUserId = Criteria.where("userId").is(userId);
+    public Page<Event> filterSearch(String find, int page, int size,String username){
+        List<EventDocumentDB> eventDocumentDBS = eventRepository.findByUserIdAndNameOrDescriptionContainingIgnoreCase(username, find, find);
+        List<Event> events = new ArrayList<>();
+        for (EventDocumentDB eventDocumentDB : eventDocumentDBS){
+            events.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));
+        }
+        Pageable pageable=PageRequest.of(page,size);
+        return MethodUtils.convertListToPage(events, pageable);
+        /*Criteria criteriaUserId = Criteria.where("userId").is(userId);
         Criteria criteriaFilter = new Criteria();
 
 
@@ -112,7 +119,7 @@ public class EventService {
         Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
 
         Query query = new Query(combinedCriteria);
-        return mongoTemplate.find(query, EventDocumentDB.class);
+        return mongoTemplate.find(query, EventDocumentDB.class);*/
 
     }
 
