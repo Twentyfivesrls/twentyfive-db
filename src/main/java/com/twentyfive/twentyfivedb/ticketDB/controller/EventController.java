@@ -48,9 +48,9 @@ public class EventController {
 
 
     @PostMapping("/filter/event/autocomplete")
-    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username, @RequestParam("find") String find) {
+    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username, @RequestParam("filterObject") String filterObject) {
 
-        return new ResponseEntity<>(eventService.filterSearch(find,page,size,username), HttpStatus.OK);
+        return new ResponseEntity<>(eventService.filterSearch(filterObject,page,size,username), HttpStatus.OK);
         /*FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<EventDocumentDB> eventPage = eventService.filterSearch(page,size,username,find);
