@@ -4,6 +4,7 @@ package com.twentyfive.twentyfivedb.ticketDB.controller;
 import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
+import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -69,17 +71,8 @@ public class TicketController {
 
     }
     @PostMapping("/get/autocomplete")
-    public ResponseEntity<Page<Ticket>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
-
-        FilterObject filter = new FilterObject(page, size);
-        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<TicketDocumentDB> eventPage = ticketService.filterSearch(filterObject,username);
-        List<Ticket> aList = new ArrayList<>();
-        for (TicketDocumentDB ticketDocumentDB : eventPage) {
-            aList.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
-        }
-        Page<Ticket> aRes = MethodUtils.convertListToPage(aList, pageable);
-        return ResponseEntity.ok(aRes);
+    public ResponseEntity<Set<AutoCompleteRes>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam("username") String username) {
+        return new ResponseEntity<>(ticketService.filterSearch(username,filterObject), HttpStatus.OK);
     }
 
 

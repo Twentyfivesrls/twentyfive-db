@@ -10,6 +10,7 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface TicketRepository  extends MongoRepository<TicketDocumentDB, String> {
@@ -26,5 +27,7 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
     void deleteByCode(String code);
 
     List<TicketDocumentDB> findByEventId(String id);
+
+    Set<TicketDocumentDB> findByUserIdAndEmailContainingIgnoreCase(String userId, String email);
 
 }

@@ -16,6 +16,6 @@ public interface EventRepository extends MongoRepository<EventDocumentDB, String
 
     List<EventDocumentDB> findAllByUserId(String username);
 
-    Set<EventDocumentDB> findByUserIdAndName(String userId, String name);
-    Set<EventDocumentDB> findByUserIdAndDescription(String userId,String description);
+    Set<EventDocumentDB> findByUserIdAndNameContainingIgnoreCase(String userId, String name);
+    Set<EventDocumentDB> findByUserIdAndDescriptionContainingIgnoreCase(String userId,String description);
 }

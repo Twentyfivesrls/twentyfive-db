@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
+import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
@@ -18,11 +19,9 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -152,23 +151,14 @@ public class TicketService {
 
     }*/
 
-    public List<TicketDocumentDB> filterSearch(String filterObject, String userId){
-        Criteria criteriaUserId = Criteria.where("userId").is(userId);
-        Criteria criteriaFilter = new Criteria();
-
-
-        if (StringUtils.isNotBlank(filterObject)) {
-            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaFilter.orOperator(
-                    Criteria.where("email").regex(pattern)
-            );
+    public Set<AutoCompleteRes> filterSearch(String userId, String email){
+        Set<TicketDocumentDB> temp= ticketRepository.findByUserIdAndEmailContainingIgnoreCase(userId,email);
+        Set<AutoCompleteRes> result= new HashSet<>();
+        for (TicketDocumentDB ticket: temp){
+            AutoCompleteRes autoComplete = new AutoCompleteRes(ticket.getEmail());
+            result.add(autoComplete);
         }
-
-        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
-
-        Query query = new Query(combinedCriteria);
-        return mongoTemplate.find(query, TicketDocumentDB.class);
-
+        return result;
     }
 
 

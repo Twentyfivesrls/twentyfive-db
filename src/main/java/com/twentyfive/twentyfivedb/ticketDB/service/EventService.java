@@ -98,15 +98,15 @@ public class EventService {
     }
 
     public Set<AutoCompleteRes> filterSearch(String find, String username){
-        Set<EventDocumentDB> eventName = eventRepository.findByUserIdAndName(username, find);
-        Set<EventDocumentDB> eventDescription = eventRepository.findByUserIdAndDescription(username, find);
+        Set<EventDocumentDB> eventName = eventRepository.findByUserIdAndNameContainingIgnoreCase(username, find);
+        Set<EventDocumentDB> eventDescription = eventRepository.findByUserIdAndDescriptionContainingIgnoreCase(username, find);
 
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (EventDocumentDB eventN: eventName) {
             AutoCompleteRes temp= new AutoCompleteRes(eventN.getName());
             setCombinato.add(temp);
         }
-        for (EventDocumentDB eventD: eventName) {
+        for (EventDocumentDB eventD: eventDescription) {
             AutoCompleteRes temp= new AutoCompleteRes(eventD.getDescription());
             setCombinato.add(temp);
         }
