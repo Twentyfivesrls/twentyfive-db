@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 
@@ -101,5 +102,9 @@ public class MethodUtils {
         }
     }
 
+    // Metodo ausiliario per verificare se il Pattern è valido
+    public static boolean isValidPattern(Pattern pattern) {
+        return pattern != null && pattern.pattern() != null && !pattern.pattern().isEmpty();
+    }
 
 }
