@@ -82,8 +82,8 @@ public class TicketService {
         finalTicket.setEventName(ticket.getEventName());
         finalTicket.setEventId(ticket.getEventId());
         finalTicket.setCode(uuid.toString());
-        finalTicket.setEventDateStart(ticket.getEventDateStart());
-        finalTicket.setEventDateEnd(ticket.getEventDateEnd());
+        finalTicket.setDateStart(ticket.getDateStart());
+        finalTicket.setDateEnd(ticket.getDateEnd());
         finalTicket.setUsed(ticket.getUsed());
         finalTicket.setActive(ticket.getActive());
         finalTicket.setAddressBookId(addressBook.getId());
@@ -276,19 +276,19 @@ public class TicketService {
         }
 
         //date range
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
-            Criteria dateCriteria1 = Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
+            Criteria dateCriteria1 = Criteria.where("ateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             criteriaList.add(dateCriteria1);
-            Criteria dateCriteria2 = Criteria.where("eventDateEnd").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
+            Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             criteriaList.add(dateCriteria2);
         }
         //date start
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() == null) {
-            criteriaList.add(Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()));
+        if (filterObject.getDateStart() != null && filterObject.getDateEnd() == null) {
+            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
         }
         //date end
-        if (filterObject.getEventDateStart() == null && filterObject.getEventDateEnd() != null) {
-            criteriaList.add(Criteria.where("eventDateEnd").lte(filterObject.getEventDateEnd()));
+        if (filterObject.getDateStart() == null && filterObject.getDateEnd() != null) {
+            criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
         }
 
         Query query = new Query();
