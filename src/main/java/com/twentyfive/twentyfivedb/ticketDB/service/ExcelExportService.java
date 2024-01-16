@@ -100,11 +100,11 @@ public class ExcelExportService {
                 row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(item.getEventName());
                 row.createCell(1).setCellValue(item.getCode());
-                if (item.getEventDateStart() != null) {
-                    row.createCell(2).setCellValue(MethodUtils.formatDate(item.getEventDateStart()));
+                if (item.getDateStart() != null) {
+                    row.createCell(2).setCellValue(MethodUtils.formatDate(item.getDateStart()));
                 }
-                if (item.getEventDateEnd() != null) {
-                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getEventDateEnd()));
+                if (item.getDateEnd() != null) {
+                    row.createCell(3).setCellValue(MethodUtils.formatDate(item.getDateEnd()));
                 }
                 if (item.getActive() != null) {
                     if (item.getActive()){

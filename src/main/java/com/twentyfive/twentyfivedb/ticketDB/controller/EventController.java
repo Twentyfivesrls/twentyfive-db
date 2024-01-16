@@ -3,15 +3,14 @@ package com.twentyfive.twentyfivedb.ticketDB.controller;
 
 import com.twentyfive.twentyfivedb.ticketDB.service.EventService;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
+
+
+import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
-
-
-import com.twentyfive.twentyfivemodel.filterTicket.EventFilter;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/event")
@@ -48,9 +48,9 @@ public class EventController {
 
 
     @PostMapping("/filter/event/autocomplete")
-    public ResponseEntity<Page<Event>> getEventListAutocomplete(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username, @RequestParam("filterObject") String filterObject) {
+    public ResponseEntity<Set<AutoCompleteRes>> getEventListAutocomplete(@RequestParam("username") String username, @RequestParam("filterObject") String filterObject) {
 
-        return new ResponseEntity<>(eventService.filterSearch(filterObject,page,size,username), HttpStatus.OK);
+        return new ResponseEntity<>(eventService.filterSearch(filterObject,username), HttpStatus.OK);
         /*FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<EventDocumentDB> eventPage = eventService.filterSearch(page,size,username,find);

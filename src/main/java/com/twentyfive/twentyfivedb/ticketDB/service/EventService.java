@@ -2,9 +2,9 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
+import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
-import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,11 +15,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -96,14 +97,20 @@ public class EventService {
 
     }
 
-    public Page<Event> filterSearch(String find, int page, int size,String username){
-        List<EventDocumentDB> eventDocumentDBS = eventRepository.findByUserIdAndNameOrDescriptionContainingIgnoreCase(username, find, find);
-        List<Event> events = new ArrayList<>();
-        for (EventDocumentDB eventDocumentDB : eventDocumentDBS){
-            events.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB));
+    public Set<AutoCompleteRes> filterSearch(String find, String username){
+        Set<EventDocumentDB> eventName = eventRepository.findByUserIdAndName(username, find);
+        Set<EventDocumentDB> eventDescription = eventRepository.findByUserIdAndDescription(username, find);
+
+        Set<AutoCompleteRes> setCombinato = new HashSet<>();
+        for (EventDocumentDB eventN: eventName) {
+            AutoCompleteRes temp= new AutoCompleteRes(eventN.getName());
+            setCombinato.add(temp);
         }
-        Pageable pageable=PageRequest.of(page,size);
-        return MethodUtils.convertListToPage(events, pageable);
+        for (EventDocumentDB eventD: eventName) {
+            AutoCompleteRes temp= new AutoCompleteRes(eventD.getDescription());
+            setCombinato.add(temp);
+        }
+        return setCombinato;
         /*Criteria criteriaUserId = Criteria.where("userId").is(userId);
         Criteria criteriaFilter = new Criteria();
 

@@ -8,6 +8,7 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDo
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -15,6 +16,6 @@ public interface EventRepository extends MongoRepository<EventDocumentDB, String
 
     List<EventDocumentDB> findAllByUserId(String username);
 
-    List<EventDocumentDB>  findByUserIdAndNameOrDescriptionContainingIgnoreCase(String username, String name,String description);
-   // EventDocumentDB findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled);
+    Set<EventDocumentDB> findByUserIdAndName(String userId, String name);
+    Set<EventDocumentDB> findByUserIdAndDescription(String userId,String description);
 }
