@@ -2,8 +2,8 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
-import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;

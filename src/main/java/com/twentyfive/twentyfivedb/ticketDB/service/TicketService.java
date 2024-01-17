@@ -2,8 +2,8 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
-import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -267,7 +267,7 @@ public class TicketService {
 
         //date range
         if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
-            Criteria dateCriteria1 = Criteria.where("ateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
+            Criteria dateCriteria1 = Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             criteriaList.add(dateCriteria1);
             Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             criteriaList.add(dateCriteria2);

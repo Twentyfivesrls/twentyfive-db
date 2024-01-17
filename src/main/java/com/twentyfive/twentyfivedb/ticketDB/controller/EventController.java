@@ -5,12 +5,9 @@ import com.twentyfive.twentyfivedb.ticketDB.service.EventService;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 
 
-import com.twentyfive.twentyfivedb.ticketDB.utils.AutoCompleteRes;
-import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
-import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
