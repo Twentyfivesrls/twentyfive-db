@@ -30,4 +30,5 @@ public interface TicketRepository  extends MongoRepository<TicketDocumentDB, Str
 
     Set<TicketDocumentDB> findByUserIdAndEmailContainingIgnoreCase(String userId, String email);
 
+    void deleteByEventId(String eventId);
 }

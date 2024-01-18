@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
+import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
@@ -28,11 +30,13 @@ import java.util.regex.Pattern;
 @Service
 public class EventService {
     private final EventRepository eventRepository;
+    private final TicketRepository ticketRepository;
     private final MongoTemplate mongoTemplate;
 
-    public EventService(EventRepository eventRepository, MongoTemplate mongoTemplate) {
+    public EventService(EventRepository eventRepository, MongoTemplate mongoTemplate, TicketRepository ticketRepository) {
         this.eventRepository = eventRepository;
         this.mongoTemplate = mongoTemplate;
+        this.ticketRepository= ticketRepository;
     }
 
     public void saveEvent(Event event) {
@@ -184,6 +188,7 @@ public class EventService {
     }*/
 
     public void delete(String id) {
+        ticketRepository.deleteByEventId(id);
         eventRepository.deleteById(id);
     }
 
