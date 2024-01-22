@@ -1,12 +1,16 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
+import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
+import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import io.micrometer.common.util.StringUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,19 +30,15 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TicketService {
 
+    @Value("${ticketUrl}")
+    private String ticketUrl;
     private final TicketRepository ticketRepository;
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
-
-
-    public TicketService(TicketRepository ticketRepository, AddressBookService addressBookService, MongoTemplate mongoTemplate) {
-        this.addressBookService = addressBookService;
-        this.mongoTemplate = mongoTemplate;
-        this.ticketRepository = ticketRepository;
-    }
-
+    private final AddressBookRepository addressBookRepository;
 
 
 
@@ -92,10 +92,34 @@ public class TicketService {
 
         ticketRepository.save(finalTicket);
 
-
-
     }
 
+    public TicketDocumentDB salvaTicket(Ticket ticket, AddressBook addressBook, String username) {
+        AddressBookDocumentDB addressBookDB= TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook);
+        boolean isPresent=false;
+        List<AddressBookDocumentDB> addresses = addressBookRepository.findAllByUserId(username);
+        for(AddressBookDocumentDB a: addresses){
+            if(MethodUtils.existedAddress(a,addressBookDB)){
+                isPresent=true;
+                break;
+            }
+        }
+        if (!isPresent){
+            addressBookDB.setUserId(username);
+            addressBookDB = addressBookRepository.save(addressBookDB);
+        } else {
+            addressBookDB = addressBookRepository.findByFirstNameAndLastNameAndUserIdAndEmail(addressBookDB.getFirstName(), addressBookDB.getLastName(),username,addressBookDB.getEmail()).orElse(addressBookDB);
+        }
+        String code=UUID.randomUUID().toString();
+        ticket.setCode(code);
+        ticket.setAddressBookId(addressBookDB.getId());
+        ticket.setEmail(addressBookDB.getEmail());
+        ticket.setUrl(ticketUrl+code);
+        ticket.setUserId(username);
+        TicketDocumentDB ticketDocumentDB=TwentyFiveMapper.INSTANCE.ticketToTicketDocumentDB(ticket);
+        return ticketRepository.save(ticketDocumentDB);
+
+    }
 
     public TicketDocumentDB getTicketById(String id) {
         if (StringUtils.isBlank(id)) {

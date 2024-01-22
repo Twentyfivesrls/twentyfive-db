@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -107,4 +108,10 @@ public class MethodUtils {
         return pattern != null && pattern.pattern() != null && !pattern.pattern().isEmpty();
     }
 
+    public static boolean existedAddress(AddressBookDocumentDB address1, AddressBookDocumentDB address2){
+        if(address1.getEmail().equals(address2.getEmail()) && address1.getFirstName().equals(address2.getFirstName()) && address1.getLastName().equals(address2.getLastName())){
+            return true;
+        }
+        return false;
+    }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AddressBookRepository extends MongoRepository<AddressBookDocumentDB, String> {
@@ -19,4 +20,6 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
 
     AddressBookDocumentDB findByUserId(String userId);
     void deleteByEmail(String email);
+
+    Optional<AddressBookDocumentDB> findByFirstNameAndLastNameAndUserIdAndEmail(String firstName, String lastName, String userId, String email);
 }

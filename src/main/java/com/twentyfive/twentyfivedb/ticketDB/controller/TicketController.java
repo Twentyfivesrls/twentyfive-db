@@ -5,8 +5,10 @@ import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
+import com.twentyfive.twentyfivemodel.dto.ticketDto.TicketAndAddressBook;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
+import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
@@ -55,12 +58,16 @@ public class TicketController {
     /*
     * Generate ticket
     */
-    @PostMapping("/generate")
+    /*@PostMapping("/generate")
     public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket,@RequestParam("id") String id, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("username") String username) {
         ticketService.saveTicket(ticket,id, name, lastName, email, username);
         return ResponseEntity.ok(ticket);
-    }
+    }*/
 
+    @PostMapping("/generate")
+    public ResponseEntity<Object> addTicket(@RequestBody TicketAndAddressBook ticket, @RequestParam("username") String username){
+        return new ResponseEntity<>(ticketService.salvaTicket(ticket.getTicket(),ticket.getAddressBook(),username), HttpStatus.OK);
+    }
 
     /*
     * Get ticket list end filters
