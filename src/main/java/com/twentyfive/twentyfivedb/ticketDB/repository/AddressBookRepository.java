@@ -22,4 +22,5 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
     void deleteByEmail(String email);
 
     Optional<AddressBookDocumentDB> findByFirstNameAndLastNameAndUserIdAndEmail(String firstName, String lastName, String userId, String email);
+    long countByUserId(String userId);
 }

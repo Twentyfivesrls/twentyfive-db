@@ -208,6 +208,9 @@ public class AddressBookService {
         return list;
     }
 
+    public long countByUserId(String userId){
+        return addressBookRepository.countByUserId(userId);
+    }
 }
 
 

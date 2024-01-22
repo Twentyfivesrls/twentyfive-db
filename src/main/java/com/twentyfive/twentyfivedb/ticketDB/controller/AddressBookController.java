@@ -151,6 +151,10 @@ public class AddressBookController {
     public List<AddressBook> getAllByUser(@RequestParam("userId") String userId){
         return addressBookService.getAllAddressByUser(userId);
     }
+    @GetMapping("/countRubrica")
+    public ResponseEntity<Object> countRubrica(@RequestParam("username") String userId) {
+        return new ResponseEntity<>(addressBookService.countByUserId(userId), HttpStatus.OK);
+    }
 
 
 }
