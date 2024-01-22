@@ -77,18 +77,14 @@ public class ShortenLinkService {
     }
 
     private String generateUniqueLink() {
-        boolean goOn = false;
-        do {
+        while (true) {
             String current = GeneratePasswordUtil.generateCommonLangPassword(DEFAULT_SHORTEN_LINK_LENGTH);
-            Optional<ShortenLinkDocumentDB> find = shortenLinkRepository.findByShortUrl(current);
-            if (find.isEmpty()) {
+            if (shortenLinkRepository.findByShortUrl(current).isEmpty()) {
                 return current;
-            } else {
-                goOn = true;
             }
-        } while (goOn);
-        return "";
+        }
     }
+
 
     public List<ShortenLink> getAllLinksForUserId(String userId) {
         if (StringUtils.isBlank(userId)) {

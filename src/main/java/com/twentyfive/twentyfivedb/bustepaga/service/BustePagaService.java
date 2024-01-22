@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
-import java.awt.print.Pageable;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -30,5 +30,9 @@ public class BustePagaService {
 
     public void deleteDipendente(String id) {
         this.bustePagaRepository.deleteById(id);
+    }
+
+    public List<Dipendente> getAllDipendentiList(String userId) {
+        return this.bustePagaRepository.getAllByUserId(userId);
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/buste-paga")
@@ -17,12 +19,18 @@ public class BustePagaController {
         this.bustePagaService = bustePagaService;
     }
 
-    @GetMapping("/list")
+    @GetMapping("/page")
     public ResponseEntity<Page<Dipendente>> getAllDipendenti(
             @RequestParam(name = "userId") String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(bustePagaService.getAllDipendenti(userId, page, size));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Dipendente>> getAllDipendenti(
+            @RequestParam(name = "userId") String userId) {
+        return ResponseEntity.ok(bustePagaService.getAllDipendentiList(userId));
     }
 
     @PostMapping("/create")
