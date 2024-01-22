@@ -105,6 +105,7 @@ public class TicketService {
             }
         }
         if (!isPresent){
+            addressBookDB.setId(null);
             addressBookDB.setUserId(username);
             addressBookDB = addressBookRepository.save(addressBookDB);
         } else {
