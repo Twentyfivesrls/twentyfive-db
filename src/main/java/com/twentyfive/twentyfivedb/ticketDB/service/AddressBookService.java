@@ -3,6 +3,7 @@ package com.twentyfive.twentyfivedb.ticketDB.service;
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
@@ -137,23 +141,14 @@ public class AddressBookService {
     }
 
 
-    public List<AddressBookDocumentDB> filterSearch(String filterObject, String userId){
-        Criteria criteriaUserId = Criteria.where("userId").is(userId);
-        Criteria criteriaFilter = new Criteria();
-
-
-        if (StringUtils.isNotBlank(filterObject)) {
-            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaFilter.orOperator(
-                    Criteria.where("email").regex(pattern));
-
+    public Set<AutoCompleteRes> filterSearch(String userId, String email){
+        Set<AddressBookDocumentDB> temp= addressBookRepository.findByUserIdAndEmailContainingIgnoreCase(userId,email);
+        Set<AutoCompleteRes> result= new HashSet<>();
+        for (AddressBookDocumentDB addressBookDocumentDB: temp){
+            AutoCompleteRes autoComplete = new AutoCompleteRes(addressBookDocumentDB.getEmail());
+            result.add(autoComplete);
         }
-
-        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
-
-        Query query = new Query(combinedCriteria);
-        return mongoTemplate.find(query, AddressBookDocumentDB.class);
-
+        return result;
     }
 
 

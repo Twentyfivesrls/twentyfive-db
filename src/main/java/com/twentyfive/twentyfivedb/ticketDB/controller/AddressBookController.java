@@ -4,6 +4,7 @@ package com.twentyfive.twentyfivedb.ticketDB.controller;
 import com.twentyfive.twentyfivedb.ticketDB.service.AddressBookService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AddressBookFilter;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
 import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
@@ -20,6 +21,7 @@ import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -120,17 +122,8 @@ public class AddressBookController {
     }
 
     @PostMapping("/get/autocomplete")
-    public ResponseEntity<Page<AddressBook>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
-
-        FilterObject filter = new FilterObject(page, size);
-        Pageable pageable = MethodUtils.makePageableFromFilter(filter);
-        List<AddressBookDocumentDB> eventPage = addressBookService.filterSearch(filterObject,username);
-        List<AddressBook> aList = new ArrayList<>();
-        for (AddressBookDocumentDB addressBookDocumentDB : eventPage) {
-            aList.add(TwentyFiveMapper.INSTANCE.addressBookDocumentDBToAddressBook(addressBookDocumentDB));
-        }
-        Page<AddressBook> aRes = MethodUtils.convertListToPage(aList, pageable);
-        return ResponseEntity.ok(aRes);
+    public ResponseEntity<Set<AutoCompleteRes>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam("username") String username) {
+        return new ResponseEntity<>(addressBookService.filterSearch(username,filterObject), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
