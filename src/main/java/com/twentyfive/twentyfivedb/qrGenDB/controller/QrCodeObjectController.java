@@ -5,7 +5,6 @@ import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
-import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +25,7 @@ import java.util.List;
 public class QrCodeObjectController {
 
 
-     private final QrCodeObjectService qrCodeObjectService;
+    private final QrCodeObjectService qrCodeObjectService;
 
 
     //@Value("${deployment.base.url}")
@@ -35,17 +34,13 @@ public class QrCodeObjectController {
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
 
-    /*public QrCodeObjectController(QrCodeObjectService qrCodeObjectService) {
-        this.qrCodeObjectService = qrCodeObjectService;
-    }*/
-
 
     @GetMapping("/allByUsername")
     public ResponseEntity<Page<QrCodeObject>> getAllQrCodeObjectByIdUser(@RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "10") int size,
                                                                          @RequestParam(defaultValue = "username") String username) {
 
-        List<QrCodeObject> qrCodeObjectDocumentDBList =qrCodeObjectService.getObjectsByUsername(username, page, size);
+        List<QrCodeObject> qrCodeObjectDocumentDBList = qrCodeObjectService.getObjectsByUsername(username, page, size);
         Page<QrCodeObject> qrCodeObjectPage = new PageImpl<>(qrCodeObjectDocumentDBList);
 
         return ResponseEntity.status(HttpStatus.OK).body(qrCodeObjectPage);
@@ -87,21 +82,15 @@ public class QrCodeObjectController {
 
     @DeleteMapping("/delete/{idQrCode}")
     public ResponseEntity<QrCodeObject> deleteQrCodeObject(@PathVariable String idQrCode) {
-
         qrCodeObjectService.deleteQrCodeObjectAndStats(idQrCode);
         return ResponseEntity.ok().build();
     }
 
 
-
-
     @PostMapping(value = "/generateAndDownloadQRCode")
     public ResponseEntity<String> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
-
-
         if (qrCodeObject.getLink() == null || qrCodeObject.getLink().isEmpty())
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 
         QrCodeObject tmpO = new QrCodeObject(qrCodeObject.getName(),
                 qrCodeObject.getLink(),
@@ -110,14 +99,13 @@ public class QrCodeObjectController {
                 qrCodeObject.getUsername(),
                 qrCodeObject.getIsActivated());
 
-        qrCodeObjectService.saveQrCodeObject(tmpO,username);
+        qrCodeObjectService.saveQrCodeObject(tmpO, username);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping("/update/{idQrCode}")
     ResponseEntity<QrCodeObject> updateQrCodeObject(@PathVariable String idQrCode, @RequestBody QrCodeObject qrCodeObject) {
-
         if (idQrCode == null || idQrCode.isEmpty())
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
