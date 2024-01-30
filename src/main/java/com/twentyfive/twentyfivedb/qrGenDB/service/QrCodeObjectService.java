@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.QrGenDocumentDB.QrCodeObjectDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
@@ -31,7 +30,7 @@ public class QrCodeObjectService {
     }
 
 
-    public void saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
+    public QrCodeObjectDocumentDB saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
         if (qrCodeObject == null) {
             throw new IllegalArgumentException("QrCodeObject is null");
         }
@@ -47,7 +46,7 @@ public class QrCodeObjectService {
         } catch (Exception e) {
             log.error("Error in parsing link");
         }
-        qrCodeObjectRepository.save(TwentyFiveMapper.INSTANCE.qrCodeObjectToQrCodeObjectDocumentDB(qrCodeObject));
+        return qrCodeObjectRepository.save(TwentyFiveMapper.INSTANCE.qrCodeObjectToQrCodeObjectDocumentDB(qrCodeObject));
     }
 
     public QrCodeObject getQrCodeObjectById(String idQrCode) {

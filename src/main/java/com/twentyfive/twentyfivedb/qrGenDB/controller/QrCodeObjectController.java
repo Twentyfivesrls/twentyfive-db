@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.QrGenDocumentDB.QrCodeObjectDocumentDB;
 
 
 import java.util.Base64;
@@ -88,7 +89,7 @@ public class QrCodeObjectController {
 
 
     @PostMapping(value = "/generateAndDownloadQRCode")
-    public ResponseEntity<String> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
+    public ResponseEntity<QrCodeObjectDocumentDB> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
         if (qrCodeObject.getLink() == null || qrCodeObject.getLink().isEmpty())
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
@@ -99,9 +100,9 @@ public class QrCodeObjectController {
                 qrCodeObject.getUsername(),
                 qrCodeObject.getIsActivated());
 
-        qrCodeObjectService.saveQrCodeObject(tmpO, username);
+        QrCodeObjectDocumentDB res = qrCodeObjectService.saveQrCodeObject(tmpO, username);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PutMapping("/update/{idQrCode}")
