@@ -4,6 +4,8 @@ import com.twentyfive.twentyfivedb.bustepaga.repository.BustePagaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
@@ -18,10 +20,19 @@ public class BustePagaService {
         this.bustePagaRepository = bustePagaRepository;
     }
 
-    public Page<Dipendente> getAllDipendenti(String userId, int page, int size) {
-        //create a pageable object
-        PageRequest pageable = PageRequest.of(page, size);
-        return this.bustePagaRepository.getAllByUserId(userId, pageable);
+    public Page<Dipendente> getAllDipendenti(String userId, int page, int size, String sortColumn, String sortDirection) {
+        Sort.Direction direction;
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            direction = Sort.Direction.DESC;
+        } else {
+            direction = Sort.Direction.ASC;
+        }
+
+        // Create a Pageable instance
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortColumn));
+        return bustePagaRepository.getAllByUserId(userId, pageable);
+
+
     }
 
     public Dipendente createDipendente(Dipendente dipendente) {

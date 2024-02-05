@@ -23,8 +23,10 @@ public class BustePagaController {
     public ResponseEntity<Page<Dipendente>> getAllDipendenti(
             @RequestParam(name = "userId") String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(bustePagaService.getAllDipendenti(userId, page, size));
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "lastname") String sortColumn,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(bustePagaService.getAllDipendenti(userId, page, size, sortColumn, sortDirection));
     }
 
     @GetMapping("/list")
