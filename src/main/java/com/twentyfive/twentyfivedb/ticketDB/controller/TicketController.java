@@ -196,4 +196,13 @@ public class TicketController {
 
         return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticket));
     }
+
+    //TODO un biglietto è valido se appartiene a quell'evento se il giorno di scansione è nel range della data dell'evento
+    // se la data del biglietto è presente nell'evento.
+    @GetMapping("checkTicket/{id}")
+    public ResponseEntity<Boolean> checkTicket(@PathVariable String ticketId) {
+        TicketDocumentDB ticket = ticketService.findByCode(ticketId);
+
+        return ResponseEntity.ok(true);
+    }
 }
