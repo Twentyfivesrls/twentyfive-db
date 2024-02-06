@@ -8,6 +8,7 @@ import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -28,9 +29,8 @@ public class QrCodeObjectController {
 
     private final QrCodeObjectService qrCodeObjectService;
 
-
-    //@Value("${deployment.base.url}")
-    private String baseUrl = "http://80.211.123.141:5555/";
+    @Value("${qrgen.base.url}")
+    private String baseUrl;
 
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
