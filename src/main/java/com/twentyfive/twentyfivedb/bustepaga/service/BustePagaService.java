@@ -52,6 +52,10 @@ public class BustePagaService {
         return this.bustePagaRepository.getAllByUserId(userId);
     }
 
+    public BPSetting getSettings(String userId) {
+        Optional<BPSetting> bpSetting = this.settingsRepository.getByUserId(userId);
+        return bpSetting.orElse(null);
+    }
     public String getMailText(String userId) {
         Optional<BPSetting> bpSetting = this.settingsRepository.getByUserId(userId);
         return bpSetting.map(BPSetting::getMailText).orElse("");

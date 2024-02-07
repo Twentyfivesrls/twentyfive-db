@@ -4,6 +4,7 @@ import com.twentyfive.twentyfivedb.bustepaga.service.BustePagaService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPSetting;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
 import java.util.List;
@@ -47,10 +48,17 @@ public class BustePagaController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/get-mail-text")
-    public String getMailText(@RequestParam(name = "userId") String userId){
+    public ResponseEntity<String> getMailText(@RequestParam(name = "userId") String userId){
         String mailText = bustePagaService.getMailText(userId);
-        return ResponseEntity.ok(mailText).toString();
+        return ResponseEntity.ok(mailText);
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/get-settings")
+    public ResponseEntity<BPSetting> getSettings(@RequestParam(name = "userId") String userId){
+        BPSetting setting = bustePagaService.getSettings(userId);
+        return ResponseEntity.ok(setting);
+    }
+
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update-mail-text")
     public ResponseEntity<Boolean> updateMailText(@RequestParam(name = "userId") String userId, @RequestParam(name = "mailText") String mailText){
