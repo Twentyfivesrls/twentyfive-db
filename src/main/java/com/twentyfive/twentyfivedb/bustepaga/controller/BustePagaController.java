@@ -46,5 +46,16 @@ public class BustePagaController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/get-mail-text")
+    public String getMailText(@RequestParam(name = "userId") String userId){
+        String mailText = bustePagaService.getMailText(userId);
+        return ResponseEntity.ok(mailText).toString();
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/update-mail-text")
+    public ResponseEntity<Boolean> updateMailText(@RequestParam(name = "userId") String userId, @RequestParam(name = "mailText") String mailText){
+        bustePagaService.updateMailText(userId, mailText);
+        return ResponseEntity.ok(true);
+    }
 
 }
