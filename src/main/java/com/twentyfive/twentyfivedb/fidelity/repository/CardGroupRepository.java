@@ -1,9 +1,12 @@
 package com.twentyfive.twentyfivedb.fidelity.repository;
 
-import com.twentyfive.twentyfivemodel.models.fidelityModels.CardGroup;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
 @Repository
 public interface CardGroupRepository extends MongoRepository<CardGroup, String> {
+    Page<CardGroup> getAllByOwnerId(String ownerId, Pageable pageable);
 }
