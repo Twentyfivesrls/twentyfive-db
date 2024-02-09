@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 @Service
 @Slf4j
@@ -15,8 +16,11 @@ public class CardService {
 
     private final CardRepository cardRepository;
 
-    public CardService(CardRepository cardRepository) {
+    private final ContactService contactService;
+
+    public CardService(CardRepository cardRepository, ContactService contactService) {
         this.cardRepository = cardRepository;
+        this.contactService = contactService;
     }
 
     public Page<Card> getAllCard(int page, int size, String sortColumn, String sortDirection){
@@ -36,7 +40,16 @@ public class CardService {
         return cardRepository.findById(id).orElse(null);
     }
 
-    public Card createCard(Card card){
+    public Card createCard(String id, Card card){
+
+        Contact contact = this.contactService.getContact(id);
+
+        card.setCustomerId(id);
+        card.setName(contact.getName());
+        card.setSurname(contact.getSurname());
+        card.setEmail(contact.getEmail());
+        card.setPhoneNumber(Integer.parseInt(contact.getPhoneNumber()));
+
         return this.cardRepository.save(card);
     }
 

@@ -30,8 +30,8 @@ public class CardController {
         }
 
         @PostMapping("/create")
-        public ResponseEntity<Card> createCard(@RequestBody Card card) {
-                return ResponseEntity.ok(cardService.createCard(card));
+        public ResponseEntity<Card> createCard(@RequestBody Card card, @RequestParam("id") String id) {
+                return ResponseEntity.ok(cardService.createCard(id, card));
         }
 
         @DeleteMapping("/delete/{id}")
