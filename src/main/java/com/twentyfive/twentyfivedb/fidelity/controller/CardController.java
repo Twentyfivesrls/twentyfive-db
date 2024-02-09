@@ -16,13 +16,12 @@ public class CardController {
 
         @GetMapping("/page")
         public ResponseEntity<Page<Card>> getAllCard(
-                @RequestParam(name = "userId") String customerId,
                 @RequestParam(defaultValue = "0") int page,
                 @RequestParam(defaultValue = "5") int size,
                 @RequestParam(defaultValue = "lastname") String sortColumn,
                 @RequestParam(defaultValue = "asc") String sortDirection
         ) {
-                return ResponseEntity.ok(cardService.getAllCard(customerId, page, size, sortColumn, sortDirection));
+                return ResponseEntity.ok(cardService.getAllCard(page, size, sortColumn, sortDirection));
         }
 
         @GetMapping("/detail/{id}")
@@ -31,8 +30,8 @@ public class CardController {
         }
 
         @PostMapping("/create")
-        public ResponseEntity<Card> createCard(@RequestBody Card cardGroup) {
-                return ResponseEntity.ok(cardService.createCard(cardGroup));
+        public ResponseEntity<Card> createCard(@RequestBody Card card) {
+                return ResponseEntity.ok(cardService.createCard(card));
         }
 
         @DeleteMapping("/delete/{id}")

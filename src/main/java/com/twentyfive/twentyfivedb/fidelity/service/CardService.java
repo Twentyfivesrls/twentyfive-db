@@ -19,7 +19,7 @@ public class CardService {
         this.cardRepository = cardRepository;
     }
 
-    public Page<Card> getAllCard(String id, int page, int size, String sortColumn, String sortDirection){
+    public Page<Card> getAllCard(int page, int size, String sortColumn, String sortDirection){
         //TODO fix this
         Sort.Direction direction;
         if ("desc".equalsIgnoreCase(sortDirection)) {
@@ -29,7 +29,7 @@ public class CardService {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortColumn));
-        return cardRepository.getAllById(id, pageable);
+        return cardRepository.findAll(pageable);
     }
 
     public Card getCard(String id){
