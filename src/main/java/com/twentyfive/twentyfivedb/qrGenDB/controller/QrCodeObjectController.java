@@ -7,16 +7,13 @@ import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.QrGenDocumentDB.QrCodeObjectDocumentDB;
-
 
 import java.util.Base64;
 import java.util.List;

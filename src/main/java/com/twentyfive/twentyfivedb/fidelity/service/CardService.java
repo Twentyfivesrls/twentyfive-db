@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 @Service
 @Slf4j

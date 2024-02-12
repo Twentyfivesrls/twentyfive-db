@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.UserLinkDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;

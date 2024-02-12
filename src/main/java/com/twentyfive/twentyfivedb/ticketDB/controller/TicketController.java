@@ -8,18 +8,14 @@ import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.ticketDto.TicketAndAddressBook;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.filterTicket.FilterObject;
-import com.twentyfive.twentyfivemodel.models.ticketModels.AddressBook;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Ticket;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.AddressBookDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 

@@ -22,10 +22,7 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.Address
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
-import java.time.LocalDateTime;
 import java.util.*;
-
-
 import java.util.regex.Pattern;
 
 @Slf4j
