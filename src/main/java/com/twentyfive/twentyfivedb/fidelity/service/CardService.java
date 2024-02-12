@@ -40,16 +40,7 @@ public class CardService {
         return cardRepository.findById(id).orElse(null);
     }
 
-    public Card createCard(String id, Card card){
-
-        Contact contact = this.contactService.getContact(id);
-
-        card.setCustomerId(id);
-        card.setName(contact.getName());
-        card.setSurname(contact.getSurname());
-        card.setEmail(contact.getEmail());
-        card.setPhoneNumber(Integer.parseInt(contact.getPhoneNumber()));
-
+    public Card createCard(Card card){
         return this.cardRepository.save(card);
     }
 
