@@ -31,7 +31,7 @@ jobs:
       - name: Add maven settings for GitHub packages
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          servers: '[{"id": "github", "username": "${{secrets.SSH_USERNAME}}", "password": "${{secrets.SSH_GITHUB_TOKEN}}"}]'
+          servers: '[{"id": "github", "username": "${{secrets.SSH_USERNAME}}", "password": "${{secrets.SSH_PASSWORD}}"}]'
 
       - name: Build and analyze
         env:
