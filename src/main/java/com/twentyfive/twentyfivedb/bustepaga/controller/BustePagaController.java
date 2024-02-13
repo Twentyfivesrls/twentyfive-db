@@ -1,9 +1,11 @@
 package com.twentyfive.twentyfivedb.bustepaga.controller;
 
 import com.twentyfive.twentyfivedb.bustepaga.service.BustePagaService;
+import com.twentyfive.twentyfivemodel.dto.bustepagaDto.UpdateBPSettingRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPConfiguration;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPSetting;
 import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
 
@@ -47,23 +49,23 @@ public class BustePagaController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get-mail-text")
-    public ResponseEntity<String> getMailText(@RequestParam(name = "userId") String userId){
-        String mailText = bustePagaService.getMailText(userId);
-        return ResponseEntity.ok(mailText);
-    }
-
     @GetMapping("/get-settings")
     public ResponseEntity<BPSetting> getSettings(@RequestParam(name = "userId") String userId){
         BPSetting setting = bustePagaService.getSettings(userId);
         return ResponseEntity.ok(setting);
     }
 
-
-    @PutMapping("/update-mail-text")
-    public ResponseEntity<Boolean> updateMailText(@RequestParam(name = "userId") String userId, @RequestParam(name = "mailText") String mailText){
-        bustePagaService.updateMailText(userId, mailText);
+    @PostMapping("/update-setting")
+    public ResponseEntity<Boolean> updateSetting(@RequestBody UpdateBPSettingRequest request){
+        bustePagaService.updateSetting(request);
         return ResponseEntity.ok(true);
     }
+
+    @GetMapping("/get-all-configurations")
+    public ResponseEntity<List<BPConfiguration>> getConfigurationsByType(@RequestParam(name="type", defaultValue = "PAYBOLT_FILENAME") String type){
+        List<BPConfiguration> configuration = bustePagaService.getConfigurationsByType(type);
+        return ResponseEntity.ok(configuration);
+    }
+
 
 }
