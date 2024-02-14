@@ -48,9 +48,9 @@ public class CardController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update-active/{id}")
-    public ResponseEntity<Void> updateActive(@PathVariable String id, @RequestParam("active") Boolean isActive) {
-        cardService.updateActive(id, isActive);
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
+        cardService.updateStatus(id, status);
         return ResponseEntity.ok().build();
     }
 }

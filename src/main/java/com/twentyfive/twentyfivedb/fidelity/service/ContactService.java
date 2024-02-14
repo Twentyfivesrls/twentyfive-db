@@ -30,13 +30,7 @@ public class ContactService {
         return contactRepository.findById(id).orElse(null);
     }
 
-    public Contact createContact(Contact contact) {
-        Optional<Contact> contact1 = contactRepository.findByEmail(contact.getEmail());
-        if(contact1.isPresent()){
-            throw new RuntimeException("Contact already exist");
-        }
-        return this.contactRepository.save(contact);
-    }
+    public Contact createContact(Contact contact) { return this.contactRepository.save(contact); }
 
     public void deleteContact(String id) {
         this.contactRepository.deleteById(id);

@@ -30,13 +30,7 @@ public class CardGroupService {
         return cardGroupRepository.findById(id).orElse(null);
     }
 
-    public CardGroup createCardGroup(CardGroup cardGroup) {
-        Optional<CardGroup> cardGroup1 = cardGroupRepository.findById(cardGroup.getId());
-        if(cardGroup1.isPresent()){
-            throw new RuntimeException("Cardgroup already exist");
-        }
-        return this.cardGroupRepository.save(cardGroup);
-    }
+    public CardGroup createCardGroup(CardGroup cardGroup) { return this.cardGroupRepository.save(cardGroup); }
 
     public void deleteCardGroup(String id) {
         this.cardGroupRepository.deleteById(id);
@@ -64,9 +58,21 @@ public class CardGroupService {
             cardGroup1.setExpirationDate(cardGroup.getExpirationDate());
             cardGroup1.setScanNumber(cardGroup.getScanNumber());
             cardGroup1.setNumberOfDaysForPrize(cardGroup.getNumberOfDaysForPrize());
-            cardGroup1.setActive(cardGroup.isActive());
+            cardGroup1.setIsActive(cardGroup.getIsActive());
             cardGroupRepository.save(cardGroup1);
         }
     }
 
+    public void updateStatus(String id, Boolean status){
+        if (StringUtils.isBlank(id)) {
+            log.error("Id cannot be null or empty");
+            throw new IllegalArgumentException("Id cannot be null or empty");
+        }
+
+        CardGroup cardGroup = cardGroupRepository.findById(id).orElse(null);
+        if(cardGroup != null){
+            cardGroup.setIsActive(status);
+            cardGroupRepository.save(cardGroup);
+        }
+    }
 }

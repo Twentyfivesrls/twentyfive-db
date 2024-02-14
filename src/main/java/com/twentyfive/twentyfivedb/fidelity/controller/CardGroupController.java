@@ -50,4 +50,9 @@ public class CardGroupController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
+        cardGroupService.updateStatus(id, status);
+        return ResponseEntity.ok().build();
+    }
 }

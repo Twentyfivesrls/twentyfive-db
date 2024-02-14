@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
 import java.util.Optional;
 
@@ -30,13 +31,7 @@ public class CardService {
         return cardRepository.findById(id).orElse(null);
     }
 
-    public Card createCard(Card card) {
-        Optional<Card> card1 = cardRepository.findById(card.getId());
-        if (card1.isPresent()) {
-            throw new RuntimeException("Card already exist");
-        }
-        return this.cardRepository.save(card);
-    }
+    public Card createCard(Card card) { return this.cardRepository.save(card); }
 
     public void deleteCard(String id) {
         this.cardRepository.deleteById(id);
@@ -44,12 +39,13 @@ public class CardService {
 
     public void updateCard(String id, Card card) {
         if (card == null) {
-            return;
+            log.error("Card is null");
+            throw new IllegalArgumentException("Card is null");
         }
 
         if (StringUtils.isBlank(id)) {
-            //TODO
-            return;
+            log.error("Card is null or empty");
+            throw new IllegalArgumentException("Card is null or empty");
         }
 
         Card card1 = cardRepository.findById(id).orElse(null);
@@ -66,16 +62,22 @@ public class CardService {
             card1.setScanNumberExecuted(card.getScanNumberExecuted());
             card1.setCreationDate(card.getCreationDate());
             card1.setLastScanDate(card.getLastScanDate());
+            card1.setIsActive(card.getIsActive());
             cardRepository.save(card1);
         }
     }
 
-    public void updateActive(String id, Boolean status) {
-        Card card1 = cardRepository.findById(id).orElse(null);
-        if (card1 == null) {
-            return;
+    public void updateStatus(String id, Boolean status){
+        if (StringUtils.isBlank(id)) {
+            log.error("Id cannot be null or empty");
+            throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        card1.setActive(status);
-        cardRepository.save(card1);
+
+        Card card = cardRepository.findById(id).orElse(null);
+        if(card != null){
+            card.setIsActive(status);
+            cardRepository.save(card);
+        }
     }
+
 }
