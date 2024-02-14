@@ -17,11 +17,8 @@ public class CardService {
 
     private final CardRepository cardRepository;
 
-    private final ContactService contactService;
-
-    public CardService(CardRepository cardRepository, ContactService contactService) {
+    public CardService(CardRepository cardRepository) {
         this.cardRepository = cardRepository;
-        this.contactService = contactService;
     }
 
     public Page<Card> getAllCard(int page, int size, String sortColumn, String sortDirection) {
@@ -35,7 +32,7 @@ public class CardService {
 
     public Card createCard(Card card) {
         Optional<Card> card1 = cardRepository.findById(card.getId());
-        if(card1.isPresent()){
+        if (card1.isPresent()) {
             throw new RuntimeException("Card already exist");
         }
         return this.cardRepository.save(card);
@@ -75,6 +72,9 @@ public class CardService {
 
     public void updateActive(String id, Boolean status) {
         Card card1 = cardRepository.findById(id).orElse(null);
+        if (card1 == null) {
+            return;
+        }
         card1.setActive(status);
         cardRepository.save(card1);
     }

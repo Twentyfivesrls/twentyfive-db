@@ -1,7 +1,6 @@
 package com.twentyfive.twentyfivedb.qrGenDB.service;
 
 
-
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
@@ -24,15 +23,18 @@ public class QrCodeObjectService {
     private final QrCodeObjectRepository qrCodeObjectRepository;
     private final QrStatisticsService qrStatisticsService;
 
+    private static final String NULL_QRCODE = "QrCodeObject is null";
+    private static final String ID_NULL_QRCODE = "IdQrCode is null or empty";
+
+
     public QrCodeObjectService(QrCodeObjectRepository qrCodeObjectRepository, QrStatisticsService qrStatisticsService) {
         this.qrCodeObjectRepository = qrCodeObjectRepository;
         this.qrStatisticsService = qrStatisticsService;
     }
 
-
     public QrCodeObjectDocumentDB saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
         if (qrCodeObject == null) {
-            throw new IllegalArgumentException("QrCodeObject is null");
+            throw new IllegalArgumentException(NULL_QRCODE);
         }
 
         String destinationUrl = qrCodeObject.getLink();
@@ -51,8 +53,8 @@ public class QrCodeObjectService {
 
     public QrCodeObject getQrCodeObjectById(String idQrCode) {
         if (StringUtils.isBlank(idQrCode)) {
-            log.error("IdQrCode is null or empty");
-            throw new IllegalArgumentException("IdQrCode is null or empty");
+            log.error(ID_NULL_QRCODE);
+            throw new IllegalArgumentException(ID_NULL_QRCODE);
         }
         QrCodeObjectDocumentDB qrDocument = qrCodeObjectRepository.findById(idQrCode).orElse(null);
         return TwentyFiveMapper.INSTANCE.qrCodeObjectDocumentDBToQrCodeObject(qrDocument);
@@ -78,14 +80,14 @@ public class QrCodeObjectService {
         for (QrCodeObjectDocumentDB qrCodeObjectDocumentDB : qrCodeObjectDocumentDBPage.getContent()) {
             mapList.add(TwentyFiveMapper.INSTANCE.qrCodeObjectDocumentDBToQrCodeObject(qrCodeObjectDocumentDB));
         }
-         return mapList;
+        return mapList;
     }
 
-    public void deleteQrCodeObjectAndStats(String idQrCode){
-        if(StringUtils.isBlank(idQrCode)){
-            log.error("IdQrCode is null or empty");
-            throw new IllegalArgumentException("IdQrCode is null or empty");
-        }else{
+    public void deleteQrCodeObjectAndStats(String idQrCode) {
+        if (StringUtils.isBlank(idQrCode)) {
+            log.error(ID_NULL_QRCODE);
+            throw new IllegalArgumentException(ID_NULL_QRCODE);
+        } else {
             qrCodeObjectRepository.deleteById(idQrCode);
             qrStatisticsService.deleteAllStatsOfQrCodeObject(idQrCode);
 
@@ -94,14 +96,14 @@ public class QrCodeObjectService {
 
     public void updateQrCodeObject(String idQrCode, QrCodeObject qrCodeObject) {
         if (StringUtils.isBlank(idQrCode)) {
-            log.error("IdQrCode is null or empty");
-            throw new IllegalArgumentException("IdQrCode is null or empty");
+            log.error(ID_NULL_QRCODE);
+            throw new IllegalArgumentException(ID_NULL_QRCODE);
         }
 
         QrCodeObjectDocumentDB qrcodeObject = qrCodeObjectRepository.findById(idQrCode).orElse(null);
         if (qrcodeObject == null) {
-            log.error("QrCodeObject is null");
-            throw new IllegalArgumentException("QrCodeObject is null");
+            log.error(NULL_QRCODE);
+            throw new IllegalArgumentException(NULL_QRCODE);
         }
         qrcodeObject.setName(qrCodeObject.getName());
         qrcodeObject.setLink(qrCodeObject.getLink());

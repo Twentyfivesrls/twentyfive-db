@@ -3,7 +3,6 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrStatisticsService;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrStatistics;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +12,12 @@ import java.util.List;
 @RequestMapping("/qr_statistics")
 @RestController
 public class QrStatisticsController {
-    @Autowired
-    private QrStatisticsService qrStatisticsService;
+
+    private final QrStatisticsService qrStatisticsService;
+
+    public QrStatisticsController(QrStatisticsService qrStatisticsService) {
+        this.qrStatisticsService = qrStatisticsService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<QrStatistics>> getAllQrStatistics() {

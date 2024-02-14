@@ -6,7 +6,6 @@ import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,19 +18,18 @@ import java.util.Base64;
 import java.util.List;
 
 @RequestMapping("/qr_code")
-@RequiredArgsConstructor
 @RestController
 public class QrCodeObjectController {
 
-
-    private final QrCodeObjectService qrCodeObjectService;
-
     @Value("${qrgen.base.url}")
     private String baseUrl;
-
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
+    private final QrCodeObjectService qrCodeObjectService;
 
+    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService) {
+        this.qrCodeObjectService = qrCodeObjectService;
+    }
 
     @GetMapping("/allByUsername")
     public ResponseEntity<Page<QrCodeObject>> getAllQrCodeObjectByIdUser(@RequestParam(defaultValue = "0") int page,

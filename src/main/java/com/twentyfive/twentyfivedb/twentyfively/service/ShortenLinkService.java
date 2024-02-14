@@ -7,7 +7,6 @@ import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.RequestValue;
 import com.twentyfive.twentyfivemodel.models.twentyfiveLyModels.ShortenLink;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.ShortenLinkDocumentDB.ShortenLinkDocumentDB;
@@ -25,14 +24,17 @@ import static com.twentyfive.twentyfivedb.twentyfively.constants.ShortenLinkCons
 @Service
 public class ShortenLinkService {
 
-    @Autowired
-    private ShortenLinkRepository shortenLinkRepository;
+    private final ShortenLinkRepository shortenLinkRepository;
 
     @Value("${deployment.base.url}")
     private String baseUrl;
 
     @Value("${max.link.threshold}")
     private int threshold;
+
+    public ShortenLinkService(ShortenLinkRepository shortenLinkRepository) {
+        this.shortenLinkRepository = shortenLinkRepository;
+    }
 
 
     public ShortenLink generateShortUrl(RequestValue requestValue) {
