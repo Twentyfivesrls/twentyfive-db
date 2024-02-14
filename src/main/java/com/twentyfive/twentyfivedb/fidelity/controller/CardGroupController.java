@@ -19,7 +19,7 @@ public class CardGroupController {
 
     @GetMapping("/page")
     public ResponseEntity<Page<CardGroup>> getAllCardGroup(
-            @RequestParam(name = "userId") String ownerId,
+            @RequestParam(name = "ownerId") String ownerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "lastname") String sortColumn,
@@ -29,7 +29,7 @@ public class CardGroupController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<CardGroup> getCardGroup(@PathVariable String id){
+    public ResponseEntity<CardGroup> getCardGroup(@PathVariable String id) {
         return ResponseEntity.ok(cardGroupService.getCardGroup(id));
     }
 
@@ -51,7 +51,7 @@ public class CardGroupController {
     }
 
     @PutMapping("/update-active/{id}")
-    public ResponseEntity<Void> updateActive(@PathVariable String id, @RequestParam("active") Boolean isActive){
+    public ResponseEntity<Void> updateActive(@PathVariable String id, @RequestParam("active") Boolean isActive) {
         cardGroupService.updateActive(id, isActive);
         return ResponseEntity.ok().build();
     }

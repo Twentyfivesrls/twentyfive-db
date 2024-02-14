@@ -12,7 +12,9 @@ public class ContactController {
 
     private final ContactService contactService;
 
-        public ContactController(ContactService contactService) {this.contactService = contactService;}
+    public ContactController(ContactService contactService) {
+        this.contactService = contactService;
+    }
 
     @GetMapping("/page")
     public ResponseEntity<Page<Contact>> getAllContact(
@@ -25,7 +27,7 @@ public class ContactController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Contact> getContact(@PathVariable String id){
+    public ResponseEntity<Contact> getContact(@PathVariable String id) {
         return ResponseEntity.ok(contactService.getContact(id));
     }
 
