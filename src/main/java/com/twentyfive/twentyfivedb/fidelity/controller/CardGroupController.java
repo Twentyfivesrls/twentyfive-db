@@ -50,9 +50,4 @@ public class CardGroupController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update-active/{id}")
-    public ResponseEntity<Void> updateActive(@PathVariable String id, @RequestParam("active") Boolean isActive) {
-        cardGroupService.updateActive(id, isActive);
-        return ResponseEntity.ok().build();
-    }
 }

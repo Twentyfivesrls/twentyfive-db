@@ -46,12 +46,13 @@ public class CardGroupService {
 
     public void updateCardGroup(String id, CardGroup cardGroup) {
         if (cardGroup == null) {
-            return;
+            log.error("Group is null");
+            throw new IllegalArgumentException("Group is null");
         }
 
         if (StringUtils.isBlank(id)) {
-            //TODO
-            return;
+            log.error("Group is null or empty");
+            throw new IllegalArgumentException("Group is null or empty");
         }
 
         CardGroup cardGroup1 = cardGroupRepository.findById(id).orElse(null);
@@ -59,20 +60,15 @@ public class CardGroupService {
         if (cardGroup1 == null) {
             this.createCardGroup(cardGroup);
         } else {
-
             cardGroup1.setName(cardGroup.getName());
             cardGroup1.setDescription(cardGroup.getDescription());
             cardGroup1.setCreationDate(cardGroup.getCreationDate());
             cardGroup1.setExpirationDate(cardGroup.getExpirationDate());
             cardGroup1.setScanNumber(cardGroup.getScanNumber());
             cardGroup1.setNumberOfDaysForPrize(cardGroup.getNumberOfDaysForPrize());
+            cardGroup1.setActive(cardGroup.isActive());
             cardGroupRepository.save(cardGroup1);
         }
     }
 
-    public void updateActive(String id, Boolean status) {
-        CardGroup cardGroup1 = cardGroupRepository.findById(id).orElse(null);
-        cardGroup1.setActive(status);
-        cardGroupRepository.save(cardGroup1);
-    }
 }
