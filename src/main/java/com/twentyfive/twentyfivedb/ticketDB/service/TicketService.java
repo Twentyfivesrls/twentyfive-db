@@ -1,7 +1,6 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 
-import com.twentyfive.twentyfivedb.ticketDB.repository.AddressBookRepository;
 import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -35,86 +34,32 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final AddressBookService addressBookService;
     private final MongoTemplate mongoTemplate;
-    private final AddressBookRepository addressBookRepository;
+    private static final String USER_KEY = "userId";
 
-
-
-    public void saveTicket(Ticket ticket, String id, String firstName, String lastName, String email, String username) {
-        if (ticket == null) {
-            log.error("Ticket cannot be null");
-            throw new IllegalArgumentException("Ticket cannot be null");
-        }
-        if (StringUtils.isBlank(firstName)) {
-            log.error("First name cannot be null or empty");
-            throw new IllegalArgumentException("First name cannot be null or empty");
-        }
-        if (StringUtils.isBlank(lastName)) {
-            log.error("Last name cannot be null or empty");
-            throw new IllegalArgumentException("Last name cannot be null or empty");
-        }
-        if (email == null) {
-            log.error("Date of birth cannot be null");
-            throw new IllegalArgumentException("Date of birth cannot be null");
-        }
-
-
-        AddressBookDocumentDB addressBookControll = TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBookService.getAddressBookById(id));
-        AddressBookDocumentDB addressBook = new AddressBookDocumentDB();
-
-        if(addressBookControll == null) {
-            addressBook.setFirstName(firstName);
-            addressBook.setLastName(lastName);
-            addressBook.setEmail(email);
-            addressBook.setUserId(username);
-            addressBookService.saveAddressBook(addressBook);
-        }
-        else{
-            addressBook = addressBookControll;
-        }
-
-        System.out.println("ADDRESSBOOK :" + addressBook);
-        UUID uuid = UUID.randomUUID();
-        TicketDocumentDB finalTicket = new TicketDocumentDB();
-        finalTicket.setEventName(ticket.getEventName());
-        finalTicket.setEventId(ticket.getEventId());
-        finalTicket.setCode(uuid.toString());
-        finalTicket.setDateStart(ticket.getDateStart());
-        finalTicket.setDateEnd(ticket.getDateEnd());
-        finalTicket.setUsed(ticket.getUsed());
-        finalTicket.setActive(ticket.getActive());
-        finalTicket.setAddressBookId(addressBook.getId());
-        finalTicket.setEmail(addressBook.getEmail());
-        finalTicket.setUserId(ticket.getUserId());
-        finalTicket.setUrl("http://80.211.123.141:5557/dettaglio-ticket/"+uuid.toString());
-
-        ticketRepository.save(finalTicket);
-
-    }
-
-    public TicketDocumentDB salvaTicket(Ticket ticket, AddressBook addressBook, String username) {
-        AddressBookDocumentDB addressBookDB= TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook);
-        boolean isPresent=false;
-        List<AddressBookDocumentDB> addresses = addressBookRepository.findAllByUserId(username);
-        for(AddressBookDocumentDB a: addresses){
-            if(MethodUtils.existedAddress(a,addressBookDB)){
-                isPresent=true;
+    public TicketDocumentDB saveTicket(Ticket ticket, AddressBook addressBook, String username) {
+        AddressBookDocumentDB addressBookDB = TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook);
+        boolean isPresent = false;
+        List<AddressBookDocumentDB> addresses = addressBookService.findAllByUserId(username);
+        for (AddressBookDocumentDB a : addresses) {
+            if (MethodUtils.existedAddress(a, addressBookDB)) {
+                isPresent = true;
                 break;
             }
         }
-        if (!isPresent){
+        if (!isPresent) {
             addressBookDB.setId(null);
             addressBookDB.setUserId(username);
-            addressBookDB = addressBookRepository.save(addressBookDB);
+            addressBookDB = addressBookService.saveAddressBook(addressBookDB);
         } else {
-            addressBookDB = addressBookRepository.findByFirstNameAndLastNameAndUserIdAndEmail(addressBookDB.getFirstName(), addressBookDB.getLastName(),username,addressBookDB.getEmail()).orElse(addressBookDB);
+            addressBookDB = addressBookService.findAddressBook(addressBookDB);
         }
-        String code=UUID.randomUUID().toString();
+        String code = UUID.randomUUID().toString();
         ticket.setCode(code);
         ticket.setAddressBookId(addressBookDB.getId());
         ticket.setEmail(addressBookDB.getEmail());
-        ticket.setUrl(ticketUrl+code);
+        ticket.setUrl(ticketUrl + code);
         ticket.setUserId(username);
-        TicketDocumentDB ticketDocumentDB=TwentyFiveMapper.INSTANCE.ticketToTicketDocumentDB(ticket);
+        TicketDocumentDB ticketDocumentDB = TwentyFiveMapper.INSTANCE.ticketToTicketDocumentDB(ticket);
         return ticketRepository.save(ticketDocumentDB);
 
     }
@@ -127,56 +72,10 @@ public class TicketService {
         return ticketRepository.findById(id).orElse(null);
     }
 
-
-    /*
-     * Search for tickets by event name, event date start, event date end
-     */
-
-    /*public List<TicketDocumentDB> ticketsSearch(Ticket filterObject, String userId) {
-
-        List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("userId").is(userId));
-
-
-
-        if (StringUtils.isNotBlank(filterObject.getEventName())) {
-            Pattern namePattern = Pattern.compile(filterObject.getEventName(), Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("eventName").regex(namePattern));
-        }
-
-        if (StringUtils.isNotBlank(filterObject.getEmail())) {
-            Pattern namePattern = Pattern.compile(filterObject.getEmail(), Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("email").regex(namePattern));
-        }
-
-        //date range
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
-            Criteria dateCriteria1 = Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
-            criteriaList.add(dateCriteria1);
-            Criteria dateCriteria2 = Criteria.where("eventDateEnd").gte(filterObject.getEventDateStart()).lte(filterObject.getEventDateEnd());
-            criteriaList.add(dateCriteria2);
-        }
-        //date start
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() == null) {
-            criteriaList.add(Criteria.where("eventDateStart").gte(filterObject.getEventDateStart()));
-        }
-        //date end
-        if (filterObject.getEventDateStart() != null && filterObject.getEventDateEnd() != null) {
-            criteriaList.add(Criteria.where("eventDateEnd").lte(filterObject.getEventDateEnd()));
-        }
-
-        Query query = new Query();
-        if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-        }
-        return mongoTemplate.find(query, TicketDocumentDB.class);
-
-    }*/
-
-    public Set<AutoCompleteRes> filterSearch(String userId, String email){
-        Set<TicketDocumentDB> temp= ticketRepository.findByUserIdAndEmailContainingIgnoreCase(userId,email);
-        Set<AutoCompleteRes> result= new HashSet<>();
-        for (TicketDocumentDB ticket: temp){
+    public Set<AutoCompleteRes> filterSearch(String userId, String email) {
+        Set<TicketDocumentDB> temp = ticketRepository.findByUserIdAndEmailContainingIgnoreCase(userId, email);
+        Set<AutoCompleteRes> result = new HashSet<>();
+        for (TicketDocumentDB ticket : temp) {
             AutoCompleteRes autoComplete = new AutoCompleteRes(ticket.getEmail());
             result.add(autoComplete);
         }
@@ -199,19 +98,14 @@ public class TicketService {
         return null;
     }
 
-
     public void deleteTicket(String id) {
         if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
-        TicketDocumentDB ticketDocumentDB =  ticketRepository.findById(id).orElse(null);
-        if(ticketDocumentDB != null){
-            ticketRepository.deleteById(id);
-        }
+        ticketRepository.findById(id).ifPresent(ticketDocumentDB -> ticketRepository.deleteById(id));
 
     }
-
 
     public void updateUsedTicket(String id, Boolean status) {
         if (StringUtils.isBlank(id)) {
@@ -243,36 +137,43 @@ public class TicketService {
         return ticketRepository.findByUsed(status);
     }
 
-
-    public List<TicketDocumentDB> findAll() {
-        return ticketRepository.findAll();
-    }
-
     public List<TicketDocumentDB> findAllByUserId(String username) {
         return ticketRepository.findAllByUserId(username);
     }
 
-   public TicketDocumentDB findByCode(String code){
-
+    public TicketDocumentDB findByCode(String code) {
         return ticketRepository.findByCode(code);
-   }
+    }
 
-   public List<Ticket> getTicketsByIdEvent(String id, String username){
-
-
-
-       List<TicketDocumentDB> documentList = ticketRepository.findByEventId(id);
-
+    public List<Ticket> getTicketsByIdEvent(String id, String username) {
+        List<TicketDocumentDB> documentList = ticketRepository.findByEventId(id);
 
         List<Ticket> list = new ArrayList<>();
-        for (TicketDocumentDB ticketDocumentDB : documentList){
+        for (TicketDocumentDB ticketDocumentDB : documentList) {
             list.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
         }
         return list;
-   }
-    public Page<Ticket> getTicketFiltered(Ticket filterObject, String userId, int page, int dimension) {
+    }
+
+    public Page<Ticket> getTicketFiltered(Ticket filterObject, String userId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("userId").is(userId));
+        criteriaList.add(Criteria.where(USER_KEY).is(userId));
+        criteriaList.addAll(parseOtherFilters(filterObject));
+        return this.pageEventMethod(criteriaList, page, size);
+    }
+
+    public Page<Ticket> pageTickets(String userId, int page, int size) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where(USER_KEY).is(userId));
+        return this.pageEventMethod(criteriaList, page, size);
+    }
+
+    private List<Criteria> parseOtherFilters(Ticket filterObject) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        if (filterObject == null) {
+            return criteriaList;
+        }
+
         if (StringUtils.isNotBlank(filterObject.getEventId())) {
             Pattern namePattern = Pattern.compile(filterObject.getEventId(), Pattern.CASE_INSENSITIVE);
             criteriaList.add(Criteria.where("eventId").regex(namePattern));
@@ -302,17 +203,20 @@ public class TicketService {
         if (filterObject.getDateStart() == null && filterObject.getDateEnd() != null) {
             criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
         }
+        return criteriaList;
+    }
 
+    private Page<Ticket> pageEventMethod(List<Criteria> criteriaList, int page, int size) {
         Query query = new Query();
-        if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-        }
-        List<TicketDocumentDB> ticketDocumentDBList =mongoTemplate.find(query, TicketDocumentDB.class);
+        query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+
+        List<TicketDocumentDB> ticketDocumentDBList = mongoTemplate.find(query, TicketDocumentDB.class);
         List<Ticket> tickets = new ArrayList<>();
-        for (TicketDocumentDB ticketDocumentDB : ticketDocumentDBList){
+        for (TicketDocumentDB ticketDocumentDB : ticketDocumentDBList) {
             tickets.add(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticketDocumentDB));
         }
-        Pageable pageable=PageRequest.of(page,dimension);
+        Pageable pageable = PageRequest.of(page, size);
         return MethodUtils.convertListToPage(tickets, pageable);
     }
+
 }

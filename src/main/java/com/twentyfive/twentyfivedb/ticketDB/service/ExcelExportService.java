@@ -31,7 +31,6 @@ public class ExcelExportService {
         this.ticketService = ticketService;
     }
 
-
     public byte[] eventExportToExcel(String userId) {
         List<EventDocumentDB> data = eventService.findAllByUsername(userId);
 

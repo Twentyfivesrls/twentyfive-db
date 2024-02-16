@@ -20,9 +20,9 @@ public interface AddressBookRepository extends MongoRepository<AddressBookDocume
     List<AddressBookDocumentDB> findAllByUserId(String userId);
 
     AddressBookDocumentDB findByUserId(String userId);
-    void deleteByEmail(String email);
 
     Optional<AddressBookDocumentDB> findByFirstNameAndLastNameAndUserIdAndEmail(String firstName, String lastName, String userId, String email);
+
     long countByUserId(String userId);
 
     Set<AddressBookDocumentDB> findByUserIdAndEmailContainingIgnoreCase(String userId, String email);

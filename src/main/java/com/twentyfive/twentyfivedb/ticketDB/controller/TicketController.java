@@ -1,6 +1,5 @@
 package com.twentyfive.twentyfivedb.ticketDB.controller;
 
-
 import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.ticketDB.service.ExcelExportService;
 import com.twentyfive.twentyfivedb.ticketDB.service.TicketService;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/ticket")
@@ -42,7 +40,7 @@ public class TicketController {
     }
 
     @GetMapping("/find/all")
-    public ResponseEntity<List<Ticket>> getAll(@RequestParam("username") String username){
+    public ResponseEntity<List<Ticket>> getAll(@RequestParam("username") String username) {
         List<TicketDocumentDB> ticketList = ticketService.findAllByUserId(username);
         List<Ticket> mapList = new ArrayList<>();
         for (TicketDocumentDB ticketDocumentDB : ticketList) {
@@ -51,36 +49,38 @@ public class TicketController {
         return ResponseEntity.ok(mapList);
     }
 
-    /*
-    * Generate ticket
-    */
-    /*@PostMapping("/generate")
-    public ResponseEntity<Ticket> generateTicket(@RequestBody Ticket ticket,@RequestParam("id") String id, @RequestParam("name") String name, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("username") String username) {
-        ticketService.saveTicket(ticket,id, name, lastName, email, username);
-        return ResponseEntity.ok(ticket);
-    }*/
-
     @PostMapping("/generate")
-    public ResponseEntity<Object> addTicket(@RequestBody TicketAndAddressBook ticket, @RequestParam("username") String username){
-        return new ResponseEntity<>(ticketService.salvaTicket(ticket.getTicket(),ticket.getAddressBook(),username), HttpStatus.OK);
+    public ResponseEntity<Object> addTicket(@RequestBody TicketAndAddressBook ticket, @RequestParam("username") String username) {
+        return new ResponseEntity<>(ticketService.saveTicket(ticket.getTicket(), ticket.getAddressBook(), username), HttpStatus.OK);
     }
 
-    /*
-    * Get ticket list end filters
-     */
     @PostMapping("/list")
-    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username) {
-        return new ResponseEntity<>(ticketService.getTicketFiltered(filterObject,username,page,size), HttpStatus.OK);
-
+    public ResponseEntity<Page<Ticket>> getTicketList(@RequestBody Ticket filterObject,
+                                                      @RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "5") int size,
+                                                      @RequestParam("username") String username) {
+        return new ResponseEntity<>(ticketService.getTicketFiltered(filterObject, username, page, size), HttpStatus.OK);
     }
+
+    @PostMapping("/page")
+    public ResponseEntity<Page<Ticket>> pageTickets(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "5") int size,
+                                                    @RequestParam("username") String username) {
+        return ResponseEntity.ok(ticketService.pageTickets(username, page, size));
+    }
+
     @PostMapping("/get/autocomplete")
-    public ResponseEntity<Set<AutoCompleteRes>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject, @RequestParam("username") String username) {
-        return new ResponseEntity<>(ticketService.filterSearch(username,filterObject), HttpStatus.OK);
+    public ResponseEntity<Set<AutoCompleteRes>> getEventListAutocomplete(@RequestParam("filterObject") String filterObject,
+                                                                         @RequestParam("username") String username) {
+        return new ResponseEntity<>(ticketService.filterSearch(username, filterObject), HttpStatus.OK);
     }
 
 
     @GetMapping("/getALl/tickets/by/event")
-    public ResponseEntity<Page<Ticket>> getTicketsByIdEvent(@RequestParam("eventId") String eventId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam("username") String username){
+    public ResponseEntity<Page<Ticket>> getTicketsByIdEvent(@RequestParam("eventId") String eventId,
+                                                            @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "5") int size,
+                                                            @RequestParam("username") String username) {
         FilterObject filter = new FilterObject(page, size);
         Pageable pageable = MethodUtils.makePageableFromFilter(filter);
         List<Ticket> list = ticketService.getTicketsByIdEvent(eventId, username);
@@ -88,10 +88,6 @@ public class TicketController {
         return ResponseEntity.ok(aRes);
     }
 
-
-    /*
-    * Get ticket by id
-     */
     @GetMapping("/getTicketById/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable String id) {
 
@@ -99,10 +95,6 @@ public class TicketController {
         return ResponseEntity.ok(TwentyFiveMapper.INSTANCE.ticketDocumentDBToTicket(ticket));
     }
 
-
-    /*
-    * Update ticket status(ublity or not)
-     */
     @PutMapping("/setStatus/{id}/{status}")
     public ResponseEntity<Ticket> setStatus(@PathVariable String id, @PathVariable Boolean status) {
 
@@ -111,9 +103,6 @@ public class TicketController {
         return ResponseEntity.ok().build();
     }
 
-    /*
-    * Update ticket used or not
-     */
     @PutMapping("/update/usedTicket/{id}/{used}")
     public ResponseEntity<Ticket> setUsed(@PathVariable String id, @PathVariable Boolean used) {
 
@@ -121,9 +110,6 @@ public class TicketController {
         return ResponseEntity.ok().build();
     }
 
-    /*
-    * Delete ticket
-     */
     @DeleteMapping("/delete")
     public ResponseEntity<Ticket> deleteTicket(@RequestParam("id") String id) {
 
@@ -131,10 +117,6 @@ public class TicketController {
         return ResponseEntity.ok().build();
     }
 
-
-    /*
-    * Export ticket list to excel
-     */
     @GetMapping(value = "/export/excel/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> downloadExcel(@PathVariable String userId) {
         byte[] excelData = exportService.ticketExportToExcel(userId);
@@ -146,9 +128,6 @@ public class TicketController {
                 .body(excelData);
     }
 
-    /*
-    * Get ticket by event name for statistics
-     */
     @GetMapping("/getBy/eventName/{eventName}")
     public ResponseEntity<List<Ticket>> getTicketByEventName(@PathVariable String eventName) {
 
@@ -160,9 +139,6 @@ public class TicketController {
         return ResponseEntity.ok(mapList);
     }
 
-    /*
-    * Get ticket by is used for statistics
-     */
     @GetMapping("/getBy/ticket/isUsed/{isUsed}")
     public ResponseEntity<List<Ticket>> getTicketByIsUsed(@PathVariable Boolean isUsed) {
 
@@ -174,12 +150,9 @@ public class TicketController {
         return ResponseEntity.ok(mapList);
     }
 
-    /*
-    qrcode generator
-     */
     @GetMapping("generate/qrCode/ticket/number")
     public ResponseEntity<byte[]> generateQrCode(@RequestParam("url") String url) throws IOException, WriterException {
-        byte[] qrCode = MethodUtils.generateQrCodeImage(url,350,350);
+        byte[] qrCode = MethodUtils.generateQrCodeImage(url, 350, 350);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=qrCode.png")
                 .body(qrCode);

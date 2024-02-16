@@ -33,38 +33,10 @@ public class MethodUtils {
 
     private MethodUtils(){}
 
-    public static void generateQRCodeImage(String text, int width, int height, String filePath)
-            throws WriterException, IOException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
-
-        Path path = FileSystems.getDefault().getPath(filePath);
-
-        System.out.println("path: " + path);
-
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
-
-    }
-
-    public static byte[] getQRCodeImage(String text, int width, int height) throws WriterException, IOException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
-
-        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-        return pngOutputStream.toByteArray();
-    }
-
-
     public static byte[] generateQrCodeImage(String text, int width, int height) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
-
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-        MatrixToImageConfig con = new MatrixToImageConfig(
-                0xFFFFFFFF
-                , 0xFF000000);
-
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
         return pngOutputStream.toByteArray();
     }
@@ -108,9 +80,6 @@ public class MethodUtils {
     }
 
     public static boolean existedAddress(AddressBookDocumentDB address1, AddressBookDocumentDB address2){
-        if(address1.getEmail().equals(address2.getEmail()) && address1.getFirstName().equals(address2.getFirstName()) && address1.getLastName().equals(address2.getLastName())){
-            return true;
-        }
-        return false;
+        return address1.getEmail().equals(address2.getEmail()) && address1.getFirstName().equals(address2.getFirstName()) && address1.getLastName().equals(address2.getLastName());
     }
 }

@@ -10,20 +10,10 @@ import java.util.Set;
 @Repository
 public interface TicketRepository  extends MongoRepository<TicketDocumentDB, String> {
 
-
     List<TicketDocumentDB> findByEventName(String eventName);
-
     List<TicketDocumentDB> findByUsed(Boolean status);
-
     List<TicketDocumentDB> findAllByUserId(String username);
-    
     TicketDocumentDB findByCode(String code);
-
-    void deleteByCode(String code);
-
     List<TicketDocumentDB> findByEventId(String id);
-
     Set<TicketDocumentDB> findByUserIdAndEmailContainingIgnoreCase(String userId, String email);
-
-    void deleteByEventId(String eventId);
 }

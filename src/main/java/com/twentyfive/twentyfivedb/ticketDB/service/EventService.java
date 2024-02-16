@@ -1,8 +1,6 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
-
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
-import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
@@ -29,13 +27,14 @@ import java.util.regex.Pattern;
 @Service
 public class EventService {
     private final EventRepository eventRepository;
-    private final TicketRepository ticketRepository;
+    private final TicketService ticketService;
     private final MongoTemplate mongoTemplate;
+    private static final String USER_KEY = "userId";
 
-    public EventService(EventRepository eventRepository, MongoTemplate mongoTemplate, TicketRepository ticketRepository) {
+    public EventService(EventRepository eventRepository, TicketService ticketService, MongoTemplate mongoTemplate) {
         this.eventRepository = eventRepository;
+        this.ticketService = ticketService;
         this.mongoTemplate = mongoTemplate;
-        this.ticketRepository= ticketRepository;
     }
 
     public void saveEvent(Event event) {
@@ -53,84 +52,23 @@ public class EventService {
         }
 
         EventDocumentDB eventDocumentDB = eventRepository.findById(id).orElse(null);
-        Event event = TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB);
-
-        return event;
+        return TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(eventDocumentDB);
     }
 
-    public List<EventDocumentDB> paginationEvent(Event filterObject, String userId) {
-        List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("userId").is(userId));
-
-
-        if (StringUtils.isNotBlank(filterObject.getName())) {
-            Pattern namePattern = Pattern.compile(filterObject.getName(), Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("name").regex(namePattern));
-        }
-        if (StringUtils.isNotBlank(filterObject.getDescription())) {
-            Pattern descriptionPattern = Pattern.compile(filterObject.getDescription(), Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("description").regex(descriptionPattern));
-        }
-        if (StringUtils.isNotBlank(filterObject.getLocation())) {
-            Pattern locationPattern = Pattern.compile(filterObject.getLocation(), Pattern.CASE_INSENSITIVE);
-            criteriaList.add(Criteria.where("location").regex(locationPattern));
-        }
-        //date range
-        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
-            Criteria dateCriteria1 = Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
-            criteriaList.add(dateCriteria1);
-            Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
-            criteriaList.add(dateCriteria2);
-        }
-        //date start
-        if (filterObject.getDateStart() != null && filterObject.getDateEnd() == null) {
-            criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
-        }
-        //date end
-        if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
-            criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
-        }
-
-        Query query = new Query();
-        if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-            return mongoTemplate.find(query, EventDocumentDB.class);
-        }
-        return mongoTemplate.findAll(EventDocumentDB.class);
-
-    }
-
-    public Set<AutoCompleteRes> filterSearch(String find, String username){
+    public Set<AutoCompleteRes> filterSearch(String find, String username) {
         Set<EventDocumentDB> eventName = eventRepository.findByUserIdAndNameContainingIgnoreCase(username, find);
         Set<EventDocumentDB> eventDescription = eventRepository.findByUserIdAndDescriptionContainingIgnoreCase(username, find);
 
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
-        for (EventDocumentDB eventN: eventName) {
-            AutoCompleteRes temp= new AutoCompleteRes(eventN.getName());
+        for (EventDocumentDB eventN : eventName) {
+            AutoCompleteRes temp = new AutoCompleteRes(eventN.getName());
             setCombinato.add(temp);
         }
-        for (EventDocumentDB eventD: eventDescription) {
-            AutoCompleteRes temp= new AutoCompleteRes(eventD.getDescription());
+        for (EventDocumentDB eventD : eventDescription) {
+            AutoCompleteRes temp = new AutoCompleteRes(eventD.getDescription());
             setCombinato.add(temp);
         }
         return setCombinato;
-        /*Criteria criteriaUserId = Criteria.where("userId").is(userId);
-        Criteria criteriaFilter = new Criteria();
-
-
-        if (StringUtils.isNotBlank(filterObject)) {
-            Pattern pattern = Pattern.compile(filterObject, Pattern.CASE_INSENSITIVE);
-            criteriaFilter.orOperator(
-                    Criteria.where("name").regex(pattern),
-                    Criteria.where("description").regex(pattern)
-            );
-        }
-
-        Criteria combinedCriteria = new Criteria().andOperator(criteriaUserId, criteriaFilter);
-
-        Query query = new Query(combinedCriteria);
-        return mongoTemplate.find(query, EventDocumentDB.class);*/
-
     }
 
     public void disableEvent(String id, Boolean isDisabled) {
@@ -148,12 +86,7 @@ public class EventService {
         eventRepository.save(event);
     }
 
-
-    public List<EventDocumentDB> findAll() {
-        return eventRepository.findAll();
-    }
-
-    public List<EventDocumentDB> findAllByUsername(String username){
+    public List<EventDocumentDB> findAllByUsername(String username) {
         return eventRepository.findAllByUserId(username);
     }
 
@@ -182,19 +115,33 @@ public class EventService {
         return eventRepository.save(eventToUpdate);
     }
 
-  /*  public EventDocumentDB  getEventByField(String name, String description, LocalDateTime dateStart, LocalDateTime dateEnd, String location, Boolean enabled) {
-        return  eventRepository.findByNameAndDescriptionAndDateStartAndDateEndAndLocationAndEnabled(name, description, dateStart, dateEnd, location, enabled);
-    }*/
-
     public void delete(String id) {
-        ticketRepository.deleteByEventId(id);
+        if (StringUtils.isBlank(id)) {
+            log.error("Id is null or empty");
+            throw new IllegalArgumentException("Id is null or empty");
+        }
+        ticketService.deleteTicket(id);
         eventRepository.deleteById(id);
     }
 
-    public Page<Event> getEventFiltered(Event filterObject, int page, int dimension, String userId) {
+    public Page<Event> getEventFiltered(Event filterObject, int page, int size, String userId) {
         List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("userId").is(userId));
+        criteriaList.add(Criteria.where(USER_KEY).is(userId));
+        criteriaList.addAll(parseOtherFilters(filterObject));
+        return this.pageEventMethod(criteriaList, page, size);
+    }
 
+    public Page<Event> pageEvents(int page, int size, String userId) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where(USER_KEY).is(userId));
+        return this.pageEventMethod(criteriaList, page, size);
+    }
+
+    private List<Criteria> parseOtherFilters(Event filterObject) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        if (filterObject == null) {
+            return criteriaList;
+        }
         if (StringUtils.isNotBlank(filterObject.getName()) || StringUtils.isNotBlank(filterObject.getDescription())) {
             List<Criteria> nameAndDescriptionCriteria = new ArrayList<>();
 
@@ -234,11 +181,12 @@ public class EventService {
                 criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
             }
         }
+        return criteriaList;
+    }
 
+    private Page<Event> pageEventMethod(List<Criteria> criteriaList, int page, int size) {
         Query query = new Query();
-        if (!criteriaList.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
-        }
+        query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
 
         List<EventDocumentDB> eventsDB = mongoTemplate.find(query, EventDocumentDB.class);
         List<Event> events = new ArrayList<>();
@@ -246,7 +194,9 @@ public class EventService {
             events.add(TwentyFiveMapper.INSTANCE.eventDocumentDBToEvent(event));
         }
 
-        Pageable pageable = PageRequest.of(page, dimension);
+        Pageable pageable = PageRequest.of(page, size);
         return MethodUtils.convertListToPage(events, pageable);
     }
+
+
 }

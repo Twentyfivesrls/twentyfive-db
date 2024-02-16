@@ -12,7 +12,6 @@ import java.util.Set;
 public interface EventRepository extends MongoRepository<EventDocumentDB, String> {
 
     List<EventDocumentDB> findAllByUserId(String username);
-
     Set<EventDocumentDB> findByUserIdAndNameContainingIgnoreCase(String userId, String name);
     Set<EventDocumentDB> findByUserIdAndDescriptionContainingIgnoreCase(String userId,String description);
 }
