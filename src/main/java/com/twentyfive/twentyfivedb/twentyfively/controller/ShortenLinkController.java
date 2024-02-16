@@ -25,6 +25,13 @@ public class ShortenLinkController {
         return ResponseEntity.ok(new ResponseValue(result.getShortUrl()));
     }
 
+    @PostMapping("/generate-keycloak")
+    public ResponseEntity<ResponseValue> generateForMailKeycloak(@RequestBody RequestValue requestValue /*, @RequestParam(value = "username") String username*/) {
+        ShortenLink result = shortenLinkService.generateForMailKeycloak(requestValue);
+        return ResponseEntity.ok(new ResponseValue(result.getShortUrl()));
+    }
+
+
 
     @GetMapping("/get-complete-link/{shortUrl}")
     public ResponseEntity<String> getCompleteShortenLink(@PathVariable String shortUrl) {

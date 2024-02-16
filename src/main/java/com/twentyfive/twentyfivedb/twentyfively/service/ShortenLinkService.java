@@ -37,6 +37,20 @@ public class ShortenLinkService {
     }
 
 
+    public ShortenLink generateForMailKeycloak(RequestValue requestValue) {
+        ShortenLinkDocumentDB toSave = new ShortenLinkDocumentDB();
+        toSave.setDestinationUrl(requestValue.getUrl());
+
+        toSave.setShortUrl(generateUniqueLink());
+        toSave.setCreatedAt(new Date());
+        ShortenLinkDocumentDB response = shortenLinkRepository.save(toSave);
+
+        String shortUrlString = response.getShortUrl();
+        String composedUrl = baseUrl + shortUrlString;
+        response.setShortUrl(composedUrl);
+        return TwentyFiveMapper.INSTANCE.shortenLinkDocumentDBToShortenLink(response);
+    }
+
     public ShortenLink generateShortUrl(RequestValue requestValue) {
         //TODO: modificare la chiamata con l'username una volta che sarà implementato il login
         String userId = "";
