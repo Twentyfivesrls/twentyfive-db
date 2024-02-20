@@ -170,6 +170,23 @@ public class EventService {
         }
 
         if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
+            Criteria criteriaWithinRange = new Criteria().orOperator(
+                    Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd()),
+                    Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd()),
+                    Criteria.where("dateStart").lte(filterObject.getDateStart()).and("dateEnd").gte(filterObject.getDateEnd())
+            );
+            criteriaList.add(criteriaWithinRange);
+        } else {
+            if (filterObject.getDateStart() != null) {
+                criteriaList.add(Criteria.where("dateStart").gte(filterObject.getDateStart()));
+            }
+            if (filterObject.getDateEnd() != null) {
+                criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
+            }
+        }
+
+
+        /*if (filterObject.getDateStart() != null && filterObject.getDateEnd() != null) {
             Criteria dateCriteria1 = Criteria.where("dateStart").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             Criteria dateCriteria2 = Criteria.where("dateEnd").gte(filterObject.getDateStart()).lte(filterObject.getDateEnd());
             criteriaList.add(new Criteria().andOperator(dateCriteria1, dateCriteria2));
@@ -180,7 +197,7 @@ public class EventService {
             if (filterObject.getDateEnd() != null) {
                 criteriaList.add(Criteria.where("dateEnd").lte(filterObject.getDateEnd()));
             }
-        }
+        }*/
         return criteriaList;
     }
 

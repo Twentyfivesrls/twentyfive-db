@@ -62,7 +62,6 @@ public class EventController {
 
     @PostMapping("/save")
     public ResponseEntity<Event> saveEvent(@RequestBody Event event) {
-        System.out.println("evento  :" + event);
         eventService.saveEvent(event);
         return ResponseEntity.ok(event);
 
