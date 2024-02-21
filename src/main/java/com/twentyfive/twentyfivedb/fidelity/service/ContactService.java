@@ -5,8 +5,10 @@ import com.twentyfive.twentyfivedb.fidelity.repository.ContactRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 @Service
@@ -26,6 +28,11 @@ public class ContactService {
 
     public Contact getContact(String id) {
         return contactRepository.findById(id).orElse(null);
+    }
+
+    public Page<Contact> getContactByName(String name, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+        return contactRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
     public Contact createContact(Contact contact) { return this.contactRepository.save(contact); }

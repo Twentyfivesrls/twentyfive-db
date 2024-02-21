@@ -4,6 +4,7 @@ import com.twentyfive.twentyfivedb.fidelity.service.ContactService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 @RestController
@@ -24,6 +25,13 @@ public class ContactController {
             @RequestParam(defaultValue = "asc") String sortDirection
     ) {
         return ResponseEntity.ok(contactService.getAllContact(page, size, sortColumn, sortDirection));
+    }
+
+    @GetMapping("/get-name")
+    public ResponseEntity<Page<Contact>> getGroupByName(@RequestParam("name") String name,
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(contactService.getContactByName(name, page, size));
     }
 
     @GetMapping("/detail/{id}")

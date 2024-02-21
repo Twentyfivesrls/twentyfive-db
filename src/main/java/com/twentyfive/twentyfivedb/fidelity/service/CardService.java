@@ -5,9 +5,13 @@ import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
+
+import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -15,20 +19,52 @@ public class CardService {
 
     private final CardRepository cardRepository;
 
-    public CardService(CardRepository cardRepository) {
+    private final CardGroupService cardGroupService;
+
+    public CardService(CardRepository cardRepository, CardGroupService cardGroupService) {
         this.cardRepository = cardRepository;
+        this.cardGroupService = cardGroupService;
     }
 
     public Page<Card> getAllCard(int page, int size, String sortColumn, String sortDirection) {
         Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        return cardRepository.findAll(pageable);
+
+        Page<Card> cards = cardRepository.findAll(pageable);
+        for(Card card: cards){
+            String groupId = card.getCardGroupId();
+            CardGroup group = cardGroupService.getCardGroup(groupId);
+            if(!group.getIsActive()){
+                card.setIsActive(false);
+                cardRepository.save(card);
+            }
+        }
+        return cards;
     }
 
     public Card getCard(String id) {
         return cardRepository.findById(id).orElse(null);
     }
 
-    public Card createCard(Card card) { return this.cardRepository.save(card); }
+    public Page<Card> getCardByName(String name, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+        return cardRepository.findAllByNameIgnoreCase(name, pageable);
+    }
+
+    public Page<Card> getAllCardByStatus(int page, int size, String sortColumn, String sortDirection, Boolean status) {
+        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+        return cardRepository.findAllByIsActive(status, pageable);
+    }
+
+    public Card createCard(Card card) {
+        String temp = card.getCardGroupId();
+        CardGroup group = cardGroupService.getCardGroup(temp);
+        try{
+            cardGroupService.checkExpirationDate(group);
+        } catch (Exception e){
+            throw new RuntimeException("Unable to create card");
+        }
+        return this.cardRepository.save(card);
+    }
 
     public void deleteCard(String id) {
         this.cardRepository.deleteById(id);

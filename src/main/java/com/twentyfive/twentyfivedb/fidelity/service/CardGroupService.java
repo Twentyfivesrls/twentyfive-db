@@ -5,9 +5,16 @@ import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Service
@@ -21,14 +28,42 @@ public class CardGroupService {
 
     public Page<CardGroup> getAllCardGroup(String ownerId, int page, int size, String sortColumn, String sortDirection) {
         Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        return cardGroupRepository.getAllByOwnerId(ownerId, pageable);
+        Page<CardGroup> groups = cardGroupRepository.getAllByOwnerId(ownerId, pageable);
+        this.disableExpiredGroups(groups);
+        return groups;
+    }
+
+    public Page<CardGroup> getAllCardGroupByStatus(int page, int size, String sortColumn, String sortDirection, Boolean status) {
+        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+        return cardGroupRepository.findAllByIsActive(status, pageable);
+    }
+
+    public Page<CardGroup> getGroupByDate(String date, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+       //  String data = Utility.formatDate(date);
+        LocalDateTime dateParsed = null;
+        try {
+            dateParsed =  LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+        } catch ( Exception e ){
+            log.info(e.getMessage());
+        }
+        return cardGroupRepository.findAllByExpirationDate(dateParsed, pageable);
     }
 
     public CardGroup getCardGroup(String id) {
         return cardGroupRepository.findById(id).orElse(null);
     }
 
-    public CardGroup createCardGroup(CardGroup cardGroup) { return this.cardGroupRepository.save(cardGroup); }
+    public Page<CardGroup> getGroupByName(String name, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+        return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
+    }
+
+    public CardGroup createCardGroup(CardGroup cardGroup) {
+        cardGroup.setExpirationDate(cardGroup.getExpirationDate().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.of("+02:00")).toLocalDateTime());
+        this.checkExpirationDate(cardGroup);
+        return this.cardGroupRepository.save(cardGroup);
+    }
 
     public void deleteCardGroup(String id) {
         this.cardGroupRepository.deleteById(id);
@@ -71,6 +106,25 @@ public class CardGroupService {
         if(cardGroup != null){
             cardGroup.setIsActive(status);
             cardGroupRepository.save(cardGroup);
+        }
+    }
+
+    public void disableExpiredGroups(Page<CardGroup> groups){
+        LocalDate currentDate = LocalDate.now();
+
+        for(CardGroup cardGroup: groups){
+            if(cardGroup.getExpirationDate().isBefore(currentDate.atStartOfDay())){
+                cardGroup.setIsActive(false);
+                cardGroupRepository.save(cardGroup);
+            }
+        }
+    }
+
+    public void checkExpirationDate(CardGroup group){
+        LocalDate currentDate = LocalDate.now();
+        if(group.getExpirationDate().isBefore(currentDate.atStartOfDay())){
+            log.error("Impossible create group with this date");
+            throw new RuntimeException("Impossible create group with this date");
         }
     }
 }
