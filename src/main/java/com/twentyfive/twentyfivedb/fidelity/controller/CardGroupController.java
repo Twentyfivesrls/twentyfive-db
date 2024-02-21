@@ -2,12 +2,9 @@ package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.CardGroupService;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/card-group")
@@ -18,6 +15,17 @@ public class CardGroupController {
     public CardGroupController(CardGroupService cardGroupService) {
         this.cardGroupService = cardGroupService;
     }
+
+    @PostMapping("/filter")
+    public ResponseEntity<Page<CardGroup>> getCardGroupListPagination(@RequestBody CardGroup filterObject,
+                                                                      @RequestParam(name = "ownerId") String ownerId,
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "5") int size,
+                                                                      @RequestParam(defaultValue = "id") String sortColumn,
+                                                                      @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(cardGroupService.getCardGroupFiltered(filterObject, ownerId, page, size, sortColumn, sortDirection));
+    }
+
 
     @GetMapping("/page")
     public ResponseEntity<Page<CardGroup>> getAllCardGroup(

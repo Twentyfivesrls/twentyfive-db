@@ -5,25 +5,34 @@ import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @Service
 public class CardGroupService {
 
     private final CardGroupRepository cardGroupRepository;
+    private final MongoTemplate mongoTemplate;
 
-    public CardGroupService(CardGroupRepository cardGroupRepository) {
+
+    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate) {
         this.cardGroupRepository = cardGroupRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public Page<CardGroup> getAllCardGroup(String ownerId, int page, int size, String sortColumn, String sortDirection) {
@@ -127,4 +136,45 @@ public class CardGroupService {
             throw new RuntimeException("Impossible create group with this date");
         }
     }
+
+    public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size, String sortColumn, String sortDirection) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("ownerId").is(ownerId));
+        criteriaList.addAll(parseOtherFilters(filterObject));
+        return this.pageMethod(criteriaList, page, size, sortColumn, sortDirection);
+    }
+
+    private List<Criteria> parseOtherFilters(CardGroup filterObject){
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(filterObject == null){
+            return criteriaList;
+        }
+        if(StringUtils.isNotBlank(filterObject.getName())){
+            criteriaList.add(Criteria.where("name").regex(filterObject.getName(), "i"));
+        }
+        if(StringUtils.isNotBlank(filterObject.getDescription())){
+            criteriaList.add(Criteria.where("description").regex(filterObject.getDescription(), "i"));
+        }
+        if(filterObject.getIsActive() != null){
+            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
+        }
+        if(filterObject.getExpirationDate() != null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getExpirationDate()));
+        }
+        return criteriaList;
+    }
+
+    private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size, String sortColumn, String sortDirection) {
+        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+
+        Query query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+        query.with(pageable);
+
+        long total = mongoTemplate.count(query, CardGroup.class);
+
+        List<CardGroup> cardGroups = mongoTemplate.find(query, CardGroup.class);
+        return new PageImpl<>(cardGroups, pageable, total);
+    }
+
+
 }
