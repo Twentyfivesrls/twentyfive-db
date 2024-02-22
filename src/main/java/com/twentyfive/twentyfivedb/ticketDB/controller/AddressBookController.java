@@ -102,7 +102,7 @@ public class AddressBookController {
     }
 
     @PostMapping("/save/addressbook")
-    public AddressBookDocumentDB saveAddressbook(@RequestBody AddressBook addressBook) {
+    public AddressBookDocumentDB saveAddressbook(@RequestBody AddressBook addressBook){
 
         AddressBookDocumentDB addressBookDocumentDB = TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook);
         return addressBookService.saveAddressBook(addressBookDocumentDB);

@@ -38,20 +38,20 @@ public class TicketService {
 
     public TicketDocumentDB saveTicket(Ticket ticket, AddressBook addressBook, String username) {
         AddressBookDocumentDB addressBookDB = TwentyFiveMapper.INSTANCE.addressBookToAddressBookDocumentDB(addressBook);
-        boolean isPresent = false;
         List<AddressBookDocumentDB> addresses = addressBookService.findAllByUserId(username);
+        AddressBookDocumentDB found = null;
         for (AddressBookDocumentDB a : addresses) {
             if (MethodUtils.existedAddress(a, addressBookDB)) {
-                isPresent = true;
+                found = a;
                 break;
             }
         }
-        if (!isPresent) {
+        if (found == null) {
             addressBookDB.setId(null);
             addressBookDB.setUserId(username);
             addressBookDB = addressBookService.saveAddressBook(addressBookDB);
         } else {
-            addressBookDB = addressBookService.findAddressBook(addressBookDB);
+            addressBookDB = found;
         }
         String code = UUID.randomUUID().toString();
         ticket.setCode(code);

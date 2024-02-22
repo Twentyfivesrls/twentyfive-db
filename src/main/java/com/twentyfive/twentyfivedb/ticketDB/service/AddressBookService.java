@@ -103,6 +103,12 @@ public class AddressBookService {
             log.error("AddressBook is null or empty");
             throw new IllegalArgumentException("AddressBook is null or empty");
         }
+        //check if the addressBook already exists based on equality with fistName, lastName, email and userId
+        AddressBookDocumentDB findAddressBook = addressBookRepository.findByFirstNameAndLastNameAndUserIdAndEmail(addressBook.getFirstName(), addressBook.getLastName(), addressBook.getUserId(), addressBook.getEmail()).orElse(null);
+        if (findAddressBook != null) {
+            log.error("AddressBook already exists");
+            throw new IllegalArgumentException("AddressBook already exists");
+        }
         addressBookRepository.save(addressBook);
         return addressBook;
     }
