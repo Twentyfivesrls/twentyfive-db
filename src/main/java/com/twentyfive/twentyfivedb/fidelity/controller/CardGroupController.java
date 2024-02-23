@@ -26,37 +26,6 @@ public class CardGroupController {
         return ResponseEntity.ok(cardGroupService.getCardGroupFiltered(filterObject, ownerId, page, size, sortColumn, sortDirection));
     }
 
-
-    @GetMapping("/page")
-    public ResponseEntity<Page<CardGroup>> getAllCardGroup(
-            @RequestParam(name = "ownerId") String ownerId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "lastname") String sortColumn,
-            @RequestParam(defaultValue = "asc") String sortDirection
-    ) {
-        return ResponseEntity.ok(cardGroupService.getAllCardGroup(ownerId, page, size, sortColumn, sortDirection));
-    }
-
-    @GetMapping("/page-status")
-    public ResponseEntity<Page<CardGroup>> getAllCardGroupByStatus(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "lastname") String sortColumn,
-            @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam("status") Boolean status
-
-    ) {
-        return ResponseEntity.ok(cardGroupService.getAllCardGroupByStatus(page, size, sortColumn, sortDirection, status));
-    }
-
-    @GetMapping("/page-date")
-    public ResponseEntity<Page<CardGroup>> getGroupByDate(@RequestParam("date") String date,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(cardGroupService.getGroupByDate(date, page, size));
-    }
-
     @GetMapping("/detail/{id}")
     public ResponseEntity<CardGroup> getCardGroup(@PathVariable String id) {
         return ResponseEntity.ok(cardGroupService.getCardGroup(id));

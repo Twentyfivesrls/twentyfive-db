@@ -16,10 +16,8 @@ import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGrou
 
 import java.util.ArrayList;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -35,37 +33,8 @@ public class CardGroupService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public Page<CardGroup> getAllCardGroup(String ownerId, int page, int size, String sortColumn, String sortDirection) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        Page<CardGroup> groups = cardGroupRepository.getAllByOwnerId(ownerId, pageable);
-        this.disableExpiredGroups(groups);
-        return groups;
-    }
-
-    public Page<CardGroup> getAllCardGroupByStatus(int page, int size, String sortColumn, String sortDirection, Boolean status) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        return cardGroupRepository.findAllByIsActive(status, pageable);
-    }
-
-    public Page<CardGroup> getGroupByDate(String date, int page, int size){
-        Pageable pageable= PageRequest.of(page, size);
-       //  String data = Utility.formatDate(date);
-        LocalDateTime dateParsed = null;
-        try {
-            dateParsed =  LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
-        } catch ( Exception e ){
-            log.info(e.getMessage());
-        }
-        return cardGroupRepository.findAllByExpirationDate(dateParsed, pageable);
-    }
-
     public CardGroup getCardGroup(String id) {
         return cardGroupRepository.findById(id).orElse(null);
-    }
-
-    public Page<CardGroup> getGroupByName(String name, int page, int size){
-        Pageable pageable= PageRequest.of(page, size);
-        return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
     public CardGroup createCardGroup(CardGroup cardGroup) {
@@ -118,7 +87,7 @@ public class CardGroupService {
         }
     }
 
-    public void disableExpiredGroups(Page<CardGroup> groups){
+    public void disableExpiredGroups(List<CardGroup> groups){
         LocalDate currentDate = LocalDate.now();
 
         for(CardGroup cardGroup: groups){
@@ -137,6 +106,8 @@ public class CardGroupService {
         }
     }
 
+
+    /* TODO metodi aggiunta criteri per filtraggio*/
     public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size, String sortColumn, String sortDirection) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("ownerId").is(ownerId));
@@ -173,8 +144,12 @@ public class CardGroupService {
         long total = mongoTemplate.count(query, CardGroup.class);
 
         List<CardGroup> cardGroups = mongoTemplate.find(query, CardGroup.class);
+        this.disableExpiredGroups(cardGroups);
         return new PageImpl<>(cardGroups, pageable, total);
     }
 
-
+    public Page<CardGroup> getGroupByName(String name, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+        return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
+    }
 }
