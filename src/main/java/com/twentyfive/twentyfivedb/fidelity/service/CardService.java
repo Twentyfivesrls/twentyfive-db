@@ -5,13 +5,19 @@ import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -19,26 +25,14 @@ public class CardService {
 
     private final CardRepository cardRepository;
 
+    private final MongoTemplate mongoTemplate;
+
     private final CardGroupService cardGroupService;
 
-    public CardService(CardRepository cardRepository, CardGroupService cardGroupService) {
+    public CardService(CardRepository cardRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService) {
         this.cardRepository = cardRepository;
+        this.mongoTemplate = mongoTemplate;
         this.cardGroupService = cardGroupService;
-    }
-
-    public Page<Card> getAllCard(int page, int size, String sortColumn, String sortDirection) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-
-        Page<Card> cards = cardRepository.findAll(pageable);
-        for(Card card: cards){
-            String groupId = card.getCardGroupId();
-            CardGroup group = cardGroupService.getCardGroup(groupId);
-            if(!group.getIsActive()){
-                card.setIsActive(false);
-                cardRepository.save(card);
-            }
-        }
-        return cards;
     }
 
     public Card getCard(String id) {
@@ -48,11 +42,6 @@ public class CardService {
     public Page<Card> getCardByName(String name, int page, int size){
         Pageable pageable= PageRequest.of(page, size);
         return cardRepository.findAllByNameIgnoreCase(name, pageable);
-    }
-
-    public Page<Card> getAllCardByStatus(int page, int size, String sortColumn, String sortDirection, Boolean status) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        return cardRepository.findAllByIsActive(status, pageable);
     }
 
     public Card createCard(Card card) {
@@ -113,4 +102,61 @@ public class CardService {
         }
     }
 
+
+    /* TODO metodi aggiunta criteri per filtraggio*/
+    public Page<Card> getCardFiltered(Card filterObject, int page, int size, String sortColumn, String sortDirection) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.addAll(parseOtherFilters(filterObject));
+        return this.pageMethod(criteriaList, page, size, sortColumn, sortDirection);
+    }
+
+    private List<Criteria> parseOtherFilters(Card filterObject){
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(filterObject == null){
+            return criteriaList;
+        }
+        if(StringUtils.isNotBlank(filterObject.getName())){
+            criteriaList.add(Criteria.where("name").regex(filterObject.getName(), "i"));
+        }
+        if(StringUtils.isNotBlank(filterObject.getEmail())){
+            criteriaList.add(Criteria.where("email").regex(filterObject.getEmail(), "i"));
+        }
+        if(filterObject.getIsActive() != null){
+            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
+        }
+        /* TODO aggiungere la ricerca per data di scadenza */
+        /*if(filterObject.getExpirationDate() != null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getExpirationDate()));
+        }*/
+        return criteriaList;
+    }
+
+    private Page<Card> pageMethod(List<Criteria> criteriaList, int page, int size, String sortColumn, String sortDirection) {
+        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+        Query query = new Query();
+        if(CollectionUtils.isEmpty(criteriaList)){
+           log.info("criteria empty");
+
+        } else {
+            query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+        }
+        query.with(pageable);
+
+        long total = mongoTemplate.count(query, Card.class);
+
+        List<Card> cards = mongoTemplate.find(query, Card.class);
+        this.disableStatusCard(cards);
+        return new PageImpl<>(cards, pageable, total);
+    }
+
+    private void disableStatusCard(List<Card> cards){
+        for(Card card: cards){
+            String groupId = card.getCardGroupId();
+            CardGroup group = cardGroupService.getCardGroup(groupId);
+            if(!group.getIsActive()){
+                card.setIsActive(false);
+                cardRepository.save(card);
+            }
+        }
+    }
 }

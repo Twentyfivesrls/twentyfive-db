@@ -4,7 +4,6 @@ import com.twentyfive.twentyfivedb.fidelity.service.ContactService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 @RestController
@@ -17,20 +16,19 @@ public class ContactController {
         this.contactService = contactService;
     }
 
-    @GetMapping("/page")
-    public ResponseEntity<Page<Contact>> getAllContact(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "lastname") String sortColumn,
-            @RequestParam(defaultValue = "asc") String sortDirection
-    ) {
-        return ResponseEntity.ok(contactService.getAllContact(page, size, sortColumn, sortDirection));
+    @PostMapping("/filter")
+    public ResponseEntity<Page<Contact>> getContactListPagination(@RequestBody Contact filterObject,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "5") int size,
+                                                                  @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                                  @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(contactService.getContactFiltered(filterObject, page, size, sortColumn, sortDirection));
     }
 
     @GetMapping("/get-name")
-    public ResponseEntity<Page<Contact>> getGroupByName(@RequestParam("name") String name,
-                                                     @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Page<Contact>> getContactByName(@RequestParam("name") String name,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(contactService.getContactByName(name, page, size));
     }
 

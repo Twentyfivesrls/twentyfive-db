@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
 @RestController
 @RequestMapping("/card")
@@ -17,32 +16,19 @@ public class CardController {
         this.cardService = cardService;
     }
 
-    @GetMapping("/page")
-    public ResponseEntity<Page<Card>> getAllCard(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "lastname") String sortColumn,
-            @RequestParam(defaultValue = "asc") String sortDirection
-    ) {
-        return ResponseEntity.ok(cardService.getAllCard(page, size, sortColumn, sortDirection));
-    }
-
-    @GetMapping("/page-status")
-    public ResponseEntity<Page<Card>> getAllCardGroupByStatus(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "lastname") String sortColumn,
-            @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam("status") Boolean status
-
-    ) {
-        return ResponseEntity.ok(cardService.getAllCardByStatus(page, size, sortColumn, sortDirection, status));
+    @PostMapping("/filter")
+    public ResponseEntity<Page<Card>> getCardListPagination(@RequestBody Card filterObject,
+                                                            @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "5") int size,
+                                                            @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                            @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size, sortColumn, sortDirection));
     }
 
     @GetMapping("/get-name")
     public ResponseEntity<Page<Card>> getGroupByName(@RequestParam("name") String name,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size) {
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(cardService.getCardByName(name, page, size));
     }
 
