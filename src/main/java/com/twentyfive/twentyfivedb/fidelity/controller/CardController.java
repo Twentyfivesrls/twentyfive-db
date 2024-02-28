@@ -1,14 +1,26 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
+import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
+import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
+import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 
+import java.io.IOException;
+import java.util.Base64;
+
 @RestController
 @RequestMapping("/card")
 public class CardController {
+
+    private final String baseUrl = "http://localhost:8080";
+
+    public static final int DEFAULT_QR_WIDTH = 350;
+    public static final int DEFAULT_QR_HEIGHT = 350;
 
     private final CardService cardService;
 
@@ -58,5 +70,25 @@ public class CardController {
     public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
         cardService.updateStatus(id, status);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/generateQrCode/{id}")
+        public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id) throws IOException, WriterException {
+        /*byte[] qrCode = MethodUtils.generateQrCodeImage(id, 350, 350);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=qrCode.png")
+                .body(qrCode);
+         */
+        try {
+            String togenerate = baseUrl + "crudStats/" + id;
+            byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            base64 = "data:image/png;base64," + base64;
+            ResponseImage response = new ResponseImage();
+            response.setImageBase64(base64);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 }

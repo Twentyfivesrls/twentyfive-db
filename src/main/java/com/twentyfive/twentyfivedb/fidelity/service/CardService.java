@@ -35,6 +35,10 @@ public class CardService {
         this.cardGroupService = cardGroupService;
     }
 
+    public List<Card> getCardList(){
+        return cardRepository.findAll();
+    }
+
     public Card getCard(String id) {
         return cardRepository.findById(id).orElse(null);
     }
