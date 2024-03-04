@@ -1,23 +1,23 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
-import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 
-import java.io.IOException;
 import java.util.Base64;
 
 @RestController
 @RequestMapping("/card")
 public class CardController {
 
-    private final String baseUrl = "http://localhost:8080";
+    @Value("${fidelity.base.url}")
+    private String baseUrl;
 
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
@@ -73,14 +73,9 @@ public class CardController {
     }
 
     @GetMapping("/generateQrCode/{id}")
-        public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id) throws IOException, WriterException {
-        /*byte[] qrCode = MethodUtils.generateQrCodeImage(id, 350, 350);
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=qrCode.png")
-                .body(qrCode);
-         */
+        public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id){
         try {
-            String togenerate = baseUrl + "crudStats/" + id;
+            String togenerate = baseUrl + "dashboard/card/detail/" + id;
             byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
             String base64 = Base64.getEncoder().encodeToString(bytes);
             base64 = "data:image/png;base64," + base64;
