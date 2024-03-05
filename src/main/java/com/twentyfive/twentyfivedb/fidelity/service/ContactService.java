@@ -1,7 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
-import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.ContactRepository;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,9 @@ import org.springframework.util.CollectionUtils;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -29,6 +31,11 @@ public class ContactService {
     public ContactService(ContactRepository contactRepository, MongoTemplate mongoTemplate) {
         this.contactRepository = contactRepository;
         this.mongoTemplate = mongoTemplate;
+    }
+
+    public Page<Contact> pageContact(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return contactRepository.findAll(pageable);
     }
 
     public Contact getContact(String id) {
@@ -71,10 +78,10 @@ public class ContactService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Contact> getContactFiltered(Contact filterObject, int page, int size, String sortColumn, String sortDirection) {
+    public Page<Contact> getContactFiltered(Contact filterObject, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.addAll(parseOtherFilters(filterObject));
-        return this.pageMethod(criteriaList, page, size, sortColumn, sortDirection);
+        return this.pageMethod(criteriaList, page, size);
     }
 
     private List<Criteria> parseOtherFilters(Contact filterObject){
@@ -88,8 +95,8 @@ public class ContactService {
         return criteriaList;
     }
 
-    private Page<Contact> pageMethod(List<Criteria> criteriaList, int page, int size, String sortColumn, String sortDirection) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+    private Page<Contact> pageMethod(List<Criteria> criteriaList, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
         if(CollectionUtils.isEmpty(criteriaList)){
             log.info("criteria empty");
@@ -103,5 +110,15 @@ public class ContactService {
 
         List<Contact> contacts = mongoTemplate.find(query, Contact.class);
         return new PageImpl<>(contacts, pageable, total);
+    }
+
+    public Set<AutoCompleteRes> filterSearch(String find){
+        Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
+        Set<AutoCompleteRes> setCombinato = new HashSet<>();
+        for (Contact contact : contacts) {
+            AutoCompleteRes temp = new AutoCompleteRes(contact.getName());
+            setCombinato.add(temp);
+        }
+        return setCombinato;
     }
 }

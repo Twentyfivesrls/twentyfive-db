@@ -1,10 +1,14 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.CardGroupService;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/card-group")
@@ -20,10 +24,20 @@ public class CardGroupController {
     public ResponseEntity<Page<CardGroup>> getCardGroupListPagination(@RequestBody CardGroup filterObject,
                                                                       @RequestParam(name = "ownerId") String ownerId,
                                                                       @RequestParam(defaultValue = "0") int page,
-                                                                      @RequestParam(defaultValue = "5") int size,
-                                                                      @RequestParam(defaultValue = "id") String sortColumn,
-                                                                      @RequestParam(defaultValue = "asc") String sortDirection) {
-        return ResponseEntity.ok(cardGroupService.getCardGroupFiltered(filterObject, ownerId, page, size, sortColumn, sortDirection));
+                                                                      @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(cardGroupService.getCardGroupFiltered(filterObject, ownerId, page, size));
+    }
+
+    @PostMapping("/page")
+    public ResponseEntity<Page<CardGroup>> getGroupsListPagination(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "5") int size,
+                                                                   @RequestParam(name = "ownerId") String ownerId) {
+        return new ResponseEntity<>(cardGroupService.pageGroups(page, size, ownerId), HttpStatus.OK);
+    }
+
+    @PostMapping("/filter/group/autocomplete")
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("ownerId") String ownerId, @RequestParam("filterObject") String filterObject) {
+        return new ResponseEntity<>(cardGroupService.filterSearch(filterObject, ownerId), HttpStatus.OK);
     }
 
     @GetMapping("/detail/{id}")

@@ -3,6 +3,7 @@ package com.twentyfive.twentyfivedb.fidelity.controller;
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 
 import java.util.Base64;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/card")
@@ -29,12 +31,21 @@ public class CardController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<Card>> getCardListPagination(@RequestBody Card filterObject,
-                                                            @RequestParam(defaultValue = "0") int page,
-                                                            @RequestParam(defaultValue = "5") int size,
-                                                            @RequestParam(defaultValue = "lastname") String sortColumn,
-                                                            @RequestParam(defaultValue = "asc") String sortDirection) {
-        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size, sortColumn, sortDirection));
+    public ResponseEntity<Page<Card>> getCardListFilteredPagination(@RequestBody Card filterObject,
+                                                                    @RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size));
+    }
+
+    @PostMapping("/page")
+    public ResponseEntity<Page<Card>> getCardListPagination(@RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "5") int size) {
+        return new ResponseEntity<>(cardService.pageCard(page, size), HttpStatus.OK);
+    }
+
+    @PostMapping("/filter/card/autocomplete")
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject) {
+        return new ResponseEntity<>(cardService.filterSearch(filterObject), HttpStatus.OK);
     }
 
     @GetMapping("/get-name")
@@ -73,7 +84,7 @@ public class CardController {
     }
 
     @GetMapping("/generateQrCode/{id}")
-        public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id){
+    public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id) {
         try {
             String togenerate = baseUrl + "dashboard/card/detail/" + id;
             byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);

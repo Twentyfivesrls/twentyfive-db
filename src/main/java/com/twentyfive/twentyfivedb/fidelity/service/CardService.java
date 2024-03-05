@@ -1,7 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
-import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,9 @@ import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -35,8 +37,9 @@ public class CardService {
         this.cardGroupService = cardGroupService;
     }
 
-    public List<Card> getCardList(){
-        return cardRepository.findAll();
+    public Page<Card> pageCard(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findAll(pageable);
     }
 
     public Card getCard(String id) {
@@ -44,7 +47,7 @@ public class CardService {
     }
 
     public Page<Card> getCardByName(String name, int page, int size){
-        Pageable pageable= PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
         return cardRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
@@ -108,10 +111,10 @@ public class CardService {
 
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Card> getCardFiltered(Card filterObject, int page, int size, String sortColumn, String sortDirection) {
+    public Page<Card> getCardFiltered(Card filterObject, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.addAll(parseOtherFilters(filterObject));
-        return this.pageMethod(criteriaList, page, size, sortColumn, sortDirection);
+        return this.pageMethod(criteriaList, page, size);
     }
 
     private List<Criteria> parseOtherFilters(Card filterObject){
@@ -135,8 +138,8 @@ public class CardService {
         return criteriaList;
     }
 
-    private Page<Card> pageMethod(List<Criteria> criteriaList, int page, int size, String sortColumn, String sortDirection) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+    private Page<Card> pageMethod(List<Criteria> criteriaList, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
         if(CollectionUtils.isEmpty(criteriaList)){
            log.info("criteria empty");
@@ -151,6 +154,16 @@ public class CardService {
         List<Card> cards = mongoTemplate.find(query, Card.class);
         this.disableStatusCard(cards);
         return new PageImpl<>(cards, pageable, total);
+    }
+
+    public Set<AutoCompleteRes> filterSearch(String find){
+        Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCase(find);
+        Set<AutoCompleteRes> setCombinato = new HashSet<>();
+        for (Card card : cards) {
+            AutoCompleteRes temp = new AutoCompleteRes(card.getName());
+            setCombinato.add(temp);
+        }
+        return setCombinato;
     }
 
     private void disableStatusCard(List<Card> cards){

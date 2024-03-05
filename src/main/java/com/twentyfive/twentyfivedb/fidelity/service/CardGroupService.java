@@ -1,7 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
-import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -26,7 +28,7 @@ public class CardGroupService {
 
     private final CardGroupRepository cardGroupRepository;
     private final MongoTemplate mongoTemplate;
-
+    private static final String USER_KEY = "ownerId";
 
     public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate) {
         this.cardGroupRepository = cardGroupRepository;
@@ -44,6 +46,7 @@ public class CardGroupService {
     }
 
     public void deleteCardGroup(String id) {
+
         this.cardGroupRepository.deleteById(id);
     }
 
@@ -106,13 +109,24 @@ public class CardGroupService {
         }
     }
 
+    public Page<CardGroup> getGroupByName(String name, int page, int size){
+        Pageable pageable= PageRequest.of(page, size);
+        return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
+    }
+
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("ownerId").is(ownerId));
+        criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
-        return this.pageMethod(criteriaList, page, size, sortColumn, sortDirection);
+        return this.pageMethod(criteriaList, page, size);
+    }
+
+    public Page<CardGroup> pageGroups(int page, int size, String userId) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where(USER_KEY).is(userId));
+        return this.pageMethod(criteriaList, page, size);
     }
 
     private List<Criteria> parseOtherFilters(CardGroup filterObject){
@@ -135,8 +149,8 @@ public class CardGroupService {
         return criteriaList;
     }
 
-    private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size, String sortColumn, String sortDirection) {
-        Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+    private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size) {
+        Pageable pageable= PageRequest.of(page, size);
 
         Query query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         query.with(pageable);
@@ -148,8 +162,21 @@ public class CardGroupService {
         return new PageImpl<>(cardGroups, pageable, total);
     }
 
-    public Page<CardGroup> getGroupByName(String name, int page, int size){
-        Pageable pageable= PageRequest.of(page, size);
-        return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
+    public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
+        Set<CardGroup> groups = cardGroupRepository.findAllByOwnerIdAndNameContainingIgnoreCase(ownerId, find);
+        //Set<CardGroup> groupsDescription = cardGroupRepository.findByOwnerIdAndDescriptionContainingIgnoreCase(ownerId, find);
+
+        Set<AutoCompleteRes> setCombinato = new HashSet<>();
+        for (CardGroup group : groups) {
+            AutoCompleteRes temp = new AutoCompleteRes(group.getName());
+            setCombinato.add(temp);
+        }
+        /*for (CardGroup groupD : groupsDescription) {
+            AutoCompleteRes temp = new AutoCompleteRes(groupD.getDescription());
+            setCombinato.add(temp);
+        }
+
+         */
+        return setCombinato;
     }
 }
