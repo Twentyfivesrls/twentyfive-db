@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
+import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +13,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -28,15 +27,21 @@ public class CardGroupService {
 
     private final CardGroupRepository cardGroupRepository;
     private final MongoTemplate mongoTemplate;
+    private final CardRepository cardRepository;
     private static final String USER_KEY = "ownerId";
 
-    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate) {
+    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate, CardRepository cardRepository) {
         this.cardGroupRepository = cardGroupRepository;
         this.mongoTemplate = mongoTemplate;
+        this.cardRepository = cardRepository;
     }
 
     public CardGroup getCardGroup(String id) {
         return cardGroupRepository.findById(id).orElse(null);
+    }
+
+    public List<CardGroup> findAll(){
+        return cardGroupRepository.findAll();
     }
 
     public CardGroup createCardGroup(CardGroup cardGroup) {
@@ -46,7 +51,8 @@ public class CardGroupService {
     }
 
     public void deleteCardGroup(String id) {
-
+        List<Card> list = cardRepository.findAllByCardGroupId(id);
+        cardRepository.deleteAll(list);
         this.cardGroupRepository.deleteById(id);
     }
 

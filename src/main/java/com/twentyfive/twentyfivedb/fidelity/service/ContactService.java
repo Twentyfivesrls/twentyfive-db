@@ -38,6 +38,10 @@ public class ContactService {
         return contactRepository.findAll(pageable);
     }
 
+    public List<Contact> findAll(){
+        return contactRepository.findAll();
+    }
+
     public Contact getContact(String id) {
         return contactRepository.findById(id).orElse(null);
     }

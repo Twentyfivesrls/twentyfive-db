@@ -46,6 +46,14 @@ public class CardService {
         return cardRepository.findById(id).orElse(null);
     }
 
+    public List<Card> findAll(){
+        return cardRepository.findAll();
+    }
+
+    public List<Card> getByGroupId(String groupId){
+        return cardRepository.findAllByCardGroupId(groupId);
+    }
+
     public Page<Card> getCardByName(String name, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         return cardRepository.findAllByNameIgnoreCase(name, pageable);

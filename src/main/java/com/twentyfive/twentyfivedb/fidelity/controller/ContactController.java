@@ -1,13 +1,17 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.ContactService;
+import com.twentyfive.twentyfivedb.fidelity.service.ExportExcelService;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 @RestController
@@ -16,8 +20,11 @@ public class ContactController {
 
     private final ContactService contactService;
 
-    public ContactController(ContactService contactService) {
+    private final ExportExcelService exportService;
+
+    public ContactController(ContactService contactService, ExportExcelService exportService) {
         this.contactService = contactService;
+        this.exportService = exportService;
     }
 
     @PostMapping("/filter")
@@ -69,4 +76,14 @@ public class ContactController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(){
+        byte[] excelData = exportService.addressbookExport();
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String formattedDateTime = dateTime.format(formatter);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=Lista_Contatti_" + formattedDateTime + ".xlsx")
+                .body(excelData);
+    }
 }

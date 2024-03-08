@@ -1,17 +1,22 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
+import com.twentyfive.twentyfivedb.fidelity.service.ExportExcelService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -23,10 +28,12 @@ public class CardController {
 
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
-
+    private final ExportExcelService exportService;
     private final CardService cardService;
 
-    public CardController(CardService cardService) {
+
+    public CardController(ExportExcelService exportService, CardService cardService) {
+        this.exportService = exportService;
         this.cardService = cardService;
     }
 
@@ -41,6 +48,11 @@ public class CardController {
     public ResponseEntity<Page<Card>> getCardListPagination(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "5") int size) {
         return new ResponseEntity<>(cardService.pageCard(page, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/find-by-groupId")
+    public ResponseEntity<List<Card>> getByGroupId(@RequestParam("cardGroupId") String groupId){
+        return new ResponseEntity<>(cardService.getByGroupId(groupId), HttpStatus.OK);
     }
 
     @PostMapping("/filter/card/autocomplete")
@@ -96,5 +108,27 @@ public class CardController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
+    }
+
+    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(){
+        byte[] excelData = exportService.cardExport();
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String formattedDateTime = dateTime.format(formatter);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=Lista_Card_" + formattedDateTime + ".xlsx")
+                .body(excelData);
+    }
+
+    @GetMapping(value = "/export/excel-by-group/{groupId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String groupId){
+        byte[] excelData = exportService.cardExportByGroupId(groupId);
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String formattedDateTime = dateTime.format(formatter);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=Lista_Card_Associate_" + groupId + formattedDateTime + ".xlsx")
+                .body(excelData);
     }
 }

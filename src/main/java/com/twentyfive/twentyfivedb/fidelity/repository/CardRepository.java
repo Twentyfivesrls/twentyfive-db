@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -15,6 +16,8 @@ public interface CardRepository extends MongoRepository<Card, String> {
     Page<Card> findAllByNameIgnoreCase(String name, Pageable pageable);
 
     Set<Card> findAllByNameContainingIgnoreCase(String name);
+
+    List<Card> findAllByCardGroupId(String groupId);
 
     Page<Card> findAllByIsActive(Boolean status, Pageable pageable);
 }
