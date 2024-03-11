@@ -29,18 +29,18 @@ public class CardGroupController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<CardGroup>> getCardGroupListPagination(@RequestBody CardGroup filterObject,
-                                                                      @RequestParam(name = "ownerId") String ownerId,
-                                                                      @RequestParam(defaultValue = "0") int page,
-                                                                      @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Page<CardGroup>> getGroupsPaginationFiltered(@RequestBody CardGroup filterObject,
+                                                                       @RequestParam(name = "ownerId") String ownerId,
+                                                                       @RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(cardGroupService.getCardGroupFiltered(filterObject, ownerId, page, size));
     }
 
     @PostMapping("/page")
-    public ResponseEntity<Page<CardGroup>> getGroupsListPagination(@RequestParam(defaultValue = "0") int page,
-                                                                   @RequestParam(defaultValue = "5") int size,
-                                                                   @RequestParam(name = "ownerId") String ownerId) {
-        return new ResponseEntity<>(cardGroupService.pageGroups(page, size, ownerId), HttpStatus.OK);
+    public ResponseEntity<Page<CardGroup>> getGroupsListPagination(@RequestParam(name = "ownerId") String ownerId,
+                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "5") int size) {
+        return new ResponseEntity<>(cardGroupService.pageGroups(ownerId, page, size), HttpStatus.OK);
     }
 
     @PostMapping("/filter/group/autocomplete")
@@ -51,6 +51,11 @@ public class CardGroupController {
     @GetMapping("/detail/{id}")
     public ResponseEntity<CardGroup> getCardGroup(@PathVariable String id) {
         return ResponseEntity.ok(cardGroupService.getCardGroup(id));
+    }
+
+    @GetMapping("/cards-number/{id}")
+    public ResponseEntity<Long> getCardNumber(@PathVariable String id) {
+        return ResponseEntity.ok(cardGroupService.numberCards(id));
     }
 
     @GetMapping("/get-name")
@@ -67,10 +72,10 @@ public class CardGroupController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteCardGroup(@PathVariable String id) {
-        try{
+        try {
             cardGroupService.deleteCardGroup(id);
             return ResponseEntity.ok().build();
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
     }
@@ -88,7 +93,7 @@ public class CardGroupController {
     }
 
     @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel(){
+    public ResponseEntity<byte[]> downloadExcel() {
         byte[] excelData = exportService.groupExport();
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");

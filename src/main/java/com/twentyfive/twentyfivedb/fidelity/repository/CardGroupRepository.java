@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Repository
 public interface CardGroupRepository extends MongoRepository<CardGroup, String> {
-    Page<CardGroup> getAllByOwnerId(String ownerId, Pageable pageable);
+    Page<CardGroup> findAllByOwnerId(String ownerId, Pageable pageable);
 
     Page<CardGroup> findAllByNameIgnoreCase(String name, Pageable pageable);
 

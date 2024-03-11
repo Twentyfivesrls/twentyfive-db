@@ -37,11 +37,6 @@ public class CardService {
         this.cardGroupService = cardGroupService;
     }
 
-    public Page<Card> pageCard(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        return cardRepository.findAll(pageable);
-    }
-
     public Card getCard(String id) {
         return cardRepository.findById(id).orElse(null);
     }
@@ -125,6 +120,11 @@ public class CardService {
         return this.pageMethod(criteriaList, page, size);
     }
 
+    public Page<Card> pageCard(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findAll(pageable);
+    }
+
     private List<Criteria> parseOtherFilters(Card filterObject){
         List<Criteria> criteriaList = new ArrayList<>();
         if(filterObject == null){
@@ -147,7 +147,6 @@ public class CardService {
     }
 
     private Page<Card> pageMethod(List<Criteria> criteriaList, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
         if(CollectionUtils.isEmpty(criteriaList)){
            log.info("criteria empty");
@@ -155,9 +154,10 @@ public class CardService {
         } else {
             query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
-        query.with(pageable);
 
         long total = mongoTemplate.count(query, Card.class);
+        Pageable pageable = PageRequest.of(page, size);
+        query.with(pageable);
 
         List<Card> cards = mongoTemplate.find(query, Card.class);
         this.disableStatusCard(cards);

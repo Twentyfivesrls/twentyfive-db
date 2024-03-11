@@ -45,9 +45,16 @@ public class CardGroupService {
     }
 
     public CardGroup createCardGroup(CardGroup cardGroup) {
-        cardGroup.setExpirationDate(cardGroup.getExpirationDate().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.of("+02:00")).toLocalDateTime());
+        cardGroup.setExpirationDate(cardGroup.getExpirationDate().atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneOffset.of("+02:00")).toLocalDateTime().toLocalDate().atStartOfDay());
         this.checkExpirationDate(cardGroup);
         return this.cardGroupRepository.save(cardGroup);
+    }
+
+    public long numberCards(String groupId){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("cardGroupId").is(groupId));
+        return mongoTemplate.count(query, Card.class);
     }
 
     public void deleteCardGroup(String id) {
@@ -129,10 +136,9 @@ public class CardGroupService {
         return this.pageMethod(criteriaList, page, size);
     }
 
-    public Page<CardGroup> pageGroups(int page, int size, String userId) {
-        List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where(USER_KEY).is(userId));
-        return this.pageMethod(criteriaList, page, size);
+    public Page<CardGroup> pageGroups(String ownerId, int page, int size) {
+        Pageable pageable= PageRequest.of(page, size);
+        return cardGroupRepository.findAllByOwnerId(ownerId, pageable);
     }
 
     private List<Criteria> parseOtherFilters(CardGroup filterObject){
@@ -156,12 +162,13 @@ public class CardGroupService {
     }
 
     private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size) {
-        Pageable pageable= PageRequest.of(page, size);
 
         Query query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
-        query.with(pageable);
 
         long total = mongoTemplate.count(query, CardGroup.class);
+
+        Pageable pageable= PageRequest.of(page, size);
+        query.with(pageable);
 
         List<CardGroup> cardGroups = mongoTemplate.find(query, CardGroup.class);
         this.disableExpiredGroups(cardGroups);

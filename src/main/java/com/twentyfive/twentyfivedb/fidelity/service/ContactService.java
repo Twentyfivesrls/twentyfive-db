@@ -100,7 +100,6 @@ public class ContactService {
     }
 
     private Page<Contact> pageMethod(List<Criteria> criteriaList, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
         if(CollectionUtils.isEmpty(criteriaList)){
             log.info("criteria empty");
@@ -108,9 +107,10 @@ public class ContactService {
         } else {
             query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
-        query.with(pageable);
 
         long total = mongoTemplate.count(query, Contact.class);
+        Pageable pageable = PageRequest.of(page, size);
+        query.with(pageable);
 
         List<Contact> contacts = mongoTemplate.find(query, Contact.class);
         return new PageImpl<>(contacts, pageable, total);
