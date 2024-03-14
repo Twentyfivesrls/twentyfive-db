@@ -127,7 +127,6 @@ public class CardGroupService {
         return cardGroupRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
-
     /* TODO metodi aggiunta criteri per filtraggio*/
     public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();

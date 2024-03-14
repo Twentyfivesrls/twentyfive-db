@@ -67,6 +67,11 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCardByName(name, page, size));
     }
 
+    @PutMapping("/reset-scan-executed/{id}")
+    public void resetScanExecuted(@PathVariable String id){
+        cardService.resetScanExecuted(id);
+    }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<Card> getCard(@PathVariable String id) {
         return ResponseEntity.ok(cardService.getCard(id));
@@ -92,6 +97,12 @@ public class CardController {
     @PutMapping("/status/{id}")
     public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
         cardService.updateStatus(id, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/scanning/{id}")
+    public ResponseEntity<Void> scanningCard(@PathVariable String id) {
+        cardService.scannerCard(id);
         return ResponseEntity.ok().build();
     }
 
