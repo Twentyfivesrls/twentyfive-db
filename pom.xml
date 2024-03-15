@@ -46,13 +46,13 @@
         <dependency>
             <groupId>com.twentyfive</groupId>
             <artifactId>twentyfive-models</artifactId>
-            <version>0.0.48</version>
+            <version>0.0.51</version>
         </dependency>
 
         <dependency>
             <groupId>com.twentyfive</groupId>
             <artifactId>twentyfive-adapters</artifactId>
-            <version>0.0.40</version>
+            <version>0.0.43</version>
         </dependency>
 
         <dependency>
