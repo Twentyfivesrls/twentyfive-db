@@ -5,8 +5,7 @@ import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.ThubDocumentDB.ThubProfile;
 
 @Repository
-public interface ProfileRepository extends MongoRepository<ThubProfile, String> {
+public interface ThubProfileRepository extends MongoRepository<ThubProfile, String> {
     ThubProfile findByUsername(String username);
-
 
 }

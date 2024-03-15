@@ -1,8 +1,6 @@
 package com.twentyfive.twentyfivedb.thub.controller;
 
-import com.twentyfive.twentyfivedb.thub.service.ProfileService;
-
-import org.springframework.http.HttpStatus;
+import com.twentyfive.twentyfivedb.thub.service.ThubProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.ThubDocumentDB.ThubProfile;
@@ -11,11 +9,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/thubprofile")
-public class ProfileController {
+public class ThubProfileController {
 
-    private final ProfileService profileService;
+    private final ThubProfileService profileService;
 
-    public ProfileController(ProfileService profileService) {
+    public ThubProfileController(ThubProfileService profileService) {
         this.profileService = profileService;
     }
 

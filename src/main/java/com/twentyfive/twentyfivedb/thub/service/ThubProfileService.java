@@ -1,16 +1,16 @@
 package com.twentyfive.twentyfivedb.thub.service;
 
-import com.twentyfive.twentyfivedb.thub.repository.ProfileRepository;
+import com.twentyfive.twentyfivedb.thub.repository.ThubProfileRepository;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.ThubDocumentDB.ThubProfile;
 
 import java.util.List;
 
 @Service
-public class ProfileService {
-    private final ProfileRepository profileRepository;
+public class ThubProfileService {
+    private final ThubProfileRepository profileRepository;
 
-    public ProfileService(ProfileRepository profileRepository) {
+    public ThubProfileService(ThubProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
     }
 
