@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/profile")
-public class ProfileController {
+public class FidelityProfileController {
     private static final String UPLOAD_DIR = "uploads/";
 
 
