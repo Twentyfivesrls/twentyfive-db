@@ -28,6 +28,7 @@ public class CardService {
     private final PrizeRepository prizeRepository;
     private final MongoTemplate mongoTemplate;
     private final CardGroupService cardGroupService;
+    private static final String USER_KEY = "ownerId";
 
     public CardService(CardRepository cardRepository, PrizeRepository prizeRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService) {
         this.cardRepository = cardRepository;
@@ -147,8 +148,9 @@ public class CardService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Card> getCardFiltered(Card filterObject, int page, int size) {
+    public Page<Card> getCardFiltered(Card filterObject, int page, int size, String ownerId) {
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
         return this.pageMethod(criteriaList, page, size);
     }

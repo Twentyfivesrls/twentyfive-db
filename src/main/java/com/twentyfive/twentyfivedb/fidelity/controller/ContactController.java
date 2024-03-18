@@ -30,9 +30,10 @@ public class ContactController {
     @PostMapping("/filter")
     public ResponseEntity<Page<Contact>> getContactListFiltered(@RequestBody Contact filterObject,
                                                                 @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "5") int size) {
+                                                                @RequestParam(defaultValue = "5") int size,
+                                                                @RequestParam(name = "ownerId") String ownerId) {
 
-        return ResponseEntity.ok(contactService.getContactFiltered(filterObject, page, size));
+        return ResponseEntity.ok(contactService.getContactFiltered(filterObject, page, size, ownerId));
     }
 
     @PostMapping("/page")

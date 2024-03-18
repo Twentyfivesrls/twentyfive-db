@@ -28,6 +28,9 @@ public class ContactService {
 
     private final MongoTemplate mongoTemplate;
 
+    private static final String USER_KEY = "ownerId";
+
+
     public ContactService(ContactRepository contactRepository, MongoTemplate mongoTemplate) {
         this.contactRepository = contactRepository;
         this.mongoTemplate = mongoTemplate;
@@ -82,8 +85,9 @@ public class ContactService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Contact> getContactFiltered(Contact filterObject, int page, int size) {
+    public Page<Contact> getContactFiltered(Contact filterObject, int page, int size, String ownerId) {
         List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
         return this.pageMethod(criteriaList, page, size);
     }

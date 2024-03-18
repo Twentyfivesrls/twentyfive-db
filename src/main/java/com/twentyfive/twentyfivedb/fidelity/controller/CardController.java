@@ -40,8 +40,9 @@ public class CardController {
     @PostMapping("/filter")
     public ResponseEntity<Page<Card>> getCardListFilteredPagination(@RequestBody Card filterObject,
                                                                     @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size));
+                                                                    @RequestParam(defaultValue = "5") int size,
+                                                                    @RequestParam(name = "ownerId") String ownerId) {
+        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size, ownerId));
     }
 
     @PostMapping("/page")
