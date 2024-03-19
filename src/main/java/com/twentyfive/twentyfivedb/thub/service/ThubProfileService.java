@@ -19,7 +19,7 @@ public class ThubProfileService {
     }
 
     public ThubProfile saveThubProfile(ThubProfile thubProfile) {
-        ThubProfile tP = profileRepository.findByUsername(thubProfile.getUsername());
+        ThubProfile tP = profileRepository.findByUsername(thubProfile.getUsername()).orElse(null);
 
         if(tP != null) {
             tP.setUsername(thubProfile.getUsername());
@@ -37,6 +37,6 @@ public class ThubProfileService {
         return profileRepository.save(thubProfile);
     }
     public ThubProfile getProfile(String username) {
-        return profileRepository.findByUsername(username);
+        return profileRepository.findByUsername(username).orElse(null);
     }
 }
