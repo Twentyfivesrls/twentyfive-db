@@ -19,5 +19,9 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
     List<Card> findAllByCardGroupId(String groupId);
 
+    List<Card> findAllByCardGroupIdAndOwnerId(String groupId, String ownerId);
+
+    List<Card> findAllByOwnerId(String ownerId);
+
     Page<Card> findAllByIsActive(Boolean status, Pageable pageable);
 }

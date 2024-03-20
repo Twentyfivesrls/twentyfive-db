@@ -1,5 +1,8 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
+import com.twentyfive.twentyfivedb.fidelity.exceptions.ExpiredCard;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.InvalidCard;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
 import com.twentyfive.twentyfivedb.fidelity.service.ExportExcelService;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
@@ -102,9 +105,17 @@ public class CardController {
     }
 
     @PutMapping("/scanning/{id}")
-    public ResponseEntity<Void> scanningCard(@PathVariable String id) {
-        cardService.scannerCard(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Card> scanningCard(@PathVariable String id) {
+        try{
+            return ResponseEntity.ok(cardService.scannerCard(id));
+        }catch (NotFoundException e) {
+            System.err.println("Card non riconosciuta: " + e.getMessage());
+        } catch (ExpiredCard e) {
+            System.err.println("Card scaduto: " + e.getMessage());
+        } catch (InvalidCard e) {
+            System.err.println("Card non valida: " + e.getMessage());
+        }
+        return null;
     }
 
     @GetMapping("/generateQrCode/{id}")
@@ -122,9 +133,9 @@ public class CardController {
         }
     }
 
-    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel(){
-        byte[] excelData = exportService.cardExport();
+    @GetMapping(value = "/export/excel/{ownerId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String ownerId){
+        byte[] excelData = exportService.cardExport(ownerId);
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String formattedDateTime = dateTime.format(formatter);
@@ -133,9 +144,9 @@ public class CardController {
                 .body(excelData);
     }
 
-    @GetMapping(value = "/export/excel-by-group/{groupId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel(@PathVariable String groupId){
-        byte[] excelData = exportService.cardExportByGroupId(groupId);
+    @GetMapping(value = "/export/excel-by-group/{groupId}/{ownerId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String groupId, @PathVariable String ownerId){
+        byte[] excelData = exportService.cardExportByGroupId(groupId, ownerId);
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String formattedDateTime = dateTime.format(formatter);

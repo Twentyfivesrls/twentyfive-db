@@ -41,12 +41,16 @@ public class CardService {
         return cardRepository.findById(id).orElse(null);
     }
 
-    public List<Card> findAll() {
-        return cardRepository.findAll();
+    public List<Card> findAllByOwnerId(String ownerId) {
+        return cardRepository.findAllByOwnerId(ownerId);
     }
 
     public List<Card> getByGroupId(String groupId) {
         return cardRepository.findAllByCardGroupId(groupId);
+    }
+
+    public List<Card> findAllByGroupIdAndOwnerId(String groupId, String ownerId){
+        return cardRepository.findAllByCardGroupIdAndOwnerId(groupId, ownerId);
     }
 
     public Page<Card> getCardByName(String name, int page, int size) {
@@ -54,10 +58,9 @@ public class CardService {
         return cardRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
-    public void scannerCard(String id) {
+    public Card scannerCard(String id) {
         LocalDate currentDate = LocalDate.now();
         Card card = cardRepository.findById(id).orElse(null);
-        assert card != null;
         CardGroup group = cardGroupService.getCardGroup(card.getCardGroupId());
         try {
             cardGroupService.checkExpirationDate(group);
@@ -75,6 +78,7 @@ public class CardService {
             premio.setCardComplete(currentDate.atStartOfDay());
             prizeRepository.save(premio);
         }
+        return card;
     }
 
     public Card createCard(Card card) {

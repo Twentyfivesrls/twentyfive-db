@@ -40,8 +40,8 @@ public class CardGroupService {
         return cardGroupRepository.findById(id).orElse(null);
     }
 
-    public List<CardGroup> findAll(){
-        return cardGroupRepository.findAll();
+    public List<CardGroup> findAllByOwnerId(String ownerId){
+        return cardGroupRepository.findAllListByOwnerId(ownerId);
     }
 
     public CardGroup createCardGroup(CardGroup cardGroup) {

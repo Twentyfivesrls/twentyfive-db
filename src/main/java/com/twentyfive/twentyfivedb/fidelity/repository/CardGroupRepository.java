@@ -7,11 +7,14 @@ import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Repository
 public interface CardGroupRepository extends MongoRepository<CardGroup, String> {
     Page<CardGroup> findAllByOwnerId(String ownerId, Pageable pageable);
+
+    List<CardGroup> findAllListByOwnerId(String ownerId);
 
     Page<CardGroup> findAllByNameIgnoreCase(String name, Pageable pageable);
 

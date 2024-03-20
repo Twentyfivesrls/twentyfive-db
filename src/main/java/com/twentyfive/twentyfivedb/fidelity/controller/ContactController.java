@@ -77,9 +77,9 @@ public class ContactController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/export/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> downloadExcel(){
-        byte[] excelData = exportService.addressbookExport();
+    @GetMapping(value = "/export/excel/{ownerId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable String ownerId){
+        byte[] excelData = exportService.addressbookExport(ownerId);
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String formattedDateTime = dateTime.format(formatter);

@@ -32,8 +32,8 @@ public class ExportExcelService {
         this.contactService = contactService;
     }
 
-    public byte[] cardExportByGroupId(String groupId){
-        List<Card> data = cardService.getByGroupId(groupId);
+    public byte[] cardExportByGroupId(String groupId, String ownerId){
+        List<Card> data = cardService.findAllByGroupIdAndOwnerId(groupId, ownerId);
 
         try(Workbook workbook = new XSSFWorkbook()){
             String currentDateTime = LocalDateTime.now()
@@ -78,8 +78,8 @@ public class ExportExcelService {
         }
     }
 
-    public byte[] cardExport(){
-        List<Card> data = cardService.findAll();
+    public byte[] cardExport(String ownerId){
+        List<Card> data = cardService.findAllByOwnerId(ownerId);
 
         try(Workbook workbook = new XSSFWorkbook()){
             String currentDateTime = LocalDateTime.now()
@@ -124,8 +124,8 @@ public class ExportExcelService {
         }
     }
 
-    public byte[] groupExport(){
-        List<CardGroup> data = groupService.findAll();
+    public byte[] groupExport(String ownerId){
+        List<CardGroup> data = groupService.findAllByOwnerId(ownerId);
 
         try(Workbook workbook = new XSSFWorkbook()){
             String currentDateTime = LocalDateTime.now()
@@ -166,8 +166,8 @@ public class ExportExcelService {
         }
     }
 
-    public byte[] addressbookExport(){
-        List<Contact> data = contactService.findAll();
+    public byte[] addressbookExport(String ownerId){
+        List<Contact> data = contactService.findAll(ownerId);
 
         try(Workbook workbook = new XSSFWorkbook()){
             String currentDateTime = LocalDateTime.now()

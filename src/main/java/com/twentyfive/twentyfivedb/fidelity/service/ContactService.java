@@ -41,8 +41,8 @@ public class ContactService {
         return contactRepository.findAll(pageable);
     }
 
-    public List<Contact> findAll(){
-        return contactRepository.findAll();
+    public List<Contact> findAll(String ownerId){
+        return contactRepository.findAllByOwnerId(ownerId);
     }
 
     public Contact getContact(String id) {
