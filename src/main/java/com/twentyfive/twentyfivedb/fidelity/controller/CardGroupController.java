@@ -102,4 +102,9 @@ public class CardGroupController {
                 .header("Content-Disposition", "attachment; filename=Lista_Gruppi_Card_" + formattedDateTime + ".xlsx")
                 .body(excelData);
     }
+
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkSameName(@RequestParam("name") String name) {
+        return ResponseEntity.ok(cardGroupService.checkSameName(name));
+    }
 }

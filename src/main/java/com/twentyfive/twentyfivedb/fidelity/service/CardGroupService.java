@@ -191,4 +191,8 @@ public class CardGroupService {
          */
         return setCombinato;
     }
+
+    public boolean checkSameName(String name) {
+        return cardGroupRepository.findAllByNameIgnoreCase(name, PageRequest.of(0, 1)).hasContent();
+    }
 }
