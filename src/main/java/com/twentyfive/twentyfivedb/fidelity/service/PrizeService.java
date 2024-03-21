@@ -19,6 +19,7 @@ import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +97,20 @@ public class PrizeService {
         if(premio.getCardComplete().equals(currentDate.atStartOfDay()) && card.getScanNumberExecuted() == group.getScanNumber()){
             card.setScanNumberExecuted(0);
             cardRepository.save(card);
+        }
+    }
+
+    public Premio claimLastPrize(String cardId) {
+        LocalDate currentDate = LocalDate.now();
+        Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdOrderByCardCompleteDesc(cardId));
+
+        if (ultimoPremioOptional.isPresent()) {
+            Premio ultimoPremio = ultimoPremioOptional.get();
+            ultimoPremio.setClaimed(true);
+            ultimoPremio.setClaimDate(currentDate.atStartOfDay());
+            return prizeRepository.save(ultimoPremio);
+        } else {
+            throw new RuntimeException("Nessun premio trovato per la carta con ID: " + cardId);
         }
     }
 }

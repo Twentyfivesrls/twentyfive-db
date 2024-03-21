@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.PrizeService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
@@ -43,12 +44,22 @@ public class PrizeController {
     }
 
     @PostMapping("/claim-prize/{id}")
-    public ResponseEntity<Object> pagePrize(@PathVariable String id) {
+    public ResponseEntity<Object> claimPrize(@PathVariable String id) {
         try {
             prizeService.claimPrize(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/claim-last-prize/{cardId}")
+    public ResponseEntity<Premio> claimLastPrize(@PathVariable String cardId) {
+        try {
+            Premio ultimoPremio = prizeService.claimLastPrize(cardId);
+            return new ResponseEntity<>(ultimoPremio, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

@@ -10,4 +10,6 @@ import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
 public interface PrizeRepository extends MongoRepository<Premio, String> {
 
     Page<Premio> findAllByCardIdIgnoreCase(String id, Pageable pageable);
+
+    Premio findTopByCardIdOrderByCardCompleteDesc(String cardId);
 }

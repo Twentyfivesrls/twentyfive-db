@@ -121,7 +121,7 @@ public class CardController {
     @GetMapping("/generateQrCode/{id}")
     public ResponseEntity<ResponseImage> generateQrCode(@PathVariable String id) {
         try {
-            String togenerate = baseUrl + "dashboard/card/detail/" + id;
+            String togenerate = baseUrl + "card-view/" + id;
             byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
             String base64 = Base64.getEncoder().encodeToString(bytes);
             base64 = "data:image/png;base64," + base64;
