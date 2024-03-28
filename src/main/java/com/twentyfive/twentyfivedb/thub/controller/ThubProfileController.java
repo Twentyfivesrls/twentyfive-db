@@ -3,7 +3,7 @@ package com.twentyfive.twentyfivedb.thub.controller;
 import com.twentyfive.twentyfivedb.thub.service.ThubProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.ThubDocumentDB.ThubProfile;
+import twentyfive.twentyfiveadapter.models.thubModels.ThubProfile;
 
 import java.util.List;
 

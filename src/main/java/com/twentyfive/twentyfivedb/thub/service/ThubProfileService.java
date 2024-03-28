@@ -2,7 +2,8 @@ package com.twentyfive.twentyfivedb.thub.service;
 
 import com.twentyfive.twentyfivedb.thub.repository.ThubProfileRepository;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.adapter.Document.ThubDocumentDB.ThubProfile;
+import twentyfive.twentyfiveadapter.models.thubModels.ThubProfile;
+
 
 import java.util.List;
 
