@@ -13,8 +13,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
+import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
 import java.util.*;
 import java.time.LocalDate;

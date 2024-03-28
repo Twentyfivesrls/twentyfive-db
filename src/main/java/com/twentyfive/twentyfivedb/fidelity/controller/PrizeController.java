@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.util.List;
 

@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
+import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.time.LocalDate;
 import java.util.List;

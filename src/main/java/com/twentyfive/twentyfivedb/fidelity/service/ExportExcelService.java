@@ -6,9 +6,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.CardGroup;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
+import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Contact;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

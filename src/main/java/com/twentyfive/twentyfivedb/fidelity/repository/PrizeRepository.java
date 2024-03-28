@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Premio;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 @Repository
 public interface PrizeRepository extends MongoRepository<Premio, String> {

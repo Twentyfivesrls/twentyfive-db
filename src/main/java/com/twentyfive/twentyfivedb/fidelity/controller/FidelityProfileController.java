@@ -1,35 +1,24 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
+import com.twentyfive.twentyfivedb.fidelity.service.FidelityProfileService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import twentyfive.twentyfiveadapter.models.fidelityModels.ProfileFidelity;
 
 @RestController
 @RequestMapping("/profile")
 public class FidelityProfileController {
-    private static final String UPLOAD_DIR = "uploads/";
+
+    private final FidelityProfileService profileService;
+
+    public FidelityProfileController(FidelityProfileService profileService) {
+        this.profileService = profileService;
+    }
 
 
-    /*spring.servlet.multipart.enabled=true
-    upload.dir=uploads/
-     */
-    @PostMapping("/upload")
-    public String uploadImage(@RequestParam("image") MultipartFile file) {
-        if (file.isEmpty()) {
-            return "Nessun file caricato.";
-        }
+    @PostMapping("/create/{imageName}")
+    public ResponseEntity<ProfileFidelity> createImageName(@PathVariable ProfileFidelity imageName){
+        return ResponseEntity.ok(profileService.createImageName(imageName));
 
-        try {
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-            Files.write(path, bytes);
-            return "File uploaded successfully.";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Errore durante il caricamento del file.";
-        }
     }
 }

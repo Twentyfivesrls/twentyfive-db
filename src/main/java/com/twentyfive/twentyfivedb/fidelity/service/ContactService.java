@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Contact;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Contact;
 
 import java.util.ArrayList;
 import java.util.HashSet;

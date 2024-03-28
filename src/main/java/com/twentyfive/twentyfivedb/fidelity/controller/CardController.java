@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.FidelityDocumentDB.Card;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
