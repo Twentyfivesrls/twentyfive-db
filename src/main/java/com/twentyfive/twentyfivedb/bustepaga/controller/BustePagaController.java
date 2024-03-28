@@ -5,9 +5,10 @@ import com.twentyfive.twentyfivemodel.dto.bustepagaDto.UpdateBPSettingRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPConfiguration;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPSetting;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
+
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.Dipendente;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPSetting;
 
 import java.util.List;
 

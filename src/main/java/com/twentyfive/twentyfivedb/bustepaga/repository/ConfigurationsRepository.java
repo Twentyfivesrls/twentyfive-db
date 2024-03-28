@@ -2,7 +2,8 @@ package com.twentyfive.twentyfivedb.bustepaga.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPConfiguration;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
+
 
 import java.util.List;
 

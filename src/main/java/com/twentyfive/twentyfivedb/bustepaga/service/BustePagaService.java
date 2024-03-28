@@ -10,9 +10,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPConfiguration;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.BPSetting;
-import twentyfive.twentyfiveadapter.adapter.Document.BustePagaDocumentDB.Dipendente;
+
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.Dipendente;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPSetting;
 
 import java.util.List;
 import java.util.Optional;
