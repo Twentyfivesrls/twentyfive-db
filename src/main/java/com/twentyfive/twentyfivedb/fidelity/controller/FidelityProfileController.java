@@ -16,9 +16,13 @@ public class FidelityProfileController {
     }
 
 
-    @PostMapping("/create/{imageName}")
-    public ResponseEntity<ProfileFidelity> createImageName(@PathVariable ProfileFidelity imageName){
+    @PostMapping("/create")
+    public ResponseEntity<ProfileFidelity> createImageName(@RequestBody ProfileFidelity imageName){
         return ResponseEntity.ok(profileService.createImageName(imageName));
+    }
 
+    @GetMapping("/name-image")
+    public ResponseEntity<ProfileFidelity> getImageName(@RequestParam(name = "ownerId") String ownerId){
+        return ResponseEntity.ok(profileService.getImageName(ownerId));
     }
 }

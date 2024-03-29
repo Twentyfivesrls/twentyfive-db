@@ -16,19 +16,22 @@ public class FidelityProfileService {
     }
 
     public ProfileFidelity createImageName(ProfileFidelity imageName) {
-        if (imageName == null) {
-            throw new IllegalArgumentException("Image name cannot be null");
+        // Verifica se esiste già un'immagine nel repository con lo stesso nome
+        ProfileFidelity existingImage = profileRepository.findAllByImageName(imageName.getImageName());
+
+        // Se esiste un'immagine con lo stesso nome, solleva un'eccezione o gestisci il caso di errore
+        if (existingImage != null) {
+            throw new IllegalArgumentException("An image with the same name already exists");
+            // oppure puoi gestire il caso di errore in un altro modo, ad esempio restituendo null
+            // oppure loggando un messaggio di errore e restituendo null
         }
 
-        if (imageName.getId() != null) {
-            throw new IllegalArgumentException("Image name already has an ID assigned");
-        }
-
-        if (profileRepository.existsById(imageName.getId())) {
-            throw new IllegalArgumentException("Image name already exists in the repository");
-        }
-
+        // Se non esiste un'immagine con lo stesso nome, procedi con il salvataggio
         return profileRepository.save(imageName);
+    }
+
+    public ProfileFidelity getImageName(String ownerId){
+        return profileRepository.findByOwnerId(ownerId);
     }
 
 }
