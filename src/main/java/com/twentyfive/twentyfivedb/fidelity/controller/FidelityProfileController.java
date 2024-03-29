@@ -25,4 +25,9 @@ public class FidelityProfileController {
     public ResponseEntity<ProfileFidelity> getImageName(@RequestParam(name = "ownerId") String ownerId){
         return ResponseEntity.ok(profileService.getImageName(ownerId));
     }
+
+    @DeleteMapping("delete")
+    public void deleteImageName(@RequestParam(name = "ownerId") String ownerId){
+        profileService.deleteImageName(ownerId);
+    }
 }

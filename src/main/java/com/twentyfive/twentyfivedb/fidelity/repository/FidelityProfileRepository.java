@@ -9,4 +9,6 @@ public interface FidelityProfileRepository extends MongoRepository<ProfileFideli
     ProfileFidelity findAllByImageName(String imageName);
 
     ProfileFidelity findByOwnerId(String ownerId);
+
+    void deleteByOwnerId(String ownerId);
 }
