@@ -31,5 +31,7 @@ public class AnimalOwnerController {
         ownerService.updateOwner(email, animalOwner);
         return ResponseEntity.ok().build();
     }
+
+
 }
 

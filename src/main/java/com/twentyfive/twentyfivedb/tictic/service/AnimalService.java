@@ -3,8 +3,19 @@ package com.twentyfive.twentyfivedb.tictic.service;
 import com.twentyfive.twentyfivedb.tictic.repository.AnimalRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -73,5 +84,13 @@ public class AnimalService {
             animal1.setAge(animal.getAge());
             animal1.setWeight(animal.getWeight());
         }
+    }
+
+    public TTAnimal getAnimalById(String id){
+        return animalRepository.findById(id).orElse(null);
+    }
+
+    public List<TTAnimal> findAllByAnimalOwnerId(String animalOwnerId){
+        return animalRepository.findAllByAnimalOwnerId(animalOwnerId);
     }
 }
