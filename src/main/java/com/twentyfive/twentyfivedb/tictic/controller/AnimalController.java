@@ -28,9 +28,9 @@ public class AnimalController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update-animal/{microchip}")
-    public ResponseEntity<Void> updateAnimal(@PathVariable String microchip, @RequestBody TTAnimal animal) {
-        animalService.updateAnimal(microchip, animal);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Void> updateAnimal(@PathVariable String id, @RequestBody TTAnimal animal) {
+        animalService.updateAnimal(id, animal);
         return ResponseEntity.ok().build();
     }
 

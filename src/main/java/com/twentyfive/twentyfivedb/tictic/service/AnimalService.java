@@ -57,17 +57,17 @@ public class AnimalService {
         }
     }
 
-    public void updateAnimal(String microchipCode, TTAnimal animal){
+    public void updateAnimal(String id, TTAnimal animal){
         if(animal == null){
             log.error("Animal is null");
             throw new IllegalArgumentException("Animal is null");
         }
-        if(StringUtils.isBlank(microchipCode)){
+        if(StringUtils.isBlank(id)){
             log.error("Animal is null or empty");
             throw new IllegalArgumentException("Animal is null or empty");
         }
 
-        TTAnimal animal1 = animalRepository.findByMicrochipCode(microchipCode);
+        TTAnimal animal1 = animalRepository.findById(id).orElse(null);
 
         if(animal1 == null){
             this.createAnimal(animal);
@@ -85,6 +85,7 @@ public class AnimalService {
             animal1.setWeight(animal.getWeight());
             animal1.setAddress(animal.getAddress());
             animal1.setPhone(animal.getPhone());
+            animalRepository.save(animal1);
         }
     }
 
