@@ -10,5 +10,5 @@ public interface AnimalRepository extends MongoRepository<TTAnimal, String>{
 
     TTAnimal findByMicrochipCode(String microchipCode);
 
-    List<TTAnimal> findAllByAnimalOwnerId(String animalOwnerId);
+    List<TTAnimal> findAllByOwnerId(String ownerId);
 }

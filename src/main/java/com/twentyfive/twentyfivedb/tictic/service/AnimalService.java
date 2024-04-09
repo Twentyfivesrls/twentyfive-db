@@ -28,7 +28,7 @@ public class AnimalService {
     }
 
     public TTAnimal createAnimal(TTAnimal animal) {
-        if (animal == null || animal.getMicrochipCode() == null || animal.getAnimalOwnerId() == null || animal.getAnimalOwnerId().isEmpty()) {
+        if (animal == null || animal.getMicrochipCode() == null || animal.getOwnerId() == null || animal.getOwnerId().isEmpty()) {
             log.error("Animal or animal owner cannot be null");
             return null;
         }
@@ -83,6 +83,8 @@ public class AnimalService {
             animal1.setSterilization(animal.isSterilization());
             animal1.setAge(animal.getAge());
             animal1.setWeight(animal.getWeight());
+            animal1.setAddress(animal.getAddress());
+            animal1.setPhone(animal.getPhone());
         }
     }
 
@@ -90,7 +92,7 @@ public class AnimalService {
         return animalRepository.findById(id).orElse(null);
     }
 
-    public List<TTAnimal> findAllByAnimalOwnerId(String animalOwnerId){
-        return animalRepository.findAllByAnimalOwnerId(animalOwnerId);
+    public List<TTAnimal> findAllByOwnerId(String ownerId){
+        return animalRepository.findAllByOwnerId(ownerId);
     }
 }

@@ -40,8 +40,8 @@ public class AnimalController {
     }
 
     @GetMapping("/getByOwnerId")
-    public ResponseEntity<List<TTAnimal>> getAllByAnimalOwnerId(@RequestParam("animalOwnerId") String animalOwnerId){
-        return new ResponseEntity<>(animalService.findAllByAnimalOwnerId(animalOwnerId), HttpStatus.OK);
+    public ResponseEntity<List<TTAnimal>> getAllByOwnerId(@RequestParam("ownerId") String ownerId){
+        return new ResponseEntity<>(animalService.findAllByOwnerId(ownerId), HttpStatus.OK);
     }
 
 }
