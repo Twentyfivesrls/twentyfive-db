@@ -5,34 +5,37 @@ import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.thubModels.ThubLink;
 import twentyfive.twentyfiveadapter.models.thubModels.ThubProfile;
 
-
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ThubLinkService {
 
     private final ThubProfileRepository thubProfileRepository;
+
     public ThubLinkService(ThubProfileRepository thubProfileRepository) {
         this.thubProfileRepository = thubProfileRepository;
     }
 
     public List<ThubLink> getProfileLinks(String username) {
-        ThubProfile tP = thubProfileRepository.findByUsername(username).orElse(null);
+        Optional<ThubProfile> opt = thubProfileRepository.findByUsername(username);
 
-        if(tP == null) {
+        if (opt.isEmpty()) {
             return null;
         }
+        ThubProfile tP = opt.get();
 
         return tP.getLinks();
     }
 
     public List<ThubLink> saveLinks(String username, List<ThubLink> links) {
-        ThubProfile tP = thubProfileRepository.findByUsername(username).orElse(null);
+        Optional<ThubProfile> opt = thubProfileRepository.findByUsername(username);
 
-        if(tP == null) {
+        if (opt.isEmpty()) {
             return null;
         }
+        ThubProfile tP = opt.get();
 
         tP.setLinks(links);
         thubProfileRepository.save(tP);
@@ -41,11 +44,12 @@ public class ThubLinkService {
     }
 
     public List<ThubLink> addLink(String username, ThubLink link) {
-        ThubProfile tP = thubProfileRepository.findByUsername(username).orElse(null);
+        Optional<ThubProfile> opt = thubProfileRepository.findByUsername(username);
 
-        if(tP == null) {
+        if (opt.isEmpty()) {
             return null;
         }
+        ThubProfile tP = opt.get();
 
         link.setId(UUID.randomUUID().toString());
         tP.getLinks().add(link);
@@ -55,11 +59,12 @@ public class ThubLinkService {
     }
 
     public List<ThubLink> updateLink(String username, ThubLink link) {
-        ThubProfile tP = thubProfileRepository.findByUsername(username).orElse(null);
+        Optional<ThubProfile> opt = thubProfileRepository.findByUsername(username);
 
-        if(tP == null) {
+        if (opt.isEmpty()) {
             return null;
         }
+        ThubProfile tP = opt.get();
 
         for (ThubLink l : tP.getLinks()) {
             if (l.getId().equals(link.getId())) {
@@ -76,11 +81,12 @@ public class ThubLinkService {
     }
 
     public List<ThubLink> deleteLink(String username, String linkId) {
-        ThubProfile tP = thubProfileRepository.findByUsername(username).orElse(null);
+        Optional<ThubProfile> opt = thubProfileRepository.findByUsername(username);
 
-        if(tP == null) {
+        if (opt.isEmpty()) {
             return null;
         }
+        ThubProfile tP = opt.get();
 
         for (ThubLink l : tP.getLinks()) {
             if (l.getId().equals(linkId)) {
@@ -92,5 +98,4 @@ public class ThubLinkService {
         thubProfileRepository.save(tP);
         return tP.getLinks();
     }
-
 }

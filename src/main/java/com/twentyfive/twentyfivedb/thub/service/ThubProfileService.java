@@ -6,6 +6,7 @@ import twentyfive.twentyfiveadapter.models.thubModels.ThubProfile;
 
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ThubProfileService {
@@ -20,22 +21,23 @@ public class ThubProfileService {
     }
 
     public ThubProfile saveThubProfile(ThubProfile thubProfile) {
-        ThubProfile tP = profileRepository.findByUsername(thubProfile.getUsername()).orElse(null);
+        Optional<ThubProfile> opt = profileRepository.findByUsername(thubProfile.getUsername());
 
-        if(tP != null) {
-            tP.setUsername(thubProfile.getUsername());
-            tP.setTitle(thubProfile.getTitle());
-            tP.setDescription(thubProfile.getDescription());
-            tP.setHasProPic(thubProfile.getHasProPic());
-            tP.setProPicUrl(thubProfile.getProPicUrl());
-            tP.setLinks(thubProfile.getLinks());
-            tP.setTemplate(thubProfile.getTemplate());
-            tP.setCustomTheme(thubProfile.getCustomTheme());
-
-            return profileRepository.save(tP);
+        if (opt.isEmpty()) {
+            return profileRepository.save(thubProfile);
         }
+        ThubProfile tP = opt.get();
 
-        return profileRepository.save(thubProfile);
+        tP.setUsername(thubProfile.getUsername());
+        tP.setTitle(thubProfile.getTitle());
+        tP.setDescription(thubProfile.getDescription());
+        tP.setHasProPic(thubProfile.getHasProPic());
+        tP.setProPicUrl(thubProfile.getProPicUrl());
+        tP.setLinks(thubProfile.getLinks());
+        tP.setCustomTheme(thubProfile.getCustomTheme());
+
+        return profileRepository.save(tP);
+
     }
     public ThubProfile getProfile(String username) {
         return profileRepository.findByUsername(username).orElse(null);

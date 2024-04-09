@@ -22,6 +22,13 @@ public class ThubLinkController {
         return ResponseEntity.ok(l);
     }
 
+
+//fare un dto che ha username e lista links
+//    SaveLinkRequest{
+//        private String username;
+//        private List<ThubLink> links;
+//    }
+
     @PutMapping("/savelinks/{username}")
     private  ResponseEntity<List<ThubLink>> saveLinks(@PathVariable String username, @RequestBody List<ThubLink> links) {
         return ResponseEntity.ok(thubLinkService.saveLinks(username,links));
