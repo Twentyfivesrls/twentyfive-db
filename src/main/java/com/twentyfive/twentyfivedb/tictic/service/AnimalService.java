@@ -28,50 +28,43 @@ public class AnimalService {
     }
 
     public TTAnimal createAnimal(TTAnimal animal) {
-        if (animal == null || animal.getMicrochipCode() == null || animal.getOwnerId() == null || animal.getOwnerId().isEmpty()) {
-            log.error("Animal or animal owner cannot be null");
-            return null;
+        if (animal == null || animal.getName() == null || animal.getName().isEmpty() || animal.getSpecies() == null || animal.getSpecies().isEmpty()) {
+            log.error("Assicurati di inserire tutti i campi obbligatori: nome e specie.");
         }
-
-        TTAnimal existingAnimal = animalRepository.findByMicrochipCode(animal.getMicrochipCode());
-        if (existingAnimal != null) {
-            log.error("Animal with this microchip already exists: {}", animal.getMicrochipCode());
-            return null;
-        } else {
-            return animalRepository.save(animal);
-        }
+        assert animal != null;
+        return animalRepository.save(animal);
     }
 
-    public void deleteAnimal(String microchipCode) {
-        if (microchipCode == null || microchipCode.isEmpty()) {
-            log.error("Microchip cannot be null or empty");
+    public void deleteAnimal(String id) {
+        if (id == null || id.isEmpty()) {
+            log.error("id cannot be null or empty");
             return;
         }
-        TTAnimal existingAnimal = animalRepository.findByMicrochipCode(microchipCode);
+        TTAnimal existingAnimal = animalRepository.findById(id).orElse(null);
         if (existingAnimal == null) {
-            log.error("Animal with this microchip already exists: {}", microchipCode);
+            log.error("Animal with this microchip already exists: {}", id);
             return;
         } else {
             animalRepository.delete(existingAnimal);
-            log.info("Animal with microchip {} deleted successfully", microchipCode);
+            log.info("Animal with microchip {} deleted successfully", id);
         }
     }
 
-    public void updateAnimal(String id, TTAnimal animal){
-        if(animal == null){
+    public void updateAnimal(String id, TTAnimal animal) {
+        if (animal == null) {
             log.error("Animal is null");
             throw new IllegalArgumentException("Animal is null");
         }
-        if(StringUtils.isBlank(id)){
+        if (StringUtils.isBlank(id)) {
             log.error("Animal is null or empty");
             throw new IllegalArgumentException("Animal is null or empty");
         }
 
         TTAnimal animal1 = animalRepository.findById(id).orElse(null);
 
-        if(animal1 == null){
+        if (animal1 == null) {
             this.createAnimal(animal);
-        }else{
+        } else {
             animal1.setName(animal.getName());
             animal1.setSpecies(animal.getSpecies());
             animal1.setRace(animal.getRace());
@@ -89,11 +82,11 @@ public class AnimalService {
         }
     }
 
-    public TTAnimal getAnimalById(String id){
+    public TTAnimal getAnimalById(String id) {
         return animalRepository.findById(id).orElse(null);
     }
 
-    public List<TTAnimal> findAllByOwnerId(String ownerId){
+    public List<TTAnimal> findAllByOwnerId(String ownerId) {
         return animalRepository.findAllByOwnerId(ownerId);
     }
 }

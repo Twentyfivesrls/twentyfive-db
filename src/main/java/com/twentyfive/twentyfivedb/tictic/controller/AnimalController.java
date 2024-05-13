@@ -22,9 +22,9 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.createAnimal(animal));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteAnimal(@RequestParam(name = "microchip") String microchip) {
-        animalService.deleteAnimal(microchip);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteAnimal(@PathVariable String id) {
+        animalService.deleteAnimal(id);
         return ResponseEntity.ok().build();
     }
 
