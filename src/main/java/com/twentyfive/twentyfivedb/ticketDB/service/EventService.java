@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.ticketDB.service;
 
 import com.twentyfive.twentyfivedb.ticketDB.repository.EventRepository;
+import com.twentyfive.twentyfivedb.ticketDB.repository.TicketRepository;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import com.twentyfive.twentyfivemodel.models.ticketModels.Event;
@@ -14,8 +15,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
+import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,12 +33,14 @@ public class EventService {
     private final EventRepository eventRepository;
     private final TicketService ticketService;
     private final MongoTemplate mongoTemplate;
+    private final TicketRepository ticketRepository;
     private static final String USER_KEY = "userId";
 
-    public EventService(EventRepository eventRepository, TicketService ticketService, MongoTemplate mongoTemplate) {
+    public EventService(EventRepository eventRepository, TicketService ticketService, MongoTemplate mongoTemplate, TicketRepository ticketRepository) {
         this.eventRepository = eventRepository;
         this.ticketService = ticketService;
         this.mongoTemplate = mongoTemplate;
+        this.ticketRepository = ticketRepository;
     }
 
     public void saveEvent(Event event) {
@@ -120,7 +126,8 @@ public class EventService {
             log.error("Id is null or empty");
             throw new IllegalArgumentException("Id is null or empty");
         }
-        ticketService.deleteTicket(id);
+        List<TicketDocumentDB> list = ticketRepository.findAllByEventId(id);
+        ticketRepository.deleteAll(list);
         eventRepository.deleteById(id);
     }
 
