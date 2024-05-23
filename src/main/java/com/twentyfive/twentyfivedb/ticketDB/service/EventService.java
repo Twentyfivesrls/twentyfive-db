@@ -19,13 +19,12 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketD
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 
 @Slf4j
 @Service
@@ -48,8 +47,24 @@ public class EventService {
             log.error("Event is null");
             throw new IllegalArgumentException("Event is null");
         }
-        eventRepository.save(TwentyFiveMapper.INSTANCE.eventToEventDocumentDB(event));
+
+        ZonedDateTime zonedDateStart = event.getDateStart().atZone(ZoneId.of("Europe/Rome"));
+        ZonedDateTime zonedDateEnd = event.getDateEnd().atZone(ZoneId.of("Europe/Rome"));
+
+        EventDocumentDB eventDocumentDB = TwentyFiveMapper.INSTANCE.eventToEventDocumentDB(event);
+        eventDocumentDB.setDateStart(zonedDateStart.toLocalDateTime());
+        eventDocumentDB.setDateEnd(zonedDateEnd.toLocalDateTime());
+
+        eventRepository.save(eventDocumentDB);
     }
+
+    /*public void saveEvent(Event event) {
+        if (event == null) {
+            log.error("Event is null");
+            throw new IllegalArgumentException("Event is null");
+        }
+        eventRepository.save(TwentyFiveMapper.INSTANCE.eventToEventDocumentDB(event));
+    }*/
 
     public Event getEventById(String id) {
         if (StringUtils.isBlank(id)) {
