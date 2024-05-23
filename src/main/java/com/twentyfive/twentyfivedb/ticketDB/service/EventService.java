@@ -18,7 +18,9 @@ import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDo
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.TicketDocumentDB;
 import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,15 +50,34 @@ public class EventService {
             throw new IllegalArgumentException("Event is null");
         }
 
-        ZonedDateTime zonedDateStart = event.getDateStart().atZone(ZoneId.of("Europe/Rome"));
-        ZonedDateTime zonedDateEnd = event.getDateEnd().atZone(ZoneId.of("Europe/Rome"));
+        ZonedDateTime zonedDateTimeStart = event.getDateStart().atZone(ZoneId.of("Europe/Rome"));
+        ZonedDateTime zonedDateTimeEnd = event.getDateEnd().atZone(ZoneId.of("Europe/Rome"));
+
+        LocalDateTime utcDateTimeStart = zonedDateTimeStart.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        LocalDateTime utcDateTimeEnd = zonedDateTimeEnd.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        EventDocumentDB eventDocumentDB = TwentyFiveMapper.INSTANCE.eventToEventDocumentDB(event);
+        eventDocumentDB.setDateStart(utcDateTimeStart);
+        eventDocumentDB.setDateEnd(utcDateTimeEnd);
+
+        eventRepository.save(eventDocumentDB);
+    }
+
+    /*public void saveEvent(Event event) {
+        if (event == null) {
+            log.error("Event is null");
+            throw new IllegalArgumentException("Event is null");
+        }
+
+        ZonedDateTime zonedDateStart = event.getDateStart().atZone(ZoneId.of("Europe/Rome")).withZoneSameInstant(ZoneId.of("UTC"));;
+        ZonedDateTime zonedDateEnd = event.getDateEnd().atZone(ZoneId.of("Europe/Rome")).withZoneSameInstant(ZoneId.of("UTC"));;
 
         EventDocumentDB eventDocumentDB = TwentyFiveMapper.INSTANCE.eventToEventDocumentDB(event);
         eventDocumentDB.setDateStart(zonedDateStart.toLocalDateTime());
         eventDocumentDB.setDateEnd(zonedDateEnd.toLocalDateTime());
 
         eventRepository.save(eventDocumentDB);
-    }
+    }*/
 
     /*public void saveEvent(Event event) {
         if (event == null) {
