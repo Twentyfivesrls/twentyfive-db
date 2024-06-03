@@ -130,7 +130,7 @@ public class ContactService {
         return setCombinato;
     }
 
-    public Long countContacts() {
-        return contactRepository.count();
+    public Long countContacts(String ownerId) {
+        return (long) contactRepository.findAllByOwnerId(ownerId).size();
     }
 }

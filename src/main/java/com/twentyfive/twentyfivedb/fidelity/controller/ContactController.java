@@ -61,8 +61,8 @@ public class ContactController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Long> countContacts() {
-        return ResponseEntity.ok(contactService.countContacts());
+    public ResponseEntity<Long> countContacts(@RequestParam String ownerId) {
+        return ResponseEntity.ok(contactService.countContacts(ownerId));
     }
     @PostMapping("/create")
     public ResponseEntity<Contact> createContact(@RequestBody Contact contact) {
