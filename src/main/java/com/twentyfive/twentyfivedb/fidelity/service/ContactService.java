@@ -129,4 +129,8 @@ public class ContactService {
         }
         return setCombinato;
     }
+
+    public Long countContacts() {
+        return contactRepository.count();
+    }
 }

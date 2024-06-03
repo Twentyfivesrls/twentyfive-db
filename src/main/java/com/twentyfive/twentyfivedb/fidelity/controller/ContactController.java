@@ -60,6 +60,10 @@ public class ContactController {
         return ResponseEntity.ok(contactService.getContact(id));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> countContacts() {
+        return ResponseEntity.ok(contactService.countContacts());
+    }
     @PostMapping("/create")
     public ResponseEntity<Contact> createContact(@RequestBody Contact contact) {
         return ResponseEntity.ok(contactService.createContact(contact));
