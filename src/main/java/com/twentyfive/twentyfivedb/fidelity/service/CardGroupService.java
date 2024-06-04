@@ -195,4 +195,8 @@ public class CardGroupService {
     public boolean checkSameName(String name) {
         return cardGroupRepository.findAllByNameIgnoreCase(name, PageRequest.of(0, 1)).hasContent();
     }
+
+    public Long countGroups(String ownerId) {
+        return (long) cardGroupRepository.findAllListByOwnerId(ownerId).size();
+    }
 }
