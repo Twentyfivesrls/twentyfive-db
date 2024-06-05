@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class CardGroupController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<CardGroup>> getGroupsPaginationFiltered(@RequestBody CardGroup filterObject,
+    public ResponseEntity<Page<CardGroup>> getGroupsPaginationFiltered(@RequestBody FilterCardGroupRequest filterObject,
                                                                        @RequestParam(name = "ownerId") String ownerId,
                                                                        @RequestParam(defaultValue = "0") int page,
                                                                        @RequestParam(defaultValue = "5") int size) {

@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
@@ -128,7 +129,7 @@ public class CardGroupService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<CardGroup> getCardGroupFiltered(CardGroup filterObject, String ownerId, int page, int size) {
+    public Page<CardGroup> getCardGroupFiltered(FilterCardGroupRequest filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
@@ -140,22 +141,22 @@ public class CardGroupService {
         return cardGroupRepository.findAllByOwnerId(ownerId, pageable);
     }
 
-    private List<Criteria> parseOtherFilters(CardGroup filterObject){
+    private List<Criteria> parseOtherFilters(FilterCardGroupRequest filterObject){
         List<Criteria> criteriaList = new ArrayList<>();
         if(filterObject == null){
             return criteriaList;
         }
-        if(StringUtils.isNotBlank(filterObject.getName())){
-            criteriaList.add(Criteria.where("name").regex(filterObject.getName(), "i"));
+        if(filterObject.isActive()){
+            criteriaList.add(Criteria.where("isActive").is(filterObject.isActive()));
         }
-        if(StringUtils.isNotBlank(filterObject.getDescription())){
-            criteriaList.add(Criteria.where("description").regex(filterObject.getDescription(), "i"));
+        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
+            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
         }
-        if(filterObject.getIsActive() != null){
-            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
+        if(filterObject.getFromDate() != null && filterObject.getToDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()));
         }
-        if(filterObject.getExpirationDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getExpirationDate()));
+        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").lte(filterObject.getToDate()));
         }
         return criteriaList;
     }
