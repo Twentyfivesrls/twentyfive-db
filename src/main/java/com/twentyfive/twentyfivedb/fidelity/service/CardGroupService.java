@@ -150,11 +150,14 @@ public class CardGroupService {
         if(filterObject.getIsActive() != null){
             criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
         }
-        if(filterObject.getFromDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()));
+        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
+            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
         }
-        if(filterObject.getToDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").lte(filterObject.getToDate()));
+        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getToDate()));
+        }
+        if (filterObject.getFromDate() != null && filterObject.getToDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getFromDate()));
         }
         return criteriaList;
     }
