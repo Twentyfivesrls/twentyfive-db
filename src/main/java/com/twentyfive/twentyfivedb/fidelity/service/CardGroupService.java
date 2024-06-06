@@ -17,6 +17,7 @@ import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -146,16 +147,13 @@ public class CardGroupService {
         if(filterObject == null){
             return criteriaList;
         }
-        if(filterObject.isActive()){
-            criteriaList.add(Criteria.where("isActive").is(filterObject.isActive()));
+        if(filterObject.getIsActive() != null){
+            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
         }
-        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
-        }
-        if(filterObject.getFromDate() != null && filterObject.getToDate() == null){
+        if(filterObject.getFromDate() != null){
             criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()));
         }
-        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
+        if(filterObject.getToDate() != null){
             criteriaList.add(Criteria.where("expirationDate").lte(filterObject.getToDate()));
         }
         return criteriaList;
