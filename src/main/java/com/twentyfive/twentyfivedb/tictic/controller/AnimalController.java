@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/animal")
 public class AnimalController {
 
-    @Value("${fidelity.base.url}")
+    @Value("${tictic.base.url}")
     private String baseUrl;
 
     private final AnimalService animalService;
