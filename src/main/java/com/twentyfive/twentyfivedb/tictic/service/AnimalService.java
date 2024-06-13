@@ -3,18 +3,9 @@ package com.twentyfive.twentyfivedb.tictic.service;
 import com.twentyfive.twentyfivedb.tictic.repository.AnimalRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -43,7 +34,6 @@ public class AnimalService {
         TTAnimal existingAnimal = animalRepository.findById(id).orElse(null);
         if (existingAnimal == null) {
             log.error("Animal with this microchip already exists: {}", id);
-            return;
         } else {
             animalRepository.delete(existingAnimal);
             log.info("Animal with microchip {} deleted successfully", id);
