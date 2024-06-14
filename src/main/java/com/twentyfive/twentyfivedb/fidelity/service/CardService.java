@@ -1,5 +1,6 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
+import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.PrizeRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -10,10 +11,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
@@ -49,7 +54,7 @@ public class CardService {
         return cardRepository.findAllByCardGroupId(groupId);
     }
 
-    public List<Card> findAllByGroupIdAndOwnerId(String groupId, String ownerId){
+    public List<Card> findAllByGroupIdAndOwnerId(String groupId, String ownerId) {
         return cardRepository.findAllByCardGroupIdAndOwnerId(groupId, ownerId);
     }
 
@@ -151,56 +156,10 @@ public class CardService {
         }
     }
 
-    /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Card> getCardFiltered(Card filterObject, int page, int size, String ownerId) {
-        List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
-        criteriaList.addAll(parseOtherFilters(filterObject));
-        return this.pageMethod(criteriaList, page, size);
-    }
 
     public Page<Card> pageCard(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return cardRepository.findAll(pageable);
-    }
-
-    private List<Criteria> parseOtherFilters(Card filterObject) {
-        List<Criteria> criteriaList = new ArrayList<>();
-        if (filterObject == null) {
-            return criteriaList;
-        }
-        if (StringUtils.isNotBlank(filterObject.getName())) {
-            criteriaList.add(Criteria.where("name").regex(filterObject.getName(), "i"));
-        }
-        if (StringUtils.isNotBlank(filterObject.getEmail())) {
-            criteriaList.add(Criteria.where("email").regex(filterObject.getEmail(), "i"));
-        }
-        if (filterObject.getIsActive() != null) {
-            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
-        }
-        /* TODO aggiungere la ricerca per data di scadenza */
-        /*if(filterObject.getExpirationDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getExpirationDate()));
-        }*/
-        return criteriaList;
-    }
-
-    private Page<Card> pageMethod(List<Criteria> criteriaList, int page, int size) {
-        Query query = new Query();
-        if (CollectionUtils.isEmpty(criteriaList)) {
-            log.info("criteria empty");
-
-        } else {
-            query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
-        }
-
-        long total = mongoTemplate.count(query, Card.class);
-        Pageable pageable = PageRequest.of(page, size);
-        query.with(pageable);
-
-        List<Card> cards = mongoTemplate.find(query, Card.class);
-        this.disableStatusCard(cards);
-        return new PageImpl<>(cards, pageable, total);
     }
 
     public Set<AutoCompleteRes> filterSearch(String find) {
@@ -213,14 +172,30 @@ public class CardService {
         return setCombinato;
     }
 
-    private void disableStatusCard(List<Card> cards) {
-        for (Card card : cards) {
-            String groupId = card.getCardGroupId();
-            CardGroup group = cardGroupService.getCardGroup(groupId);
-            if (!group.getIsActive()) {
-                card.setIsActive(false);
-                cardRepository.save(card);
-            }
-        }
+    public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size, String ownerId) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<AggregationOperation> operations = Utility.parseOtherFiltersForFidelityCard(filterObject, ownerId, pageable);
+
+        // Build the aggregation pipeline
+        Aggregation aggregation = Aggregation.newAggregation(operations);
+
+        // Execute the aggregation query
+        List<Card> cards = mongoTemplate.aggregate(aggregation, "fidelity_card", Card.class).getMappedResults();
+
+        // Get the total count for pagination
+        long total = getTotalCount(operations);
+
+        return new PageImpl<>(cards, pageable, total);
+    }
+
+    private long getTotalCount(List<AggregationOperation> operations) {
+        operations.add(Aggregation.group().count().as("total"));
+
+        Aggregation countAggregation = Aggregation.newAggregation(operations);
+
+        // Execute the count aggregation
+        AggregationResults<Utility.CountResult> countResult = mongoTemplate.aggregate(countAggregation, "fidelity_card", Utility.CountResult.class);
+
+        return countResult.getUniqueMappedResult() != null ? countResult.getUniqueMappedResult().getTotal() : 0;
     }
 }

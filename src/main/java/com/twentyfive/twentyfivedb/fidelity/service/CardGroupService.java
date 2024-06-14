@@ -1,5 +1,6 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
+import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -47,8 +48,7 @@ public class CardGroupService {
     }
 
     public CardGroup createCardGroup(CardGroup cardGroup) {
-        cardGroup.setExpirationDate(cardGroup.getExpirationDate().atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneOffset.of("+02:00")).toLocalDateTime().toLocalDate().atStartOfDay());
+        cardGroup.setExpirationDate(cardGroup.getExpirationDate());
         this.checkExpirationDate(cardGroup);
         return this.cardGroupRepository.save(cardGroup);
     }
@@ -133,33 +133,13 @@ public class CardGroupService {
     public Page<CardGroup> getCardGroupFiltered(FilterCardGroupRequest filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
-        criteriaList.addAll(parseOtherFilters(filterObject));
+        criteriaList.addAll(Utility.parseOtherFiltersForFidelity(filterObject));
         return this.pageMethod(criteriaList, page, size);
     }
 
     public Page<CardGroup> pageGroups(String ownerId, int page, int size) {
         Pageable pageable= PageRequest.of(page, size);
         return cardGroupRepository.findAllByOwnerId(ownerId, pageable);
-    }
-
-    private List<Criteria> parseOtherFilters(FilterCardGroupRequest filterObject){
-        List<Criteria> criteriaList = new ArrayList<>();
-        if(filterObject == null){
-            return criteriaList;
-        }
-        if(filterObject.getIsActive() != null){
-            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
-        }
-        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
-        }
-        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getToDate()));
-        }
-        if (filterObject.getFromDate() != null && filterObject.getToDate() == null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getFromDate()));
-        }
-        return criteriaList;
     }
 
     private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size) {
