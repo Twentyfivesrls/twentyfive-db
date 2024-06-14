@@ -18,6 +18,7 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public class PrizeService {
     }
 
     public void claimPrize(String id){
-        LocalDate currentDate = LocalDate.now();
+        Date currentDate = new Date();
         Premio premio = prizeRepository.findById(id).orElse(null);
         assert premio != null;
         Card card = cardService.getCard(premio.getCardId());
@@ -91,23 +92,23 @@ public class PrizeService {
         assert group != null;
         if(premio.getClaimDate() == null){
             premio.setClaimed(true);
-            premio.setClaimDate(currentDate.atStartOfDay());
+            premio.setClaimDate(currentDate);
             prizeRepository.save(premio);
         }
-        if(premio.getCardComplete().equals(currentDate.atStartOfDay()) && card.getScanNumberExecuted() == group.getScanNumber()){
+        if(premio.getCardComplete().equals(currentDate) && card.getScanNumberExecuted() == group.getScanNumber()){
             card.setScanNumberExecuted(0);
             cardRepository.save(card);
         }
     }
 
     public Premio claimLastPrize(String cardId) {
-        LocalDate currentDate = LocalDate.now();
+        Date currentDate = new Date();
         Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdOrderByCardCompleteDesc(cardId));
 
         if (ultimoPremioOptional.isPresent()) {
             Premio ultimoPremio = ultimoPremioOptional.get();
             ultimoPremio.setClaimed(true);
-            ultimoPremio.setClaimDate(currentDate.atStartOfDay());
+            ultimoPremio.setClaimDate(currentDate);
             return prizeRepository.save(ultimoPremio);
         } else {
             throw new RuntimeException("Nessun premio trovato per la carta con ID: " + cardId);

@@ -14,10 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
@@ -64,7 +61,7 @@ public class CardService {
     }
 
     public Card scannerCard(String id) {
-        LocalDate currentDate = LocalDate.now();
+        Date currentDate = new Date();
         Card card = cardRepository.findById(id).orElse(null);
         CardGroup group = cardGroupService.getCardGroup(card.getCardGroupId());
         try {
@@ -74,13 +71,13 @@ public class CardService {
         }
         if (card.getScanNumberExecuted() < group.getScanNumber()) {
             card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
-            card.setLastScanDate(currentDate.atStartOfDay());
+            card.setLastScanDate(currentDate);
             cardRepository.save(card);
         }
         if (card.getScanNumberExecuted() == group.getScanNumber()) {
             Premio premio = new Premio();
             premio.setCardId(card.getId());
-            premio.setCardComplete(currentDate.atStartOfDay());
+            premio.setCardComplete(currentDate);
             prizeRepository.save(premio);
         }
         return card;

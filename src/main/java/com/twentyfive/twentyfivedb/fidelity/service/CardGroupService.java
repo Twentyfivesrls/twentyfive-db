@@ -1,6 +1,5 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
-import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -106,19 +105,21 @@ public class CardGroupService {
     }
 
     public void disableExpiredGroups(List<CardGroup> groups){
-        LocalDate currentDate = LocalDate.now();
+        Date currentDate = new Date();
 
         for(CardGroup cardGroup: groups){
-            if(cardGroup.getExpirationDate().isBefore(currentDate.atStartOfDay())){
+            //compare two date
+            if(cardGroup.getExpirationDate().before(currentDate)){
                 cardGroup.setIsActive(false);
                 cardGroupRepository.save(cardGroup);
             }
+
         }
     }
 
-    public void checkExpirationDate(CardGroup group){
-        LocalDate currentDate = LocalDate.now();
-        if(group.getExpirationDate().isBefore(currentDate.atStartOfDay())){
+    public void checkExpirationDate(CardGroup cardGroup){
+        Date currentDate = new Date();
+        if(cardGroup.getExpirationDate().before(currentDate)){
             log.error("Impossible create group with this date");
             throw new RuntimeException("Impossible create group with this date");
         }
@@ -133,13 +134,33 @@ public class CardGroupService {
     public Page<CardGroup> getCardGroupFiltered(FilterCardGroupRequest filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
-        criteriaList.addAll(Utility.parseOtherFiltersForFidelity(filterObject));
+        criteriaList.addAll(parseOtherFilters(filterObject));
         return this.pageMethod(criteriaList, page, size);
     }
 
     public Page<CardGroup> pageGroups(String ownerId, int page, int size) {
         Pageable pageable= PageRequest.of(page, size);
         return cardGroupRepository.findAllByOwnerId(ownerId, pageable);
+    }
+
+    private List<Criteria> parseOtherFilters(FilterCardGroupRequest filterObject){
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(filterObject == null){
+            return criteriaList;
+        }
+        if(filterObject.getIsActive() != null){
+            criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
+        }
+        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
+            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
+        }
+        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getToDate()));
+        }
+        if (filterObject.getFromDate() != null && filterObject.getToDate() == null){
+            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getFromDate()));
+        }
+        return criteriaList;
     }
 
     private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size) {
