@@ -68,6 +68,7 @@ public class AnimalService {
             animal1.setWeight(animal.getWeight());
             animal1.setAddress(animal.getAddress());
             animal1.setPhone(animal.getPhone());
+            animal1.setEmail(animal.getEmail());
             animalRepository.save(animal1);
         }
     }
