@@ -151,6 +151,10 @@ public class CardGroupService {
         if(filterObject.getIsActive() != null){
             criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
         }
+
+        if(StringUtils.isNotBlank(filterObject.getName())){
+            criteriaList.add(Criteria.where("name").is(filterObject.getName()));
+        }
         if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
             criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
         }
@@ -186,12 +190,6 @@ public class CardGroupService {
             AutoCompleteRes temp = new AutoCompleteRes(group.getName());
             setCombinato.add(temp);
         }
-        /*for (CardGroup groupD : groupsDescription) {
-            AutoCompleteRes temp = new AutoCompleteRes(groupD.getDescription());
-            setCombinato.add(temp);
-        }
-
-         */
         return setCombinato;
     }
 

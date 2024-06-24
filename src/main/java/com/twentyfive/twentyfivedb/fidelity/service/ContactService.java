@@ -121,10 +121,12 @@ public class ContactService {
     }
 
     public Set<AutoCompleteRes> filterSearch(String find){
-        Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
+        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
+        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(find, find);
+        Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(find, find,find);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Contact contact : contacts) {
-            AutoCompleteRes temp = new AutoCompleteRes(contact.getName());
+            AutoCompleteRes temp = new AutoCompleteRes(contact.getName() + " " + contact.getSurname() + " - " + contact.getEmail());
             setCombinato.add(temp);
         }
         return setCombinato;

@@ -19,4 +19,5 @@ public interface ContactRepository extends MongoRepository<Contact, String> {
     List<Contact> findAllByOwnerId(String ownerId);
     
     Set<Contact> findAllByNameContainingIgnoreCase(String name);
+    Set<Contact> findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String surname, String email);
 }
