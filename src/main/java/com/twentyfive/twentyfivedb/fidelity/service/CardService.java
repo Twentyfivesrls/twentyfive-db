@@ -20,7 +20,6 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -197,4 +196,5 @@ public class CardService {
 
         return countResult.getUniqueMappedResult() != null ? countResult.getUniqueMappedResult().getTotal() : 0;
     }
+
 }

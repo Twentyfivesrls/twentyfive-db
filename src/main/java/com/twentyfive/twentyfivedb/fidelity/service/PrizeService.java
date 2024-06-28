@@ -17,7 +17,6 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,26 +40,13 @@ public class PrizeService {
         this.cardService = cardService;
     }
 
-    public List<Premio> totalNumberPrizeCard(String id){
+    public List<Premio> totalNumberPrizeCard(String id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("cardId").is(id));
         return mongoTemplate.find(query, Premio.class);
     }
 
-    public List<Premio> totalNumberPrizeCustomer(String id){
-        Query query = new Query();
-        query.addCriteria(Criteria.where("customerId").is(id));
-        List<Card> list = mongoTemplate.find(query, Card.class);
-        List<String> cardIds = list.stream().map(card -> card.getId()).collect(Collectors.toList());
-        if(!CollectionUtils.isEmpty(cardIds)){
-            Query queryPremio = new Query();
-            queryPremio.addCriteria(Criteria.where("cardId").in(cardIds));
-            return mongoTemplate.find(queryPremio, Premio.class);
-        }
-        return null;
-    }
-
-    public Page<Premio> pagePrizeCard(String id, int page, int size){
+    public Page<Premio> pagePrizeCard(String id, int page, int size) {
         Pageable pageable= PageRequest.of(page, size);
         return prizeRepository.findAllByCardIdIgnoreCase(id, pageable);
     }
@@ -83,7 +69,7 @@ public class PrizeService {
         return null;
     }
 
-    public void claimPrize(String id){
+    public void claimPrize(String id) {
         Date currentDate = new Date();
         Premio premio = prizeRepository.findById(id).orElse(null);
         assert premio != null;

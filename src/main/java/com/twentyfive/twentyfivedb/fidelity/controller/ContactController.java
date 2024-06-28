@@ -2,12 +2,14 @@ package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.service.ContactService;
 import com.twentyfive.twentyfivedb.fidelity.service.ExportExcelService;
+import com.twentyfive.twentyfivedb.fidelity.service.CardService;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.ContactDto;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Contact;
 
 import java.time.LocalDateTime;
@@ -22,16 +24,17 @@ public class ContactController {
 
     private final ExportExcelService exportService;
 
+
     public ContactController(ContactService contactService, ExportExcelService exportService) {
         this.contactService = contactService;
         this.exportService = exportService;
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<Contact>> getContactListFiltered(@RequestBody Contact filterObject,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "5") int size,
-                                                                @RequestParam(name = "ownerId") String ownerId) {
+    public ResponseEntity<Page<ContactDto>> getContactListFiltered(@RequestBody ContactDto filterObject,
+                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "5") int size,
+                                                                   @RequestParam(name = "ownerId") String ownerId) {
 
         return ResponseEntity.ok(contactService.getContactFiltered(filterObject, page, size, ownerId));
     }
@@ -56,7 +59,7 @@ public class ContactController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Contact> getContact(@PathVariable String id) {
+    public ResponseEntity<ContactDto> getContact(@PathVariable String id) {
         return ResponseEntity.ok(contactService.getContact(id));
     }
 

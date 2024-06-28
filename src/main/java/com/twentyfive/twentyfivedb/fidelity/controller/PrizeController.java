@@ -24,11 +24,6 @@ public class PrizeController {
         return ResponseEntity.ok(prizeService.totalNumberPrizeCard(id));
     }
 
-    @GetMapping("/total-number-prize-customer/{id}")
-    public ResponseEntity<List<Premio>> totalNumberPrizeCustomer(@PathVariable String id) {
-        return ResponseEntity.ok(prizeService.totalNumberPrizeCustomer(id));
-    }
-
     @PostMapping("/page-card/{id}")
     public ResponseEntity<Page<Premio>> pagePrizeCard(@PathVariable String id,
                                                       @RequestParam(defaultValue = "0") int page,

@@ -1,5 +1,6 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
+import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.ContactRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
@@ -13,12 +14,16 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.ContactDto;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Contact;
+import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,13 +31,16 @@ public class ContactService {
 
     private final ContactRepository contactRepository;
 
+    private final CardRepository cardRepository;
+
     private final MongoTemplate mongoTemplate;
 
     private static final String USER_KEY = "ownerId";
 
 
-    public ContactService(ContactRepository contactRepository, MongoTemplate mongoTemplate) {
+    public ContactService(ContactRepository contactRepository, CardRepository cardRepository, MongoTemplate mongoTemplate) {
         this.contactRepository = contactRepository;
+        this.cardRepository = cardRepository;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -45,8 +53,10 @@ public class ContactService {
         return contactRepository.findAllByOwnerId(ownerId);
     }
 
-    public Contact getContact(String id) {
-        return contactRepository.findById(id).orElse(null);
+    public ContactDto getContact(String id) {
+        Contact contact = contactRepository.findById(id).orElse(null);
+        assert contact != null;
+        return this.fillContact(contact);
     }
 
     public Page<Contact> getContactByName(String name, int page, int size){
@@ -85,14 +95,14 @@ public class ContactService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<Contact> getContactFiltered(Contact filterObject, int page, int size, String ownerId) {
+    public Page<ContactDto> getContactFiltered(ContactDto filterObject, int page, int size, String ownerId) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
         return this.pageMethod(criteriaList, page, size);
     }
 
-    private List<Criteria> parseOtherFilters(Contact filterObject){
+    private List<Criteria> parseOtherFilters(ContactDto filterObject){
         List<Criteria> criteriaList = new ArrayList<>();
         if(filterObject == null){
             return criteriaList;
@@ -103,7 +113,7 @@ public class ContactService {
         return criteriaList;
     }
 
-    private Page<Contact> pageMethod(List<Criteria> criteriaList, int page, int size) {
+    private Page<ContactDto> pageMethod(List<Criteria> criteriaList, int page, int size) {
         Query query = new Query();
         if(CollectionUtils.isEmpty(criteriaList)){
             log.info("criteria empty");
@@ -117,7 +127,11 @@ public class ContactService {
         query.with(pageable);
 
         List<Contact> contacts = mongoTemplate.find(query, Contact.class);
-        return new PageImpl<>(contacts, pageable, total);
+        List<ContactDto> contactsDto = new ArrayList<>();
+        for (Contact contact : contacts) {
+            contactsDto.add(this.fillContact(contact));
+        }
+        return new PageImpl<>(contactsDto, pageable, total);
     }
 
     public Set<AutoCompleteRes> filterSearch(String find){
@@ -134,5 +148,39 @@ public class ContactService {
 
     public Long countContacts(String ownerId) {
         return (long) contactRepository.findAllByOwnerId(ownerId).size();
+    }
+
+    public List<Premio> totalNumberPrizeCustomer(List<Card> cards) {
+        List<String> cardIds = cards.stream().map(card -> card.getId()).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(cardIds)){
+            Query queryPremio = new Query();
+            queryPremio.addCriteria(Criteria.where("cardId").in(cardIds));
+            return mongoTemplate.find(queryPremio, Premio.class);
+        }
+        return null;
+    }
+
+    public ContactDto fillContact(Contact contact){
+        ContactDto contactDto = new ContactDto();
+        contactDto.setId(contact.getId());
+        contactDto.setName(contact.getName());
+        contactDto.setSurname(contact.getSurname());
+        contactDto.setEmail(contact.getEmail());
+        contactDto.setPhoneNumber(contact.getPhoneNumber());
+        contactDto.setCreationDate(contact.getCreationDate());
+        List<Card> cards = cardRepository.findAllByCustomerId(contact.getId());
+        List<Premio> prizes = this.totalNumberPrizeCustomer(cards);
+        if(!CollectionUtils.isEmpty(prizes)) {
+            for(Premio premio : prizes){
+                if(premio.isClaimed()){
+                    contactDto.setClaimedPrizes(contactDto.getClaimedPrizes() + 1);
+                }else{
+                    contactDto.setUnclaimedPrizes(contactDto.getUnclaimedPrizes() + 1);
+                }
+            }
+        }
+        int cardNumber = cards.size();
+        contactDto.setAssociatedCards(cardNumber);
+        return contactDto;
     }
 }

@@ -10,6 +10,7 @@ import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -155,4 +156,5 @@ public class CardController {
                 .header("Content-Disposition", "attachment; filename=Lista_Card_Associate_" + groupId + formattedDateTime + ".xlsx")
                 .body(excelData);
     }
+
 }

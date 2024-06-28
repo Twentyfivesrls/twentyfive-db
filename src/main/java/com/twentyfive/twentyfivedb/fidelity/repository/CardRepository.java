@@ -11,12 +11,9 @@ import java.util.Set;
 
 @Repository
 public interface CardRepository extends MongoRepository<Card, String> {
-    Page<Card> getAllById(String id, Pageable pageable);
 
     Page<Card> findAllByNameIgnoreCase(String name, Pageable pageable);
 
-    Set<Card> findAllByNameContainingIgnoreCase(String name);
-    Set<Card> findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(String name, String surname);
     Set<Card> findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String surname, String email);
 
     List<Card> findAllByCardGroupId(String groupId);
@@ -25,5 +22,6 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
     List<Card> findAllByOwnerId(String ownerId);
 
-    Page<Card> findAllByIsActive(Boolean status, Pageable pageable);
+    List<Card> findAllByCustomerId(String customerId);
+
 }
