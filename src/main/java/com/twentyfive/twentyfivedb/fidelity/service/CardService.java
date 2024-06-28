@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
 import com.twentyfive.twentyfivedb.Utility;
+import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.PrizeRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.CardGroupDto;
 import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
@@ -29,13 +31,15 @@ public class CardService {
     private final PrizeRepository prizeRepository;
     private final MongoTemplate mongoTemplate;
     private final CardGroupService cardGroupService;
+    private final CardGroupRepository cardGroupRepository;
     private static final String USER_KEY = "ownerId";
 
-    public CardService(CardRepository cardRepository, PrizeRepository prizeRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService) {
+    public CardService(CardRepository cardRepository, PrizeRepository prizeRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService, CardGroupRepository cardGroupRepository) {
         this.cardRepository = cardRepository;
         this.prizeRepository = prizeRepository;
         this.mongoTemplate = mongoTemplate;
         this.cardGroupService = cardGroupService;
+        this.cardGroupRepository = cardGroupRepository;
     }
 
     public Card getCard(String id) {
@@ -62,8 +66,10 @@ public class CardService {
     public Card scannerCard(String id) {
         Date currentDate = new Date();
         Card card = cardRepository.findById(id).orElse(null);
-        CardGroup group = cardGroupService.getCardGroup(card.getCardGroupId());
+        assert card != null;
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId()).orElse(null);
         try {
+            assert group != null;
             cardGroupService.checkExpirationDate(group);
         } catch (Exception e) {
             throw new RuntimeException("Unable to scan card");
@@ -83,9 +89,9 @@ public class CardService {
     }
 
     public Card createCard(Card card) {
-        String temp = card.getCardGroupId();
-        CardGroup group = cardGroupService.getCardGroup(temp);
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId()).orElse(null);
         try {
+            assert group != null;
             cardGroupService.checkExpirationDate(group);
         } catch (Exception e) {
             throw new RuntimeException("Unable to create card");

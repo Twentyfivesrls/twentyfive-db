@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.CardGroupDto;
 import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
@@ -38,8 +39,10 @@ public class CardGroupService {
         this.cardRepository = cardRepository;
     }
 
-    public CardGroup getCardGroup(String id) {
-        return cardGroupRepository.findById(id).orElse(null);
+    public CardGroupDto getCardGroup(String id) {
+        CardGroup cardGroup = cardGroupRepository.findById(id).orElse(null);
+        assert cardGroup != null;
+        return this.fillCardGroup(cardGroup);
     }
 
     public List<CardGroup> findAllByOwnerId(String ownerId){
@@ -131,7 +134,7 @@ public class CardGroupService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<CardGroup> getCardGroupFiltered(FilterCardGroupRequest filterObject, String ownerId, int page, int size) {
+    public Page<CardGroupDto> getCardGroupFiltered(FilterCardGroupRequest filterObject, String ownerId, int page, int size) {
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
         criteriaList.addAll(parseOtherFilters(filterObject));
@@ -167,7 +170,7 @@ public class CardGroupService {
         return criteriaList;
     }
 
-    private Page<CardGroup> pageMethod(List<Criteria> criteriaList, int page, int size) {
+    private Page<CardGroupDto> pageMethod(List<Criteria> criteriaList, int page, int size) {
 
         Query query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
 
@@ -177,8 +180,12 @@ public class CardGroupService {
         query.with(pageable);
 
         List<CardGroup> cardGroups = mongoTemplate.find(query, CardGroup.class);
+        List<CardGroupDto> cardGroupDtos = new ArrayList<>();
+        for (CardGroup cardGroup : cardGroups) {
+            cardGroupDtos.add(this.fillCardGroup(cardGroup));
+        }
         this.disableExpiredGroups(cardGroups);
-        return new PageImpl<>(cardGroups, pageable, total);
+        return new PageImpl<>(cardGroupDtos, pageable, total);
     }
 
     public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
@@ -199,5 +206,19 @@ public class CardGroupService {
 
     public Long countGroups(String ownerId) {
         return (long) cardGroupRepository.findAllListByOwnerId(ownerId).size();
+    }
+
+    private CardGroupDto fillCardGroup(CardGroup cardGroup) {
+        CardGroupDto groupDto = new CardGroupDto();
+        groupDto.setId(cardGroup.getId());
+        groupDto.setName(cardGroup.getName());
+        groupDto.setDescription(cardGroup.getDescription());
+        groupDto.setCreationDate(cardGroup.getCreationDate());
+        groupDto.setExpirationDate(cardGroup.getExpirationDate());
+        groupDto.setScanNumber(cardGroup.getScanNumber());
+        groupDto.setNumberOfDaysForPrize(cardGroup.getNumberOfDaysForPrize());
+        groupDto.setIsActive(cardGroup.getIsActive());
+        groupDto.setAssociatedCard(cardRepository.findAllByCardGroupId(cardGroup.getId()).size());
+        return groupDto;
     }
 }
