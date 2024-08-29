@@ -3,6 +3,7 @@ package com.twentyfive.twentyfivedb.tictic.controller;
 import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.ticketDB.utils.MethodUtils;
 import com.twentyfive.twentyfivedb.tictic.service.AnimalService;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/animal")
@@ -23,6 +25,17 @@ public class AnimalController {
 
     public AnimalController(AnimalService animalService) {
         this.animalService = animalService;
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<List<TTAnimal>> filterAnimals(@RequestBody TTAnimal filterObject,
+                                                  @RequestParam("ownerId") String ownerId) {
+        return ResponseEntity.ok(animalService.getAnimalFiltered(filterObject, ownerId));
+    }
+
+    @PostMapping("/filter/animal/autocomplete")
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject) {
+        return new ResponseEntity<>(animalService.filterSearch(filterObject), HttpStatus.OK);
     }
 
     @PostMapping("/create")
@@ -59,5 +72,16 @@ public class AnimalController {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=qrCode.png")
                 .body(qrCode);
+    }
+
+    @GetMapping("/order")
+    public List<TTAnimal> getAnimals(
+            @RequestParam String ownerId,
+            @RequestParam String campo,
+            @RequestParam String ordine) {
+        if (ordine == null || ordine.isEmpty()) {
+            return animalService.findAllByOwnerId(ownerId);
+        }
+        return animalService.getAnimalsSorted(ownerId, campo, ordine);
     }
 }
