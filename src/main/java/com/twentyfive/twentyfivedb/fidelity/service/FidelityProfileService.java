@@ -8,7 +8,6 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.ProfileFidelity;
 @Service
 @Slf4j
 public class FidelityProfileService {
-
     private final FidelityProfileRepository profileRepository;
 
     public FidelityProfileService(FidelityProfileRepository profileRepository) {

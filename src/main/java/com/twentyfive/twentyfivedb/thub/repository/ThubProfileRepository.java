@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface ThubProfileRepository extends MongoRepository<ThubProfile, String> {
     Optional<ThubProfile> findByUsername(String username);
 
+    void deleteByUsername(String username);
+
+    ThubProfile findAllByImageName(String imageName);
 }

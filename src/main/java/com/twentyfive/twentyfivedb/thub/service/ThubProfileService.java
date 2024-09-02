@@ -31,8 +31,8 @@ public class ThubProfileService {
         tP.setUsername(thubProfile.getUsername());
         tP.setTitle(thubProfile.getTitle());
         tP.setDescription(thubProfile.getDescription());
-        tP.setHasProPic(thubProfile.getHasProPic());
-        tP.setProPicUrl(thubProfile.getProPicUrl());
+   /*     tP.setHasProPic(thubProfile.getHasProPic());
+        tP.setProPicUrl(thubProfile.getProPicUrl());*/
         tP.setLinks(thubProfile.getLinks());
         tP.setCustomTheme(thubProfile.getCustomTheme());
 
@@ -42,4 +42,25 @@ public class ThubProfileService {
     public ThubProfile getProfile(String username) {
         return profileRepository.findByUsername(username).orElse(null);
     }
+
+
+    public ThubProfile createImageName(ThubProfile imageName){
+        ThubProfile existingImage = profileRepository.findAllByImageName(imageName.getImageName());
+
+        if (existingImage != null) {
+            throw new IllegalArgumentException("An image with the same name already exists");
+        }
+
+        return profileRepository.save(imageName);
+    }
+
+    public Optional<ThubProfile> getImageName(String username){
+        return profileRepository.findByUsername(username);
+    }
+
+    public void deleteImageName(String username){
+        profileRepository.deleteByUsername(username);
+    }
+
+
 }
