@@ -6,6 +6,7 @@ import twentyfive.twentyfiveadapter.models.thubModels.ThubProfile;
 
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -58,8 +59,12 @@ public class ThubProfileService {
         return profileRepository.findByUsername(username);
     }
 
-    public void deleteImageName(String username){
-        profileRepository.deleteByUsername(username);
+    public void deleteImageName(String username) {
+        ThubProfile profile = profileRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("Profilo non trovato per l'username: " + username));
+
+        profile.setImageName(null);
+        profileRepository.save(profile);
     }
 
 
