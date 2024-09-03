@@ -110,10 +110,8 @@ public class AnimalService {
                 .collect(Collectors.toList());
     }
 
-    public Set<AutoCompleteRes> filterSearch(String find){
-        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
-        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(find, find);
-        Set<TTAnimal> animals = animalRepository.findAllByNameContainingIgnoreCase(find);
+    public Set<AutoCompleteRes> filterSearch(String find, String ownerId){
+        Set<TTAnimal> animals = animalRepository.findByNameContainingIgnoreCaseAndOwnerIdContainingIgnoreCase(find, ownerId);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (TTAnimal animal : animals) {
             AutoCompleteRes temp = new AutoCompleteRes(animal.getName());

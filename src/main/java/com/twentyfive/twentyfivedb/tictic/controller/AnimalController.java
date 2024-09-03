@@ -34,8 +34,9 @@ public class AnimalController {
     }
 
     @PostMapping("/filter/animal/autocomplete")
-    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject) {
-        return new ResponseEntity<>(animalService.filterSearch(filterObject), HttpStatus.OK);
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject,
+                                                                         @RequestParam("ownerId") String ownerId) {
+        return new ResponseEntity<>(animalService.filterSearch(filterObject, ownerId), HttpStatus.OK);
     }
 
     @PostMapping("/create")

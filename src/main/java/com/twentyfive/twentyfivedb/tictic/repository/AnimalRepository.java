@@ -10,7 +10,9 @@ import org.springframework.data.domain.Sort;
 @Repository
 public interface AnimalRepository extends MongoRepository<TTAnimal, String>{
 
-    Set<TTAnimal> findAllByNameContainingIgnoreCase(String name);
+    Set<TTAnimal> findByNameContainingIgnoreCase(String name);
+
+    Set<TTAnimal> findByNameContainingIgnoreCaseAndOwnerIdContainingIgnoreCase(String name, String ownerId);
 
     List<TTAnimal> findByOwnerIdContainingIgnoreCase(String ownerId, Sort sort);
 }
