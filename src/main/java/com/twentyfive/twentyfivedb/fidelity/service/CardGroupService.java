@@ -200,8 +200,8 @@ public class CardGroupService {
         return setCombinato;
     }
 
-    public boolean checkSameName(String name) {
-        return cardGroupRepository.findAllByNameIgnoreCase(name, PageRequest.of(0, 1)).hasContent();
+    public boolean checkSameName(String name, String ownerId) {
+        return cardGroupRepository.findAllByNameIgnoreCaseAndOwnerId(name, PageRequest.of(0, 1), ownerId).hasContent();
     }
 
     public Long countGroups(String ownerId) {

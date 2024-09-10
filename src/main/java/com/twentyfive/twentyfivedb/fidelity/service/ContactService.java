@@ -64,7 +64,13 @@ public class ContactService {
         return contactRepository.findAllByNameIgnoreCase(name, pageable);
     }
 
-    public Contact createContact(Contact contact) { return this.contactRepository.save(contact); }
+    public Contact createContact(Contact contact, String ownerId) {
+        Contact existingContact = contactRepository.findByEmailAndOwnerId(contact.getEmail(), ownerId);
+        if (existingContact != null) {
+            throw new IllegalArgumentException("A contact with this email already exists.");
+        }
+        return this.contactRepository.save(contact);
+    }
 
     public void deleteContact(String id) {
         this.contactRepository.deleteById(id);
@@ -83,7 +89,7 @@ public class ContactService {
         Contact contact1 = contactRepository.findById(id).orElse(null);
 
         if (contact1 == null) {
-            this.createContact(contact);
+            this.createContact(contact, contact.getOwnerId());
         } else {
             contact1.setName(contact.getName());
             contact1.setSurname(contact.getSurname());

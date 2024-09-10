@@ -50,8 +50,9 @@ public class CardService {
         return cardRepository.findAllByOwnerId(ownerId);
     }
 
-    public List<Card> getByGroupId(String groupId) {
-        return cardRepository.findAllByCardGroupId(groupId);
+    public Page<Card> getByGroupId(String groupId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findAllByCardGroupId(groupId, pageable);
     }
 
     public List<Card> findAllByGroupIdAndOwnerId(String groupId, String ownerId) {
@@ -68,22 +69,26 @@ public class CardService {
         Card card = cardRepository.findById(id).orElse(null);
         assert card != null;
         CardGroup group = cardGroupRepository.findById(card.getCardGroupId()).orElse(null);
-        try {
-            assert group != null;
-            cardGroupService.checkExpirationDate(group);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to scan card");
-        }
-        if (card.getScanNumberExecuted() < group.getScanNumber()) {
-            card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
-            card.setLastScanDate(currentDate);
-            cardRepository.save(card);
-        }
-        if (card.getScanNumberExecuted() == group.getScanNumber()) {
-            Premio premio = new Premio();
-            premio.setCardId(card.getId());
-            premio.setCardComplete(currentDate);
-            prizeRepository.save(premio);
+        if(card.isActive){
+            try {
+                assert group != null;
+                cardGroupService.checkExpirationDate(group);
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to scan card");
+            }
+            if (card.getScanNumberExecuted() < group.getScanNumber()) {
+                card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
+                card.setLastScanDate(currentDate);
+                cardRepository.save(card);
+            }
+            if (card.getScanNumberExecuted() == group.getScanNumber()) {
+                Premio premio = new Premio();
+                premio.setCardId(card.getId());
+                premio.setCardComplete(currentDate);
+                prizeRepository.save(premio);
+            }
+        } else {
+            throw new IllegalStateException("Unable to scan card: The card is not active");
         }
         return card;
     }

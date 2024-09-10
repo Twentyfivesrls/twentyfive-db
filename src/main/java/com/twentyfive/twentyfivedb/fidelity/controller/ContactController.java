@@ -68,8 +68,9 @@ public class ContactController {
         return ResponseEntity.ok(contactService.countContacts(ownerId));
     }
     @PostMapping("/create")
-    public ResponseEntity<Contact> createContact(@RequestBody Contact contact) {
-        return ResponseEntity.ok(contactService.createContact(contact));
+    public ResponseEntity<Contact> createContact(@RequestBody Contact contact,
+                                                 @RequestParam("ownerId") String ownerId) {
+        return ResponseEntity.ok(contactService.createContact(contact, ownerId));
     }
 
     @DeleteMapping("/delete/{id}")

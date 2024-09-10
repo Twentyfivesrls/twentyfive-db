@@ -10,7 +10,6 @@ import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,8 +56,10 @@ public class CardController {
     }
 
     @GetMapping("/find-by-groupId")
-    public ResponseEntity<List<Card>> getByGroupId(@RequestParam("cardGroupId") String groupId){
-        return new ResponseEntity<>(cardService.getByGroupId(groupId), HttpStatus.OK);
+    public ResponseEntity<Page<Card>> getByGroupId(@RequestParam("groupId") String groupId,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "5") int size){
+        return new ResponseEntity<>(cardService.getByGroupId(groupId, page, size), HttpStatus.OK);
     }
 
     @PostMapping("/filter/card/autocomplete")

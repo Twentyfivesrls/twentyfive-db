@@ -106,8 +106,8 @@ public class CardGroupController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkSameName(@RequestParam("name") String name) {
-        return ResponseEntity.ok(cardGroupService.checkSameName(name));
+    public ResponseEntity<Boolean> checkSameName(@RequestParam("name") String name, @RequestParam("ownerId") String ownerId) {
+        return ResponseEntity.ok(cardGroupService.checkSameName(name, ownerId));
     }
 
     @GetMapping("/count")
