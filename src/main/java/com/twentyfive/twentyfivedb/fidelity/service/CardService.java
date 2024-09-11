@@ -168,10 +168,10 @@ public class CardService {
         return cardRepository.findAll(pageable);
     }
 
-    public Set<AutoCompleteRes> filterSearch(String find) {
+    public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
         //Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCase(find);
         //Search by name or surname
-        Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(find, find, find);
+        Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCaseAndOwnerId(find, find, find, ownerId);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Card card : cards) {
             AutoCompleteRes temp = new AutoCompleteRes(card.getName() + " " + card.getSurname() + " - " + card.getEmail());

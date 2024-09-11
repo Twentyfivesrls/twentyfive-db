@@ -63,8 +63,9 @@ public class CardController {
     }
 
     @PostMapping("/filter/card/autocomplete")
-    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject) {
-        return new ResponseEntity<>(cardService.filterSearch(filterObject), HttpStatus.OK);
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject,
+                                                                         @RequestParam("ownerId") String ownerId) {
+        return new ResponseEntity<>(cardService.filterSearch(filterObject, ownerId), HttpStatus.OK);
     }
 
     @GetMapping("/get-name")
