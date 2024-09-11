@@ -14,7 +14,7 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
     Page<Card> findAllByNameIgnoreCase(String name, Pageable pageable);
 
-    Set<Card> findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCaseAndOwnerId(String name, String surname, String email, String ownerId);
+    Set<Card> findAllByOwnerIdAndNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(String ownerId, String name, String surname, String email);
 
     Page<Card> findAllByCardGroupId(String groupId, Pageable pageable);
 
