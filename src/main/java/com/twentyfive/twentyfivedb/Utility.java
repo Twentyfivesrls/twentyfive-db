@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,12 +99,19 @@ public class Utility {
 
                 // Match criteria on CardGroup's expirationDate
                 if (filterObject.getFromDate() != null && filterObject.getToDate() != null) {
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate())));
+                    LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
+                    LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
+                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
                 } else if (filterObject.getToDate() != null) {
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").is(filterObject.getToDate())));
+                    LocalDateTime startDate = filterObject.getToDate().toLocalDate().atStartOfDay();
+                    LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
+                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
                 } else if (filterObject.getFromDate() != null) {
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").is(filterObject.getFromDate())));
+                    LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
+                    LocalDateTime endDate = filterObject.getFromDate().toLocalDate().atTime(LocalTime.MAX);
+                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
                 }
+
             }
 
         }

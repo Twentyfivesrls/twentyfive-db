@@ -19,10 +19,8 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 @Slf4j
 @Service
@@ -146,27 +144,33 @@ public class CardGroupService {
         return cardGroupRepository.findAllByOwnerId(ownerId, pageable);
     }
 
-    private List<Criteria> parseOtherFilters(FilterCardGroupRequest filterObject){
+    private List<Criteria> parseOtherFilters(FilterCardGroupRequest filterObject) {
         List<Criteria> criteriaList = new ArrayList<>();
-        if(filterObject == null){
+        if (filterObject == null) {
             return criteriaList;
         }
-        if(filterObject.getIsActive() != null){
+        if (filterObject.getIsActive() != null) {
             criteriaList.add(Criteria.where("isActive").is(filterObject.getIsActive()));
         }
 
-        if(StringUtils.isNotBlank(filterObject.getName())){
+        if (StringUtils.isNotBlank(filterObject.getName())) {
             criteriaList.add(Criteria.where("name").is(filterObject.getName()));
         }
-        if(filterObject.getFromDate() != null && filterObject.getToDate() != null){
-            criteriaList.add(Criteria.where("expirationDate").gte(filterObject.getFromDate()).lte(filterObject.getToDate()));
+
+        if (filterObject.getFromDate() != null && filterObject.getToDate() != null) {
+            LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
+            LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
+            criteriaList.add(Criteria.where("expirationDate").gte(startDate).lte(endDate));
+        } else if (filterObject.getFromDate() != null && filterObject.getToDate() == null) {
+            LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
+            LocalDateTime endDate = filterObject.getFromDate().toLocalDate().atTime(LocalTime.MAX);
+            criteriaList.add(Criteria.where("expirationDate").gte(startDate).lt(endDate));
+        } else if (filterObject.getToDate() != null && filterObject.getFromDate() == null) {
+            LocalDateTime startDate = filterObject.getToDate().toLocalDate().atStartOfDay();
+            LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
+            criteriaList.add(Criteria.where("expirationDate").gte(startDate).lt(endDate));
         }
-        if(filterObject.getToDate() != null && filterObject.getFromDate() == null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getToDate()));
-        }
-        if (filterObject.getFromDate() != null && filterObject.getToDate() == null){
-            criteriaList.add(Criteria.where("expirationDate").is(filterObject.getFromDate()));
-        }
+
         return criteriaList;
     }
 
