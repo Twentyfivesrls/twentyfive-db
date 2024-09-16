@@ -1,10 +1,10 @@
 package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 
+import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
-import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import twentyfive.twentyfiveadapter.adapter.Document.QrGenDocumentDB.QrCodeObjectDocumentDB;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
 import java.util.Base64;
 import java.util.List;
@@ -26,9 +26,11 @@ public class QrCodeObjectController {
     public static final int DEFAULT_QR_WIDTH = 350;
     public static final int DEFAULT_QR_HEIGHT = 350;
     private final QrCodeObjectService qrCodeObjectService;
+    private final QrCodeObjectRepository qrCodeObjectRepository;
 
-    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService) {
+    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository) {
         this.qrCodeObjectService = qrCodeObjectService;
+        this.qrCodeObjectRepository = qrCodeObjectRepository;
     }
 
     @GetMapping("/allByUsername")
@@ -84,21 +86,20 @@ public class QrCodeObjectController {
 
 
     @PostMapping(value = "/generateAndDownloadQRCode")
-    public ResponseEntity<QrCodeObjectDocumentDB> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
-        if (qrCodeObject.getLink() == null || qrCodeObject.getLink().isEmpty())
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    public ResponseEntity<QrCodeObject> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
+        try {
+            QrCodeObject savedQrCode = qrCodeObjectService.saveQrCodeObject(qrCodeObject, username);
 
-        QrCodeObject tmpO = new QrCodeObject(qrCodeObject.getName(),
-                qrCodeObject.getLink(),
-                qrCodeObject.getDescription(),
-                qrCodeObject.getQrImage(),
-                qrCodeObject.getUsername(),
-                qrCodeObject.getIsActivated());
-
-        QrCodeObjectDocumentDB res = qrCodeObjectService.saveQrCodeObject(tmpO, username);
-
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+            if (savedQrCode == null) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity<>(savedQrCode, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @PutMapping("/update/{idQrCode}")
     ResponseEntity<QrCodeObject> updateQrCodeObject(@PathVariable String idQrCode, @RequestBody QrCodeObject qrCodeObject) {
@@ -114,6 +115,40 @@ public class QrCodeObjectController {
     @GetMapping("/download/{idQrCode}")
     public ResponseEntity<ResponseImage> downloadQrCodeBase64(@PathVariable String idQrCode) {
         try {
+            // Recupera il QR Code object dal database (simulazione)
+            QrCodeObject qrCodeObject = qrCodeObjectRepository.findById(idQrCode).orElse(null);
+
+            if (qrCodeObject == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            String togenerate;
+
+            // Verifica se il tipo di QR Code è "wifi"
+            if ("wifi".equalsIgnoreCase(qrCodeObject.getType())) {
+                togenerate = MethodUtils.generateWifiQrString(qrCodeObject);  // Genera la stringa WiFi
+            } else {
+                // Se non è WiFi, continua con il comportamento esistente (URL)
+                togenerate = baseUrl + "crudStats/" + idQrCode;
+            }
+
+            // Genera l'immagine del QR Code
+            byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            base64 = "data:image/png;base64," + base64;
+
+            // Prepara la risposta
+            ResponseImage response = new ResponseImage();
+            response.setImageBase64(base64);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+    }
+
+    /*@GetMapping("/download/{idQrCode}")
+    public ResponseEntity<ResponseImage> downloadQrCodeBase64(@PathVariable String idQrCode) {
+        try {
             String togenerate = baseUrl + "crudStats/" + idQrCode;
             byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
             String base64 = Base64.getEncoder().encodeToString(bytes);
@@ -124,7 +159,7 @@ public class QrCodeObjectController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
-    }
+    }*/
 
     @GetMapping("/all")
     public ResponseEntity<List<QrCodeObject>> getAllQrCodeObject(@RequestParam("username") String username) {
