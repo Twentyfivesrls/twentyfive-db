@@ -1,12 +1,15 @@
 package com.twentyfive.twentyfivedb.qrGenDB.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public class QrTypeUtils {
 
     public static String handleLinkType(QrCodeObject qrCodeObject) {
@@ -30,27 +33,65 @@ public class QrTypeUtils {
     }
 
     public static String handleSmsType(QrCodeObject qrCodeObject) {
-        if (qrCodeObject.getSmsNumber() == null || qrCodeObject.getSmsNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("SMS number cannot be null or empty for 'sms' type QR code");
+        try {
+            if (qrCodeObject.getSmsNumber() == null || qrCodeObject.getSmsNumber().trim().isEmpty()) {
+                throw new IllegalArgumentException("SMS number cannot be null or empty for 'sms' type QR code");
+            }
+
+            String destinationUrl = "sms:" + qrCodeObject.getSmsNumber();
+
+            if (qrCodeObject.getSmsMessage() != null && !qrCodeObject.getSmsMessage().trim().isEmpty()) {
+
+                String encodedMessage = URLEncoder.encode(qrCodeObject.getSmsMessage(), StandardCharsets.UTF_8.name())
+                        .replace("+", "%20");
+                destinationUrl += "?body=" + encodedMessage;
+            }
+
+            return destinationUrl;
+
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("Error encoding SMS message: " + e.getMessage());
+            return "sms:" + qrCodeObject.getSmsNumber();
         }
-        String destinationUrl = "sms:" + qrCodeObject.getSmsNumber();
-        if (qrCodeObject.getSmsMessage() != null && !qrCodeObject.getSmsMessage().trim().isEmpty()) {
-            destinationUrl += "?body=" + qrCodeObject.getSmsMessage();
-        }
-        return destinationUrl;
     }
 
+
     public static String handleEmailType(QrCodeObject qrCodeObject) {
-        if (qrCodeObject.getEmailTo() == null || qrCodeObject.getEmailTo().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email 'to' address cannot be null or empty for 'email' type QR code");
+        try {
+            if (qrCodeObject.getEmailTo() == null || qrCodeObject.getEmailTo().trim().isEmpty()) {
+                throw new IllegalArgumentException("Email 'to' address cannot be null or empty for 'email' type QR code");
+            }
+
+            String destinationUrl = "mailto:" + qrCodeObject.getEmailTo();
+            boolean hasSubject = qrCodeObject.getEmailSubject() != null && !qrCodeObject.getEmailSubject().isEmpty();
+            boolean hasBody = qrCodeObject.getEmailBody() != null && !qrCodeObject.getEmailBody().isEmpty();
+
+            if (hasSubject || hasBody) {
+                destinationUrl += "?";
+
+                if (hasSubject) {
+                    destinationUrl += "subject=" + URLEncoder.encode(qrCodeObject.getEmailSubject(), StandardCharsets.UTF_8.name()).replace("+", "%20");
+                }
+
+                if (hasBody) {
+                    if (hasSubject) {
+                        destinationUrl += "&";
+                    }
+                    destinationUrl += "body=" + URLEncoder.encode(qrCodeObject.getEmailBody(), StandardCharsets.UTF_8.name())
+                            .replace("+", "%20")
+                            .replace("%0A", "%0D%0A");
+                }
+            }
+
+            return destinationUrl;
+
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("Error encoding email parameters: " + e.getMessage());
+            return "mailto:" + qrCodeObject.getEmailTo();
         }
-        String destinationUrl = "mailto:" + qrCodeObject.getEmailTo();
-        if (qrCodeObject.getEmailSubject() != null || qrCodeObject.getEmailBody() != null) {
-            destinationUrl += "?subject=" + (qrCodeObject.getEmailSubject() != null ? qrCodeObject.getEmailSubject() : "");
-            destinationUrl += "&body=" + (qrCodeObject.getEmailBody() != null ? qrCodeObject.getEmailBody() : "");
-        }
-        return destinationUrl;
     }
+
+
 
     public static String handleWhatsappType(QrCodeObject qrCodeObject) {
         if (qrCodeObject.getPhoneNumber() == null || qrCodeObject.getPhoneNumber().trim().isEmpty()) {

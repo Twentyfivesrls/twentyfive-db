@@ -3,7 +3,9 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
+import com.twentyfive.twentyfivedb.qrGenDB.service.QrStatisticsService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
+import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,7 +117,6 @@ public class QrCodeObjectController {
     @GetMapping("/download/{idQrCode}")
     public ResponseEntity<ResponseImage> downloadQrCodeBase64(@PathVariable String idQrCode) {
         try {
-            // Recupera il QR Code object dal database (simulazione)
             QrCodeObject qrCodeObject = qrCodeObjectRepository.findById(idQrCode).orElse(null);
 
             if (qrCodeObject == null) {
@@ -124,20 +125,16 @@ public class QrCodeObjectController {
 
             String togenerate;
 
-            // Verifica se il tipo di QR Code è "wifi"
             if ("wifi".equalsIgnoreCase(qrCodeObject.getType())) {
-                togenerate = MethodUtils.generateWifiQrString(qrCodeObject);  // Genera la stringa WiFi
+                togenerate = QrTypeUtils.handleWifiType(qrCodeObject);
             } else {
-                // Se non è WiFi, continua con il comportamento esistente (URL)
                 togenerate = baseUrl + "crudStats/" + idQrCode;
             }
 
-            // Genera l'immagine del QR Code
             byte[] bytes = MethodUtils.generateQrCodeImage(togenerate, DEFAULT_QR_WIDTH, DEFAULT_QR_HEIGHT);
             String base64 = Base64.getEncoder().encodeToString(bytes);
             base64 = "data:image/png;base64," + base64;
 
-            // Prepara la risposta
             ResponseImage response = new ResponseImage();
             response.setImageBase64(base64);
             return ResponseEntity.status(HttpStatus.OK).body(response);

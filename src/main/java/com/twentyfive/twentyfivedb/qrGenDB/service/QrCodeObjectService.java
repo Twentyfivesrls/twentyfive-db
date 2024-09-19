@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
-import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,6 @@ public class QrCodeObjectService {
 
     private static final Map<String, Function<QrCodeObject, String>> qrCodeTypeHandlers = new HashMap<>();
 
-    // Blocco statico per inizializzare la mappa
     static {
         qrCodeTypeHandlers.put("link", QrTypeUtils::handleLinkType);
         qrCodeTypeHandlers.put("phone", QrTypeUtils::handlePhoneType);
@@ -134,6 +132,5 @@ public class QrCodeObjectService {
         qrcodeObject.setDescription(qrCodeObject.getDescription());
         qrcodeObject.setIsActivated(qrCodeObject.getIsActivated());
         qrCodeObjectRepository.save(qrcodeObject);
-
     }
 }
