@@ -12,4 +12,5 @@ import java.util.List;
 public interface BustePagaRepository extends MongoRepository<Dipendente, String> {
     Page<Dipendente> getAllByUserId(String userId, Pageable pageable);
     List<Dipendente> getAllByUserId(String userId);
+    Dipendente getDipendenteByUserIdAndId(String userId, String id);
 }

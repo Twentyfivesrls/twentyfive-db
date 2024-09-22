@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.bustepaga.service;
 
 import com.twentyfive.twentyfivedb.bustepaga.repository.BustePagaRepository;
 import com.twentyfive.twentyfivedb.bustepaga.repository.ConfigurationsRepository;
+import com.twentyfive.twentyfivedb.bustepaga.repository.FileRepository;
 import com.twentyfive.twentyfivedb.bustepaga.repository.SettingsRepository;
 import com.twentyfive.twentyfivemodel.dto.bustepagaDto.UpdateBPSettingRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPFile;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.Dipendente;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPSetting;
 
@@ -24,11 +26,13 @@ public class BustePagaService {
     private final BustePagaRepository bustePagaRepository;
     private final SettingsRepository settingsRepository;
     private final ConfigurationsRepository configurationsRepository;
+    private final FileRepository fileRepository;
 
-    public BustePagaService(BustePagaRepository bustePagaRepository, SettingsRepository settingsRepository, ConfigurationsRepository configurationsRepository) {
+    public BustePagaService(BustePagaRepository bustePagaRepository, SettingsRepository settingsRepository, ConfigurationsRepository configurationsRepository, FileRepository fileRepository) {
         this.bustePagaRepository = bustePagaRepository;
         this.settingsRepository = settingsRepository;
         this.configurationsRepository = configurationsRepository;
+        this.fileRepository = fileRepository;
     }
 
     public Page<Dipendente> getAllDipendenti(String userId, int page, int size, String sortColumn, String sortDirection) {
@@ -94,5 +98,31 @@ public class BustePagaService {
         setting.setMailText(request.getMailText());
         setting.setFileName(confList);
         this.settingsRepository.save(setting);
+    }
+
+    public Dipendente getDipendenteById(String userId, String employeeId) {
+        return this.bustePagaRepository.getDipendenteByUserIdAndId(userId, employeeId);
+    }
+
+    public Page<BPFile> getFilesByDipendenteId(String employeeId, int page, int size, String sortColumn, String sortDirection) {
+        Sort.Direction direction;
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            direction = Sort.Direction.DESC;
+        } else {
+            direction = Sort.Direction.ASC;
+        }
+
+        // Create a Pageable instance
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortColumn));
+        return this.fileRepository.getAllByEmployeeId(employeeId, pageable);
+    }
+
+    public Boolean saveFile(BPFile file) {
+        this.fileRepository.save(file);
+        return true;
+    }
+
+    public void deleteFile(String id) {
+        this.fileRepository.deleteById(id);
     }
 }

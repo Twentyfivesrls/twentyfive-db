@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
+import twentyfive.twentyfiveadapter.models.bustepagaModels.BPFile;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.Dipendente;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPSetting;
 
@@ -39,6 +40,11 @@ public class BustePagaController {
         return ResponseEntity.ok(bustePagaService.getAllDipendentiList(userId));
     }
 
+    @GetMapping(value = "/get-by-id")
+    public ResponseEntity<Dipendente> getDipendenteById(@RequestParam(name = "userId") String userId, @RequestParam(name = "employeeId") String employeeId) {
+        return ResponseEntity.ok(bustePagaService.getDipendenteById(userId, employeeId));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Dipendente> createDipendente(@RequestBody Dipendente dipendente) {
         return ResponseEntity.ok(bustePagaService.createDipendente(dipendente));
@@ -50,22 +56,48 @@ public class BustePagaController {
         return ResponseEntity.ok().build();
     }
 
+
+    /*----------- SETTINGS ENDPOINTS ----------*/
     @GetMapping("/get-settings")
-    public ResponseEntity<BPSetting> getSettings(@RequestParam(name = "userId") String userId){
+    public ResponseEntity<BPSetting> getSettings(@RequestParam(name = "userId") String userId) {
         BPSetting setting = bustePagaService.getSettings(userId);
         return ResponseEntity.ok(setting);
     }
 
     @PostMapping("/update-setting")
-    public ResponseEntity<Boolean> updateSetting(@RequestBody UpdateBPSettingRequest request){
+    public ResponseEntity<Boolean> updateSetting(@RequestBody UpdateBPSettingRequest request) {
         bustePagaService.updateSetting(request);
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/get-all-configurations")
-    public ResponseEntity<List<BPConfiguration>> getConfigurationsByType(@RequestParam(name="type", defaultValue = "PAYBOLT_FILENAME") String type){
+    public ResponseEntity<List<BPConfiguration>> getConfigurationsByType(@RequestParam(name = "type", defaultValue = "PAYBOLT_FILENAME") String type) {
         List<BPConfiguration> configuration = bustePagaService.getConfigurationsByType(type);
         return ResponseEntity.ok(configuration);
+    }
+
+
+
+    /*------------- FILE ENDPOINTS ---------*/
+
+    @GetMapping(value = "/get-files-by-id")
+    public ResponseEntity<Page<BPFile>> getFilesByDipendenteId(@RequestParam(name = "employeeId") String employeeId,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "5") int size,
+                                                               @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                               @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(bustePagaService.getFilesByDipendenteId(employeeId, page, size, sortColumn, sortDirection));
+    }
+
+    @PostMapping(value="/save-file")
+    public ResponseEntity<Boolean> saveFile(@RequestBody BPFile file) {
+        return ResponseEntity.ok(bustePagaService.saveFile(file));
+    }
+
+    @DeleteMapping("/delete-file/{id}")
+    public ResponseEntity<Void> deleteFile(@PathVariable String id) {
+        bustePagaService.deleteFile(id);
+        return ResponseEntity.ok().build();
     }
 
 
