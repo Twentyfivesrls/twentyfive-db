@@ -91,14 +91,30 @@ public class QrTypeUtils {
         }
     }
 
-
-
     public static String handleWhatsappType(QrCodeObject qrCodeObject) {
-        if (qrCodeObject.getPhoneNumber() == null || qrCodeObject.getPhoneNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("Phone number cannot be null or empty for 'whatsapp' type QR code");
+        try {
+            if (qrCodeObject.getWhatsappNumber() == null || qrCodeObject.getWhatsappNumber().trim().isEmpty()) {
+                throw new IllegalArgumentException("Phone number cannot be null or empty for 'whatsapp' type QR code");
+            }
+
+            String destinationUrl = "https://wa.me/" + qrCodeObject.getWhatsappNumber();
+
+            if (qrCodeObject.getWhatsappMessage() != null && !qrCodeObject.getWhatsappMessage().trim().isEmpty()) {
+
+                String encodedMessage = URLEncoder.encode(qrCodeObject.getWhatsappMessage(), StandardCharsets.UTF_8.name())
+                        .replace("+", "%20");
+
+                destinationUrl += "?text=" + encodedMessage;
+            }
+
+            return destinationUrl;
+
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("Error encoding WhatsApp message: " + e.getMessage());
+            return "https://wa.me/" + qrCodeObject.getWhatsappNumber();
         }
-        return "https://wa.me/" + qrCodeObject.getPhoneNumber();
     }
+
 
     public static String handleWifiType(QrCodeObject qrCodeObject) {
         if (qrCodeObject.getWifiSSID() == null || qrCodeObject.getWifiSSID().trim().isEmpty()) {

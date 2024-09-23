@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.twentyfive</groupId>
             <artifactId>twentyfive-adapters</artifactId>
-            <version>0.0.195</version>
+            <version>0.0.199</version>
         </dependency>
 
         <dependency>
@@ -96,7 +96,6 @@
             <artifactId>thymeleaf-spring5</artifactId>
             <version>3.0.5.M3</version>
         </dependency>
-
 
     </dependencies>
 
