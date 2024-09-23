@@ -2,10 +2,10 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrStatisticsService;
-import com.twentyfive.twentyfivemodel.models.qrGenModels.QrStatistics;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrStatistics;
 
 import java.util.List;
 
