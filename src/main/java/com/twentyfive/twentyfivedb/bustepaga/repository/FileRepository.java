@@ -11,4 +11,6 @@ import twentyfive.twentyfiveadapter.models.bustepagaModels.BPFile;
 public interface FileRepository extends MongoRepository<BPFile, String> {
 
     Page<BPFile> getAllByEmployeeId(String employeeId, Pageable pageable);
+
+    void deleteAllByEmployeeId(String employeeId);
 }

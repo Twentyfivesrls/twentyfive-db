@@ -55,7 +55,13 @@ public class BustePagaService {
     }
 
     public void deleteDipendente(String id) {
+        this.deleteFileFromDipendenteId(id); //delete all records regarding files
+        //TODO we've to delete all the files from the media manager
         this.bustePagaRepository.deleteById(id);
+    }
+
+    private void deleteFileFromDipendenteId(String id) {
+        this.fileRepository.deleteAllByEmployeeId(id);
     }
 
     public List<Dipendente> getAllDipendentiList(String userId) {
