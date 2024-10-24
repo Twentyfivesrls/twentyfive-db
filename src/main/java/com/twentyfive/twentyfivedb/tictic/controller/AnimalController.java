@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/animal")
+@RequestMapping("/tictic/animal")
 public class AnimalController {
 
     @Value("${tictic.base.url}")
