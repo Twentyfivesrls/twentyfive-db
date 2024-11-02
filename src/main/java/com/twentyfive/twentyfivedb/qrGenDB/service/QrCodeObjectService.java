@@ -2,12 +2,14 @@ package com.twentyfive.twentyfivedb.qrGenDB.service;
 
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
+import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
 import java.util.*;
@@ -18,6 +20,7 @@ import java.util.function.Function;
 public class QrCodeObjectService {
     private final QrCodeObjectRepository qrCodeObjectRepository;
     private final QrStatisticsService qrStatisticsService;
+    private final QrCodeGroupRepository qrCodeGroupRepository;
 
     private static final String NULL_QRCODE = "QrCodeObject is null";
     private static final String ID_NULL_QRCODE = "IdQrCode is null or empty";
@@ -35,9 +38,10 @@ public class QrCodeObjectService {
     }
 
 
-    public QrCodeObjectService(QrCodeObjectRepository qrCodeObjectRepository, QrStatisticsService qrStatisticsService) {
+    public QrCodeObjectService(QrCodeObjectRepository qrCodeObjectRepository, QrStatisticsService qrStatisticsService, QrCodeGroupRepository qrCodeGroupRepository) {
         this.qrCodeObjectRepository = qrCodeObjectRepository;
         this.qrStatisticsService = qrStatisticsService;
+        this.qrCodeGroupRepository = qrCodeGroupRepository;
     }
 
     public QrCodeObject saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
@@ -67,6 +71,7 @@ public class QrCodeObjectService {
 
         return qrCodeObjectRepository.save(qrCodeObject);
     }
+
 
     public QrCodeObject getQrCodeObjectById(String idQrCode) {
         if (StringUtils.isBlank(idQrCode)) {
@@ -150,6 +155,40 @@ public class QrCodeObjectService {
         copyQrCodeProperties(qrCodeObject, existingQrCodeObject);
         qrCodeObjectRepository.save(existingQrCodeObject);
     }
+
+    public List<QrCodeGroup> generateQrCodeGroup(String username, String ownerId) {
+        List<QrCodeGroup> allGroups = qrCodeGroupRepository.findAllGroupNames();
+
+        int maxGroupNumber = allGroups.stream()
+                .map(QrCodeGroup::getGroupName)
+                .filter(name -> name != null && name.startsWith("Gruppo "))
+                .mapToInt(name -> Integer.parseInt(name.replace("Gruppo ", "").trim()))
+                .max()
+                .orElse(0);
+
+        String newGroupName = "Gruppo " + (maxGroupNumber + 1);
+        List<QrCodeGroup> qrCodeGroups = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            QrCodeGroup qrCodeGroup = new QrCodeGroup();
+            qrCodeGroup.setUsername(username);
+            qrCodeGroup.setNameQrCode("QRCode " + (i + 1));
+            qrCodeGroup.setType("link");
+            qrCodeGroup.setGroupName(newGroupName);
+            qrCodeGroup.setOwnerId(ownerId);
+            qrCodeGroup.setIsActivated(true);
+            qrCodeGroup.setLink("https://tictic25.it/");
+
+            qrCodeGroups.add(qrCodeGroup);
+        }
+
+        // Salva tutti i QR code in un'unica chiamata
+        qrCodeGroupRepository.saveAll(qrCodeGroups);
+
+        return qrCodeGroups;
+    }
+
+
 
 
     /*public void updateQrCodeObject(String idQrCode, QrCodeObject qrCodeObject) {

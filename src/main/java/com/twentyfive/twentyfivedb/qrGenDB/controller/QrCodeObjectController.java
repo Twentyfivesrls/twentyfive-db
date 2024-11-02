@@ -3,7 +3,6 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
-import com.twentyfive.twentyfivedb.qrGenDB.service.QrStatisticsService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
@@ -14,10 +13,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/qr_code")
 @RestController
@@ -161,6 +162,18 @@ public class QrCodeObjectController {
     @GetMapping("/all")
     public ResponseEntity<List<QrCodeObject>> getAllQrCodeObject(@RequestParam("username") String username) {
         return ResponseEntity.status(HttpStatus.OK).body(qrCodeObjectService.getAllQrCodeObject(username));
+    }
+
+    @PostMapping("/generateQrGroup")
+    public ResponseEntity<List<QrCodeGroup>> generateQrCodeGroup(@RequestParam String username, @RequestParam ("ownerId") String ownerId) {
+        try {
+            List<QrCodeGroup> qrCodeGroup = qrCodeObjectService.generateQrCodeGroup(username, ownerId);
+            return ResponseEntity.status(HttpStatus.OK).body(qrCodeGroup);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 }

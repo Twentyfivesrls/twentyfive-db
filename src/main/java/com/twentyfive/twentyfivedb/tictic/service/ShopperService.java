@@ -1,8 +1,11 @@
 package com.twentyfive.twentyfivedb.tictic.service;
 
 import com.twentyfive.twentyfivedb.Utility;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
+import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.CustomerRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
+import com.twentyfive.twentyfivedb.tictic.repository.TicTicCodeCustomerAssociationRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -10,13 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.adapter.Document.TicketObjDocumentDB.EventDocumentDB;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicCustomer;
+import twentyfive.twentyfiveadapter.models.tictickModels.TicTicQrCodeCustomerAssociations;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicShopper;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,10 +28,15 @@ public class ShopperService {
 
     private final ShopperRepository shopperRepository;
     private final CustomerRepository customerRepository;
+    private final TicTicCodeCustomerAssociationRepository codeCustomerAssociationRepository;
+    private final QrCodeGroupRepository qrCodeGroupRepository;
 
-    public ShopperService(ShopperRepository shopperRepository, CustomerRepository customerRepository) {
+
+    public ShopperService(ShopperRepository shopperRepository, CustomerRepository customerRepository, TicTicCodeCustomerAssociationRepository codeCustomerAssociationRepository, QrCodeGroupRepository qrCodeGroupRepository) {
         this.shopperRepository = shopperRepository;
         this.customerRepository = customerRepository;
+        this.codeCustomerAssociationRepository = codeCustomerAssociationRepository;
+        this.qrCodeGroupRepository = qrCodeGroupRepository;
     }
 
     public TicTicShopper getShopperCounters(String ownerId) {
@@ -74,4 +81,39 @@ public class ShopperService {
             return res;
         }).collect(Collectors.toCollection(LinkedHashSet::new));
     }
+
+    public TicTicQrCodeCustomerAssociations associateQRCodeWithCustomer(String qrCodeId, String customerId) {
+        Optional<TicTicCustomer> customer = customerRepository.findByEmail(customerId);
+        if (customer.isEmpty()) {
+            throw new RuntimeException("Customer not found");
+        }
+
+        TicTicQrCodeCustomerAssociations association = new TicTicQrCodeCustomerAssociations();
+        association.setQrCodeId(qrCodeId);
+        association.setCustomerId(customerId);
+
+        return codeCustomerAssociationRepository.save(association);
+    }
+
+    public String checkCustomerAndQRCodeExists(String ownerId) {
+        boolean customerExists = customerRepository.existsByOwnerId(ownerId);
+        boolean qrCodeExists = qrCodeGroupRepository.existsByOwnerId(ownerId);
+
+        if (!customerExists && !qrCodeExists) {
+            return "Nessun cliente e nessun QR code trovato per lo shopper specificato.";
+        } else if (!customerExists) {
+            return "Nessun cliente trovato per lo shopper specificato.";
+        } else if (!qrCodeExists) {
+            return "Nessun QR code trovato per lo shopper specificato.";
+        }
+
+        return "Cliente e QR code trovati.";
+    }
+
+    public Page<QrCodeGroup> getQrCodes(String ownerId, Pageable pageable) {
+        return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
+    }
+
+
 }
+

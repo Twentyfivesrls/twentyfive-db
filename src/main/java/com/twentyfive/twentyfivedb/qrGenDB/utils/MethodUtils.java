@@ -33,8 +33,7 @@ public class MethodUtils {
 
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-        byte[] pngData = pngOutputStream.toByteArray();
-        return pngData;
+        return pngOutputStream.toByteArray();
     }
 
 
@@ -48,7 +47,6 @@ public class MethodUtils {
                 ,0xFF000000 ) ;
 
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-        byte[] pngData = pngOutputStream.toByteArray();
-        return pngData;
+        return pngOutputStream.toByteArray();
     }
 }
