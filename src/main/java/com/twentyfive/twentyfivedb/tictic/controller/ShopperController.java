@@ -73,10 +73,11 @@ public class ShopperController {
 
     @PostMapping("/associate-qrcode")
     public ResponseEntity<TicTicQrCodeCustomerAssociations> associateQRCodeWithCustomer(
+            @RequestParam String ownerId,
             @RequestParam String qrCodeId,
             @RequestParam String customerId) {
 
-        TicTicQrCodeCustomerAssociations association = shopperService.associateQRCodeWithCustomer(qrCodeId, customerId);
+        TicTicQrCodeCustomerAssociations association = shopperService.associateQRCodeWithCustomer(ownerId,qrCodeId, customerId);
         return ResponseEntity.ok(association);
     }
 
@@ -89,10 +90,18 @@ public class ShopperController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
     @GetMapping("/getAllQrCodesCustomers")
-    public Page<QrCodeGroup> getQrCodes(
+    public Page<TicTicQrCodeCustomerAssociations> getQrCodesAssociated(
             @RequestParam String ownerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        return shopperService.getQrCodesAssociated(ownerId, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/getQrcodeList")
+    public Page<QrCodeGroup> getQrCodes(@RequestParam String ownerId,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
         return shopperService.getQrCodes(ownerId, PageRequest.of(page, size));
+
     }
 }

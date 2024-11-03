@@ -82,7 +82,7 @@ public class ShopperService {
         }).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public TicTicQrCodeCustomerAssociations associateQRCodeWithCustomer(String qrCodeId, String customerId) {
+    public TicTicQrCodeCustomerAssociations associateQRCodeWithCustomer(String ownerId,String qrCodeId, String customerId) {
         Optional<TicTicCustomer> customer = customerRepository.findByEmail(customerId);
         if (customer.isEmpty()) {
             throw new RuntimeException("Customer not found");
@@ -91,6 +91,8 @@ public class ShopperService {
         TicTicQrCodeCustomerAssociations association = new TicTicQrCodeCustomerAssociations();
         association.setQrCodeId(qrCodeId);
         association.setCustomerId(customerId);
+        association.setOwnerId(ownerId);
+        association.setStatus("ATTIVO");
 
         return codeCustomerAssociationRepository.save(association);
     }
@@ -108,6 +110,10 @@ public class ShopperService {
         }
 
         return "Cliente e QR code trovati.";
+    }
+
+    public Page<TicTicQrCodeCustomerAssociations> getQrCodesAssociated(String ownerId, Pageable pageable) {
+        return codeCustomerAssociationRepository.findByOwnerId(ownerId, pageable);
     }
 
     public Page<QrCodeGroup> getQrCodes(String ownerId, Pageable pageable) {
