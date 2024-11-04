@@ -104,4 +104,9 @@ public class ShopperController {
         return shopperService.getQrCodes(ownerId, PageRequest.of(page, size));
 
     }
+
+    @GetMapping("/associated-qrcodes/{customerId}")
+    public List<TicTicQrCodeCustomerAssociations> getAssociatedQRCodes(@PathVariable String customerId) {
+        return shopperService.getAssociatedQRCodesForCustomer(customerId);
+    }
 }

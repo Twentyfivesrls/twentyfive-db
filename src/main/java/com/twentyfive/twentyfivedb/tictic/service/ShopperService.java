@@ -18,6 +18,7 @@ import twentyfive.twentyfiveadapter.models.tictickModels.TicTicCustomer;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicQrCodeCustomerAssociations;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicShopper;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -91,8 +92,11 @@ public class ShopperService {
         TicTicQrCodeCustomerAssociations association = new TicTicQrCodeCustomerAssociations();
         association.setQrCodeId(qrCodeId);
         association.setCustomerId(customerId);
+        association.setCustomerEmail(customer.get().getEmail());
         association.setOwnerId(ownerId);
         association.setStatus("ATTIVO");
+        association.setAssociationDate(LocalDateTime.now());
+
 
         return codeCustomerAssociationRepository.save(association);
     }
@@ -120,6 +124,9 @@ public class ShopperService {
         return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
     }
 
-
+    public List<TicTicQrCodeCustomerAssociations> getAssociatedQRCodesForCustomer(String customerId) {
+        return codeCustomerAssociationRepository.findByCustomerId(customerId);
+    }
 }
+
 
