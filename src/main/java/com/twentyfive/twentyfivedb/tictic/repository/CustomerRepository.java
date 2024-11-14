@@ -20,5 +20,9 @@ public interface CustomerRepository extends MongoRepository<TicTicCustomer, Stri
     Optional<TicTicCustomer> findByEmail(String email);
 
     boolean existsByOwnerId(String ownerId);
+
+    void deleteByIdAndOwnerId(String customerId, String ownerId);
+
+    boolean existsByEmailAndOwnerId(String email, String ownerId);
 }
 

@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
+import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicCustomer;
-import twentyfive.twentyfiveadapter.models.tictickModels.TicTicQrCodeCustomerAssociations;
 import twentyfive.twentyfiveadapter.models.tictickModels.TicTicShopper;
 
 import java.util.List;
@@ -44,14 +44,14 @@ public class ShopperController {
         return ResponseEntity.ok(shopperService.getCustomer(customerId));
     }
 
-    @PostMapping("/save-shopper")
-    public ResponseEntity<TicTicShopper> saveShopper(@RequestBody TicTicShopper shopper) {
-        return ResponseEntity.ok(shopperService.saveShopper(shopper));
-    }
-
     @PostMapping("/save-customer")
     public ResponseEntity<TicTicCustomer> saveCustomer(@RequestBody TicTicCustomer customer) {
         return ResponseEntity.ok(shopperService.saveCustomer(customer));
+    }
+
+    @PostMapping("/save-shopper")
+    public ResponseEntity<TicTicShopper> saveShopper(@RequestBody TicTicShopper shopper) {
+        return ResponseEntity.ok(shopperService.saveShopper(shopper));
     }
 
     @DeleteMapping("/delete-shopper/{shopperId}")
@@ -60,9 +60,9 @@ public class ShopperController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete-customer/{customerId}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable String customerId) {
-        shopperService.deleteCustomer(customerId);
+    @DeleteMapping("/customer/{customerId}")
+    public ResponseEntity<Void> deleteCustomer(@RequestParam("ownerId") String ownerId, @PathVariable String customerId) {
+        shopperService.deleteCustomer(customerId, ownerId);
         return ResponseEntity.ok().build();
     }
 
@@ -71,15 +71,15 @@ public class ShopperController {
         return new ResponseEntity<>(shopperService.filterAutocompleteCustomer(filterObject, ownerId), HttpStatus.OK);
     }
 
-    @PostMapping("/associate-qrcode")
+    /*@PostMapping("/associate-qrcode")
     public ResponseEntity<TicTicQrCodeCustomerAssociations> associateQRCodeWithCustomer(
             @RequestParam String ownerId,
             @RequestParam String qrCodeId,
             @RequestParam String customerId) {
 
-        TicTicQrCodeCustomerAssociations association = shopperService.associateQRCodeWithCustomer(ownerId,qrCodeId, customerId);
+        TicTicQrCodeCustomerAssociations association = shopperService.associateQRCodeWithCustomer(ownerId, qrCodeId, customerId);
         return ResponseEntity.ok(association);
-    }
+    }*/
 
     @GetMapping("/check-customer-qrcode")
     public ResponseEntity<String> checkCustomerAndQRCodeExists(@RequestParam String ownerId) {
@@ -88,13 +88,6 @@ public class ShopperController {
             return ResponseEntity.ok(message);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-    }
-    @GetMapping("/getAllQrCodesCustomers")
-    public Page<TicTicQrCodeCustomerAssociations> getQrCodesAssociated(
-            @RequestParam String ownerId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return shopperService.getQrCodesAssociated(ownerId, PageRequest.of(page, size));
     }
 
     @GetMapping("/getQrcodeList")
@@ -105,8 +98,18 @@ public class ShopperController {
 
     }
 
-    @GetMapping("/associated-qrcodes/{customerId}")
-    public List<TicTicQrCodeCustomerAssociations> getAssociatedQRCodes(@PathVariable String customerId) {
-        return shopperService.getAssociatedQRCodesForCustomer(customerId);
+    @GetMapping("/getQrCodesCustomer/{username}")
+    public List<QrCodeGroup> getQrCodesForShopper(@PathVariable String username) {
+        return shopperService.getQrCodesForShopper(username);
+    }
+
+    @PostMapping("/associateQrCodeWhitCustomer")
+    public ResponseEntity<Boolean> associateQRCodeWithCustomer(
+            @RequestParam("ownerId") String ownerId,
+            @RequestParam("qrCodeId") String qrCodeId,
+            @RequestParam("customerId") String customerId,
+            @RequestBody TTAnimal animal) {
+        shopperService.associateQRCodeWithCustomer(ownerId, qrCodeId, customerId, animal);
+        return ResponseEntity.ok(true);
     }
 }

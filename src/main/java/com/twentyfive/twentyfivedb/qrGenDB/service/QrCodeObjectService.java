@@ -3,17 +3,22 @@ package com.twentyfive.twentyfivedb.qrGenDB.service;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
+import com.twentyfive.twentyfivedb.tictic.service.ShopperService;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
+import twentyfive.twentyfiveadapter.models.tictickModels.TicTicCustomer;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,9 +26,11 @@ public class QrCodeObjectService {
     private final QrCodeObjectRepository qrCodeObjectRepository;
     private final QrStatisticsService qrStatisticsService;
     private final QrCodeGroupRepository qrCodeGroupRepository;
-
+    private final ShopperService shopperService;
     private static final String NULL_QRCODE = "QrCodeObject is null";
     private static final String ID_NULL_QRCODE = "IdQrCode is null or empty";
+
+    private static String TICTIC_URL = "https://tictic25.it/";
 
     private static final Map<String, Function<QrCodeObject, String>> qrCodeTypeHandlers = new HashMap<>();
 
@@ -38,10 +45,12 @@ public class QrCodeObjectService {
     }
 
 
-    public QrCodeObjectService(QrCodeObjectRepository qrCodeObjectRepository, QrStatisticsService qrStatisticsService, QrCodeGroupRepository qrCodeGroupRepository) {
+    public QrCodeObjectService(QrCodeObjectRepository qrCodeObjectRepository, QrStatisticsService qrStatisticsService, QrCodeGroupRepository qrCodeGroupRepository, ShopperService shopperService) {
         this.qrCodeObjectRepository = qrCodeObjectRepository;
         this.qrStatisticsService = qrStatisticsService;
         this.qrCodeGroupRepository = qrCodeGroupRepository;
+        //TODO check if this is the right way to call ShopperService in QrCodeObjectService
+        this.shopperService = shopperService;
     }
 
     public QrCodeObject saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
@@ -156,36 +165,56 @@ public class QrCodeObjectService {
         qrCodeObjectRepository.save(existingQrCodeObject);
     }
 
-    public List<QrCodeGroup> generateQrCodeGroup(String username, String ownerId) {
-        List<QrCodeGroup> allGroups = qrCodeGroupRepository.findAllGroupNames();
+    public List<QrCodeGroup> generateQrCodeGroup(String username, String ownerId, Integer quantityGroup) {
+        List<QrCodeGroup> allGroups = qrCodeGroupRepository.findAllGroupNamesByOwnerId(ownerId);
 
         int maxGroupNumber = allGroups.stream()
                 .map(QrCodeGroup::getGroupName)
-                .filter(name -> name != null && name.startsWith("Gruppo "))
-                .mapToInt(name -> Integer.parseInt(name.replace("Gruppo ", "").trim()))
+                .filter(name -> StringUtils.isNotBlank(name) && name.startsWith("Gruppo "))
+                .mapToInt(name -> Integer.parseInt(name.substring(7).trim()))
                 .max()
                 .orElse(0);
 
-        String newGroupName = "Gruppo " + (maxGroupNumber + 1);
-        List<QrCodeGroup> qrCodeGroups = new ArrayList<>();
+        int startingIdIndex = Math.toIntExact(qrCodeGroupRepository.countAllDocuments());
 
-        for (int i = 0; i < 20; i++) {
-            QrCodeGroup qrCodeGroup = new QrCodeGroup();
-            qrCodeGroup.setUsername(username);
-            qrCodeGroup.setNameQrCode("QRCode " + (i + 1));
-            qrCodeGroup.setType("link");
-            qrCodeGroup.setGroupName(newGroupName);
-            qrCodeGroup.setOwnerId(ownerId);
-            qrCodeGroup.setIsActivated(true);
-            qrCodeGroup.setLink("https://tictic25.it/");
-
-            qrCodeGroups.add(qrCodeGroup);
-        }
+        List<QrCodeGroup> qrCodeGroups = generateAndSaveQrCodeGroups(username, ownerId, quantityGroup, maxGroupNumber, startingIdIndex);
 
         // Salva tutti i QR code in un'unica chiamata
         qrCodeGroupRepository.saveAll(qrCodeGroups);
 
         return qrCodeGroups;
+    }
+
+    private List<QrCodeGroup> generateAndSaveQrCodeGroups(String username, String ownerId, int quantityGroup, int maxGroupNumber, int startingIdIndex) {
+        String newGroupName = "Gruppo " + (maxGroupNumber + 1);
+        List<QrCodeGroup> qrCodeGroups = new ArrayList<>();
+
+        for (int i = 0; i < quantityGroup; i++) {
+            QrCodeGroup qrCodeGroup = new QrCodeGroup();
+            String idQrCode = String.valueOf(startingIdIndex + i + 1);
+            qrCodeGroup.setIdQrCode(idQrCode);
+            qrCodeGroup.setUsername(username);
+            qrCodeGroup.setNameQrCode("QRCode " + idQrCode);
+            qrCodeGroup.setType("link");
+            qrCodeGroup.setGroupName(newGroupName);
+            qrCodeGroup.setOwnerId(ownerId);
+            qrCodeGroup.setIsActivated(true);
+            qrCodeGroup.setLink(TICTIC_URL + "qr/" + qrCodeGroup.getIdQrCode());
+            qrCodeGroups.add(qrCodeGroup);
+        }
+        //TODO check if this is the right way to call ShopperService in QrCodeObjectService
+        this.shopperService.updateShopperCounter(username, "orderedPlates", String.valueOf(qrCodeGroups.size()));
+        this.shopperService.updateShopperCounter(username, "remainingPlates", String.valueOf(qrCodeGroups.size()));
+        return qrCodeGroups;
+    }
+
+    public Set<AutoCompleteRes> filterAutocompleteQrCode(String find, String ownerId) {
+        Set<QrCodeGroup> qrCodes = qrCodeGroupRepository.findByOwnerIdAndAnyMatchingFields(ownerId, find);
+        return qrCodes.stream().map(c -> {
+            AutoCompleteRes res = new AutoCompleteRes();
+            res.setValue(c.getNameQrCode());
+            return res;
+        }).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 

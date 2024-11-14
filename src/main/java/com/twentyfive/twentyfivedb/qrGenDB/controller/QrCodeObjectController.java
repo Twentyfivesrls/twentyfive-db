@@ -3,14 +3,19 @@ package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
+import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodePdfService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
+import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
+import jakarta.ws.rs.Produces;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
@@ -19,6 +24,7 @@ import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @RequestMapping("/qr_code")
 @RestController
@@ -30,10 +36,12 @@ public class QrCodeObjectController {
     public static final int DEFAULT_QR_HEIGHT = 350;
     private final QrCodeObjectService qrCodeObjectService;
     private final QrCodeObjectRepository qrCodeObjectRepository;
+    private final QrCodePdfService qrCodePdfService;
 
-    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository) {
+    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository, QrCodePdfService qrCodePdfService) {
         this.qrCodeObjectService = qrCodeObjectService;
         this.qrCodeObjectRepository = qrCodeObjectRepository;
+        this.qrCodePdfService = qrCodePdfService;
     }
 
     @GetMapping("/allByUsername")
@@ -79,6 +87,22 @@ public class QrCodeObjectController {
         MethodUtils.generateQRCodeImage(codeText, 350, 350, directory);
 
         return ResponseEntity.status(HttpStatus.OK).body(MethodUtils.getQRCodeImage(codeText, 350, 350));
+    }
+
+    @GetMapping(value = "/downloadQrGroup", produces = MediaType.APPLICATION_PDF_VALUE)
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadQrGroup(
+            @RequestParam("username") String username,
+            @RequestParam("groupNumber") String groupNumber) throws Exception {
+
+        byte[] pdfBytes = qrCodePdfService.generateQrCodePdf(username, groupNumber);
+        String fileName = String.format("QrCodeGroup_%s_%s.pdf", username, groupNumber.replace(" ", "_"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", fileName);
+        headers.setContentLength(pdfBytes.length);
+
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
     }
 
     @DeleteMapping("/delete/{idQrCode}")
@@ -165,9 +189,9 @@ public class QrCodeObjectController {
     }
 
     @PostMapping("/generateQrGroup")
-    public ResponseEntity<List<QrCodeGroup>> generateQrCodeGroup(@RequestParam String username, @RequestParam ("ownerId") String ownerId) {
+    public ResponseEntity<List<QrCodeGroup>> generateQrCodeGroup(@RequestParam String username, @RequestParam("ownerId") String ownerId, @RequestParam("quantityGroup") Integer quantityGroup) {
         try {
-            List<QrCodeGroup> qrCodeGroup = qrCodeObjectService.generateQrCodeGroup(username, ownerId);
+            List<QrCodeGroup> qrCodeGroup = qrCodeObjectService.generateQrCodeGroup(username, ownerId, quantityGroup);
             return ResponseEntity.status(HttpStatus.OK).body(qrCodeGroup);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -175,5 +199,11 @@ public class QrCodeObjectController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @PostMapping("/filter/qrcode/autocomplete")
+    public ResponseEntity<Set<AutoCompleteRes>> filterAutocompleteQrCode(@RequestParam("ownerId") String ownerId, @RequestParam("filterObject") String filterObject) {
+        return new ResponseEntity<>(qrCodeObjectService.filterAutocompleteQrCode(filterObject, ownerId), HttpStatus.OK);
+    }
+
 
 }

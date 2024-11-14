@@ -17,7 +17,4 @@ public interface AnimalRepository extends MongoRepository<TTAnimal, String>{
     Set<TTAnimal> findByNameContainingIgnoreCaseAndOwnerIdContainingIgnoreCase(String name, String ownerId);
 
     List<TTAnimal> findByOwnerIdContainingIgnoreCase(String ownerId, Sort sort);
-
-    @Query("{ 'email': ?0 }")
-    Optional<TTAnimal> findByEmail(String email);
 }

@@ -15,7 +15,6 @@ import java.nio.file.Path;
 public class MethodUtils {
 
 
-
     public static void generateQRCodeImage(String text, int width, int height, String filePath)
             throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
