@@ -98,7 +98,7 @@ public class ShopperService {
     }
 
     public TicTicCustomer getCustomer(String customerId) {
-        Optional<TicTicCustomer> opt = this.customerRepository.findById(customerId);
+        Optional<TicTicCustomer> opt = this.customerRepository.findByEmail(customerId);
         return opt.orElse(null);
     }
 
