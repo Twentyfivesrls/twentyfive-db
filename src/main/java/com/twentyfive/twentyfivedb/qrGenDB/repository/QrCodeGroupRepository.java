@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
-import twentyfive.twentyfiveadapter.models.tictickModels.TicTicCustomer;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +19,10 @@ public interface QrCodeGroupRepository extends MongoRepository<QrCodeGroup, Stri
     List<QrCodeGroup> findAllByUsername(String username);
     boolean existsByOwnerId(String ownerId);
     Page<QrCodeGroup> findByOwnerId(String ownerId, Pageable pageable);
-    @Query(value = "{}", count = true)
+    List<QrCodeGroup> findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(String ownerId, String name);
+
+
+  @Query(value = "{}", count = true)
     Long countAllDocuments();
 
     Optional<QrCodeGroup> findByOwnerIdAndNameQrCode(String ownerId, String nameQrCode);
