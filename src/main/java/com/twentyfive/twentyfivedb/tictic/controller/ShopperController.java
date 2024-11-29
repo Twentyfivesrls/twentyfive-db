@@ -112,4 +112,10 @@ public class ShopperController {
         shopperService.associateQRCodeWithCustomer(ownerId, qrCodeId, customerId, animal);
         return ResponseEntity.ok(true);
     }
+
+    @GetMapping("/unassigned-qrcodes")
+    public ResponseEntity<List<QrCodeGroup>> getUnassignedQrCodes(@RequestParam("ownerId") String ownerId, @RequestParam("name") String name) {
+      List<QrCodeGroup> unassignedQrCodes = shopperService.getUnassignedQrCodes(ownerId, name);
+      return ResponseEntity.ok(unassignedQrCodes);
+    }
 }
