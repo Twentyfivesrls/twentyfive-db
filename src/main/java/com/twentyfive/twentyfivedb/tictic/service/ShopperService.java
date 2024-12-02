@@ -8,7 +8,9 @@ import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
@@ -154,9 +156,11 @@ public class ShopperService {
     }
 
 
-    public Page<QrCodeGroup> getQrCodes(String ownerId, Pageable pageable) {
-        return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
-    }
+  public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
+  }
 
     public List<QrCodeGroup> getQrCodesForShopper(String usernameShopper) {
         return qrCodeGroupRepository.findAllByUsername(usernameShopper);
