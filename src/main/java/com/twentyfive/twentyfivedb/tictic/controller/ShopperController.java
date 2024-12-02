@@ -90,13 +90,16 @@ public class ShopperController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
-    @GetMapping("/getQrcodeList")
-    public Page<QrCodeGroup> getQrCodes(@RequestParam String ownerId,
-                                        @RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int size) {
-        return shopperService.getQrCodes(ownerId, PageRequest.of(page, size));
-
-    }
+  @GetMapping("/getQrcodeList")
+  public Page<QrCodeGroup> getQrCodes(
+    @RequestParam String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn, // Default column for sorting
+    @RequestParam(defaultValue = "asc") String sortDirection // Default direction for sorting
+  ) {
+    return shopperService.getQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
 
     @GetMapping("/getQrCodesCustomer/{username}")
     public List<QrCodeGroup> getQrCodesForShopper(@PathVariable String username) {
