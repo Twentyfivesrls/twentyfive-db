@@ -30,6 +30,16 @@ public class ShopperController {
         return ResponseEntity.ok(shopperService.getShopperCounters(ownerId));
     }
 
+    @GetMapping("/customers/search")
+    public ResponseEntity<Page<TicTicCustomer>> getShopperCustomersWithEmail(@RequestParam(name = "ownerId") String ownerId,
+                                                                             @RequestParam(name = "email") String email,
+                                                                             @RequestParam(defaultValue = "0") int page,
+                                                                             @RequestParam(defaultValue = "5") int size,
+                                                                             @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                                             @RequestParam(defaultValue = "asc") String sortDirection) {
+      return ResponseEntity.ok(shopperService.getShopperCustomersWithEmail(ownerId, email, page, size, sortColumn, sortDirection));
+    }
+
     @GetMapping("/customers")
     public ResponseEntity<Page<TicTicCustomer>> getShopperCustomers(@RequestParam(name = "ownerId") String ownerId,
                                                                     @RequestParam(defaultValue = "0") int page,
@@ -99,6 +109,18 @@ public class ShopperController {
     @RequestParam(defaultValue = "asc") String sortDirection // Default direction for sorting
   ) {
     return shopperService.getQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
+
+  @GetMapping("/getQrcodeListByCustomer")
+  public Page<QrCodeGroup> getQrCodesByCustomer(
+    @RequestParam String ownerId,
+    @RequestParam String customerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn, // Colonna di ordinamento predefinita
+    @RequestParam(defaultValue = "asc") String sortDirection // Direzione di ordinamento predefinita
+  ) {
+    return shopperService.getQrCodesByCustomer(ownerId, customerId, page, size, sortColumn, sortDirection);
   }
 
     @GetMapping("/getQrCodesCustomer/{username}")

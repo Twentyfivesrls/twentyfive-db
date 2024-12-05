@@ -24,5 +24,7 @@ public interface CustomerRepository extends MongoRepository<TicTicCustomer, Stri
     void deleteByIdAndOwnerId(String customerId, String ownerId);
 
     boolean existsByEmailAndOwnerId(String email, String ownerId);
+
+  Page<TicTicCustomer> findAllByOwnerIdAndEmailContainingIgnoreCase(String ownerId, String email, Pageable pageable);
 }
 
