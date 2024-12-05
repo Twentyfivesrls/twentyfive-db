@@ -104,6 +104,11 @@ public class ShopperService {
         return opt.orElse(null);
     }
 
+    public Page<TicTicCustomer> getShopperCustomersWithEmail(String ownerId, String email, int page, int size, String sortColumn, String sortDirection) {
+      Pageable p = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+      return this.customerRepository.findAllByOwnerIdAndEmailContainingIgnoreCase(ownerId, email, p);
+    }
+
     public Set<AutoCompleteRes> filterAutocompleteCustomer(String find, String ownerId) {
         Set<TicTicCustomer> customers = customerRepository.findByOwnerIdAndAnyMatchingFields(ownerId, find);
 
@@ -160,6 +165,12 @@ public class ShopperService {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
     Pageable pageable = PageRequest.of(page, size, sort);
     return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
+  }
+
+  public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
+    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return qrCodeGroupRepository.findByOwnerIdAndCustomerId(ownerId, customerId, pageable);
   }
 
     public List<QrCodeGroup> getQrCodesForShopper(String usernameShopper) {

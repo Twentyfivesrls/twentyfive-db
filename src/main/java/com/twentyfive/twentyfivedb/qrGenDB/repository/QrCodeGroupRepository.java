@@ -20,6 +20,7 @@ public interface QrCodeGroupRepository extends MongoRepository<QrCodeGroup, Stri
     boolean existsByOwnerId(String ownerId);
     Page<QrCodeGroup> findByOwnerId(String ownerId, Pageable pageable);
     List<QrCodeGroup> findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(String ownerId, String name);
+    Page<QrCodeGroup> findByOwnerIdAndCustomerId(String ownerId, String customerId, Pageable pageable);
 
 
   @Query(value = "{}", count = true)
