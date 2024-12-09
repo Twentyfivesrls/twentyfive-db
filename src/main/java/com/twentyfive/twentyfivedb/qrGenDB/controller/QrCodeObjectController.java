@@ -1,9 +1,11 @@
 package com.twentyfive.twentyfivedb.qrGenDB.controller;
 
 
+import com.google.zxing.WriterException;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeObjectRepository;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeObjectService;
 import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodePdfService;
+import com.twentyfive.twentyfivedb.qrGenDB.service.QrCodeSvgService;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.MethodUtils;
 import com.twentyfive.twentyfivedb.qrGenDB.utils.QrTypeUtils;
 import com.twentyfive.twentyfivemodel.dto.qrGenDto.ResponseImage;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeObject;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -38,10 +41,16 @@ public class QrCodeObjectController {
     private final QrCodeObjectRepository qrCodeObjectRepository;
     private final QrCodePdfService qrCodePdfService;
 
-    public QrCodeObjectController(QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository, QrCodePdfService qrCodePdfService) {
+    private final QrCodeSvgService qrCodeSvgService;
+
+
+    public QrCodeObjectController(QrCodeSvgService qrCodeSvgService,QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository, QrCodePdfService qrCodePdfService) {
         this.qrCodeObjectService = qrCodeObjectService;
         this.qrCodeObjectRepository = qrCodeObjectRepository;
         this.qrCodePdfService = qrCodePdfService;
+        this.qrCodeSvgService = qrCodeSvgService;
+
+
     }
 
     @GetMapping("/allByUsername")
@@ -96,13 +105,35 @@ public class QrCodeObjectController {
             @RequestParam("groupNumber") String groupNumber) throws Exception {
 
         byte[] pdfBytes = qrCodePdfService.generateQrCodePdf(username, groupNumber);
-        String fileName = String.format("QrCodeGroup_%s_%s.pdf", username, groupNumber.replace(" ", "_"));
+        String fileName = String.format("QrCodeGroup_%s_%s.svg", username, groupNumber.replace(" ", "_"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("attachment", fileName);
         headers.setContentLength(pdfBytes.length);
 
         return ResponseEntity.ok().headers(headers).body(pdfBytes);
+    }
+
+    @GetMapping("/downloadQrGroupSvg")
+    public ResponseEntity<byte[]> downloadQrGroupSvg(@RequestParam("username") String username,
+                                                     @RequestParam("groupNumber") String groupNumber) {
+        try {
+            byte[] svgBytes = qrCodeSvgService.generateQrCodeSvg(username, groupNumber);
+            String fileName = "QrCodeGroup_" + groupNumber.replace(" ", "_") + ".svg";
+
+            // Set headers for file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentLength(svgBytes.length);
+
+            // Return the SVG as a downloadable file
+            return ResponseEntity.ok().headers(headers).body(svgBytes);
+
+        } catch (IOException | WriterException e) {
+            // Handle errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @DeleteMapping("/delete/{idQrCode}")
