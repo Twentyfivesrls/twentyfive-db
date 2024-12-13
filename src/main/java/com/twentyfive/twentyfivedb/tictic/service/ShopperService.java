@@ -161,11 +161,18 @@ public class ShopperService {
     }
 
 
-  public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
-    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
-    Pageable pageable = PageRequest.of(page, size, sort);
-    return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
-  }
+    public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+        // Crea il Sort, gestendo il caso per nullsFirst e nullsLast
+        Sort sort = getExclusiveSortForColumn(sortColumn, sortDirection);
+
+        // Crea Pageable con la pagina, la dimensione e il sort
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Restituisce la lista dei QR code, con la paginazione applicata
+        return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
+    }
+
+
 
   public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
@@ -181,6 +188,27 @@ public class ShopperService {
       // Recupera tutti i QR codes per l'ownerId
      return qrCodeGroupRepository.findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(ownerId, name);
 
+    }
+
+    private Sort getExclusiveSortForColumn(String sortColumn, String sortDirection) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+
+        // Ordinamento principale per customerId, secondario per idQrCode (unico)
+        if ("customerId".equalsIgnoreCase(sortColumn)) {
+            if (direction == Sort.Direction.ASC) {
+                return Sort.by(
+                        Sort.Order.asc("customerId").nullsFirst(),
+                        Sort.Order.asc("idQrCode")  // Unico ID per evitare duplicati
+                );
+            } else {
+                return Sort.by(
+                        Sort.Order.desc("customerId").nullsLast(),
+                        Sort.Order.asc("idQrCode")
+                );
+            }
+        }
+
+        return Sort.by(direction, sortColumn);
     }
 
 }
