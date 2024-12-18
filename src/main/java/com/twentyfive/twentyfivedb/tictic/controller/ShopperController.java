@@ -97,14 +97,11 @@ public class ShopperController {
         return ResponseEntity.ok(association);
     }*/
 
-    @GetMapping("/check-customer-qrcode")
-    public ResponseEntity<String> checkCustomerAndQRCodeExists(@RequestParam String ownerId) {
-        String message = shopperService.checkCustomerAndQRCodeExists(ownerId);
-        if (message.equals("Cliente e QR code trovati.")) {
-            return ResponseEntity.ok(message);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-    }
+  @GetMapping("/check-customer-qrcode")
+  public ResponseEntity<Boolean> checkCustomerAndQRCodeExists(@RequestParam String ownerId) {
+    boolean exists = shopperService.checkCustomerAndQRCodeExists(ownerId);
+    return ResponseEntity.ok(exists);
+  }
 
   @GetMapping("/getQrcodeList")
   public Page<QrCodeGroup> getQrCodes(

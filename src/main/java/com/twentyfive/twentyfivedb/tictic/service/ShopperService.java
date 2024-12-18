@@ -8,10 +8,12 @@ import com.twentyfive.twentyfivedb.tictic.repository.CustomerRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
@@ -31,12 +33,15 @@ public class ShopperService {
     private final QrCodeGroupRepository qrCodeGroupRepository;
     private final AnimalService animalService;
 
+    private final MongoTemplate mongoTemplate;
 
-    public ShopperService(ShopperRepository shopperRepository, CustomerRepository customerRepository, QrCodeGroupRepository qrCodeGroupRepository, AnimalService animalService) {
+
+    public ShopperService(ShopperRepository shopperRepository, CustomerRepository customerRepository, QrCodeGroupRepository qrCodeGroupRepository, AnimalService animalService, MongoTemplate mongoTemplate) {
         this.shopperRepository = shopperRepository;
         this.customerRepository = customerRepository;
         this.qrCodeGroupRepository = qrCodeGroupRepository;
         this.animalService = animalService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public TicTicShopper getShopperCounters(String ownerId) {
@@ -156,40 +161,43 @@ public class ShopperService {
     }
 
 
-    public String checkCustomerAndQRCodeExists(String ownerId) {
-        boolean customerExists = customerRepository.existsByOwnerId(ownerId);
-        boolean qrCodeExists = qrCodeGroupRepository.existsByOwnerId(ownerId);
+  public boolean checkCustomerAndQRCodeExists(String ownerId) {
+    boolean customerExists = customerRepository.existsByOwnerId(ownerId);
+    boolean qrCodeExists = qrCodeGroupRepository.existsByOwnerId(ownerId);
 
-        if (!customerExists && !qrCodeExists) {
-            return "Nessun cliente e nessun QR code trovato per lo shopper specificato.";
-        } else if (!customerExists) {
-            return "Nessun cliente trovato per lo shopper specificato.";
-        } else if (!qrCodeExists) {
-            return "Nessun QR code trovato per lo shopper specificato.";
-        }
+    // Ritorna true solo se entrambi esistono
+    return customerExists && qrCodeExists;
+  }
 
-        return "Cliente e QR code trovati.";
+  public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    System.out.println(sortDirection);
+      Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+
+    List<AggregationOperation> operations = new ArrayList<>();
+    operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)));
+
+    if ("idQrCode".equalsIgnoreCase(sortColumn)) {
+      // Convertiamo il campo idQrCode da string a double
+      operations.add(
+        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
+            "isActivated", "ownerId", "customerId", "associationDate")
+          .and(ConvertOperators.valueOf("idQrCode").convertToDouble()).as("idNumeric")
+      );
+      // Ordinamento numerico
+      operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
+    } else {
+      // Ordinamento diretto sulla colonna indicata
+      operations.add(Aggregation.sort(Sort.by(direction, sortColumn)));
     }
 
+    Aggregation aggregation = Aggregation.newAggregation(operations);
+    AggregationResults<QrCodeGroup> results = mongoTemplate.aggregate(aggregation, "tictic_qrcode_group", QrCodeGroup.class);
 
-    public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
-        // Crea il Sort, gestendo il caso per nullsFirst e nullsLast
-        Sort sort;
-        if ("ASC".equalsIgnoreCase(sortDirection)) {
-            sort = Sort.by(Sort.Order.asc(sortColumn).nullsFirst(), Sort.Order.asc("idQrCode"));
-        } else {
-            sort = Sort.by(Sort.Order.desc(sortColumn).nullsLast(), Sort.Order.desc("idQrCode"));
-        }
+    List<QrCodeGroup> mappedResults = results.getMappedResults();
+    Pageable pageable = PageRequest.of(page, size);
 
-
-        // Crea Pageable con la pagina, la dimensione e il sort
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Restituisce la lista dei QR code, con la paginazione applicata
-        return qrCodeGroupRepository.findByOwnerId(ownerId, pageable);
-    }
-
-
+    return Utility.convertListToPage(mappedResults, pageable);
+  }
 
   public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
