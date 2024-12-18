@@ -50,9 +50,9 @@ public class ShopperController {
     }
 
 
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<TTAnimal> getAnimal(@PathVariable String id) {
-        return ResponseEntity.ok(shopperService.getAnimalByIdQrCode(id));
+    @GetMapping("/getAnimalByQrCode/{idQrCode}")
+    public ResponseEntity<TTAnimal> getAnimalByIdQrCode(@PathVariable("idQrCode") String idQrCode) {
+        return ResponseEntity.ok(shopperService.getAnimalByIdQrCode(idQrCode));
     }
 
     @GetMapping("/get-customer/{customerId}")
