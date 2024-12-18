@@ -1,8 +1,10 @@
 package com.twentyfive.twentyfivedb.tictic.service;
 
+import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.AnimalRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
+import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,6 +12,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import twentyfive.twentyfiveadapter.dto.ticticDto.MinimalQrCode;
+import twentyfive.twentyfiveadapter.dto.ticticDto.TTAnimalAndQrCode;
+import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
 
 import java.util.*;
@@ -24,10 +29,12 @@ public class AnimalService {
     private final MongoTemplate mongoTemplate;
 
     private static final String USER_KEY = "ownerId";
+    private final QrCodeGroupRepository qrCodeGroupRepository;
 
-    public AnimalService(AnimalRepository animalRepository, MongoTemplate mongoTemplate) {
+    public AnimalService(AnimalRepository animalRepository,MongoTemplate mongoTemplate, QrCodeGroupRepository qrCodeGroupRepository) {
         this.animalRepository = animalRepository;
         this.mongoTemplate = mongoTemplate;
+        this.qrCodeGroupRepository = qrCodeGroupRepository;
     }
 
     public List<TTAnimal> getAnimalFiltered(TTAnimal filterObject, String ownerId){
@@ -171,4 +178,16 @@ public class AnimalService {
         }
     }
 
+    public TTAnimalAndQrCode getAnimalAndAssociatedQr(String id) {
+        TTAnimalAndQrCode animalAndQrCode = new TTAnimalAndQrCode();
+        QrCodeGroup qrCodeGroup = qrCodeGroupRepository.findByAnimalId(id).orElseThrow(NotFoundException::new);
+        TTAnimal animal = this.getAnimalById(id);
+        MinimalQrCode qrCode = new MinimalQrCode();
+        qrCode.setId(qrCodeGroup.getIdQrCode());
+        qrCode.setImgUrl(qrCodeGroup.getLink());
+        animalAndQrCode.setQrCode(qrCode);
+        animalAndQrCode.setAnimal(animal);
+        return animalAndQrCode;
+
+    }
 }

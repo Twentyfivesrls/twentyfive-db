@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.dto.ticticDto.TTAnimalAndQrCode;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
 
 import java.io.IOException;
@@ -55,7 +56,10 @@ public class AnimalController {
         animalService.updateAnimal(id, animal);
         return ResponseEntity.ok().build();
     }
-
+    @GetMapping("/getAnimalAndAssociatedQr/{id}")
+    public ResponseEntity<TTAnimalAndQrCode> getAnimalAndAssociatedQr(@PathVariable String id) {
+        return ResponseEntity.ok().body(animalService.getAnimalAndAssociatedQr(id));
+    }
     @GetMapping("/detail/{id}")
     public ResponseEntity<TTAnimal> getAnimal(@PathVariable String id) {
         return ResponseEntity.ok(animalService.getAnimalById(id));
@@ -68,7 +72,7 @@ public class AnimalController {
 
     @GetMapping("/generateQrCode/{id}")
     public ResponseEntity<byte[]> generateQrCode(@PathVariable("id") String id) throws IOException, WriterException {
-        String url = this.baseUrl + "/pet/" + id;
+        String url = this.baseUrl + "/qr/" + id;
         byte[] qrCode = MethodUtils.generateQrCodeImage(url, 350, 350);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=qrCode.png")
