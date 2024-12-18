@@ -49,6 +49,12 @@ public class ShopperController {
         return ResponseEntity.ok(shopperService.getShopperCustomers(ownerId, page, size, sortColumn, sortDirection));
     }
 
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<TTAnimal> getAnimal(@PathVariable String id) {
+        return ResponseEntity.ok(shopperService.getAnimalByIdQrCode(id));
+    }
+
     @GetMapping("/get-customer/{customerId}")
     public ResponseEntity<TicTicCustomer> getCustomer(@PathVariable String customerId) {
         return ResponseEntity.ok(shopperService.getCustomer(customerId));

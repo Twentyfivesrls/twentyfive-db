@@ -3,6 +3,7 @@ package com.twentyfive.twentyfivedb.tictic.service;
 import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
+import com.twentyfive.twentyfivedb.tictic.repository.AnimalRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.CustomerRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
@@ -89,6 +90,16 @@ public class ShopperService {
         }
     }
 
+    public TTAnimal getAnimalByIdQrCode(String idQrCode){
+        Optional<QrCodeGroup> optQrCode = qrCodeGroupRepository.findByIdQrCode(idQrCode);
+        if (optQrCode.isPresent() && optQrCode.get().getAnimalId() != null) {
+            QrCodeGroup qrCodeGroup = optQrCode.get();
+            return animalService.getAnimalById(qrCodeGroup.getAnimalId());
+        } else {
+            throw new NotFoundException("Animal not found");
+        }
+    }
+
     public void deleteShopper(String shopperId) {
         this.shopperRepository.deleteById(shopperId);
     }
@@ -163,7 +174,13 @@ public class ShopperService {
 
     public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
         // Crea il Sort, gestendo il caso per nullsFirst e nullsLast
-        Sort sort = getExclusiveSortForColumn(sortColumn, sortDirection);
+        Sort sort;
+        if ("ASC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(Sort.Order.asc(sortColumn).nullsFirst(), Sort.Order.asc("idQrCode"));
+        } else {
+            sort = Sort.by(Sort.Order.desc(sortColumn).nullsLast(), Sort.Order.desc("idQrCode"));
+        }
+
 
         // Crea Pageable con la pagina, la dimensione e il sort
         Pageable pageable = PageRequest.of(page, size, sort);

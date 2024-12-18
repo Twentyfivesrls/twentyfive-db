@@ -15,6 +15,7 @@ import java.util.Set;
 public interface QrCodeGroupRepository extends MongoRepository<QrCodeGroup, String> {
     @Query(value = "{ 'ownerId' : ?0 }", fields = "{ 'groupName' : 1 }")
     List<QrCodeGroup> findAllGroupNamesByOwnerId(String ownerId);
+    Optional<QrCodeGroup> findByIdQrCode(String idQrCode);
     List<QrCodeGroup> findAllByUsernameAndAndGroupName(String username, String groupName);
     List<QrCodeGroup> findAllByUsername(String username);
     boolean existsByOwnerId(String ownerId);
