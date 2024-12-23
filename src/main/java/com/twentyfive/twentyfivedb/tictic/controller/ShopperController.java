@@ -80,10 +80,10 @@ public class ShopperController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/filter/customer/autocomplete")
-    public ResponseEntity<Set<AutoCompleteRes>> filterAutocompleteCustomer(@RequestParam("ownerId") String ownerId, @RequestParam("filterObject") String filterObject) {
-        return new ResponseEntity<>(shopperService.filterAutocompleteCustomer(filterObject, ownerId), HttpStatus.OK);
-    }
+  @PostMapping("/filter/customer/autocomplete")
+  public ResponseEntity<Set<AutoCompleteRes>> filterAutocompleteCustomer(@RequestParam("filterObject") String filterObject) {
+    return new ResponseEntity<>(shopperService.filterAutocompleteCustomer(filterObject), HttpStatus.OK);
+  }
 
     /*@PostMapping("/associate-qrcode")
     public ResponseEntity<TicTicQrCodeCustomerAssociations> associateQRCodeWithCustomer(

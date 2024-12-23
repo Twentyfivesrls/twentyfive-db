@@ -117,21 +117,20 @@ public class ShopperService {
         return opt.orElse(null);
     }
 
-    public Page<TicTicCustomer> getShopperCustomersWithEmail(String email, int page, int size, String sortColumn, String sortDirection) {
-      Pageable p = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-      return this.customerRepository.findAllByEmailContainingIgnoreCase(email, p);
-    }
+  public Page<TicTicCustomer> getShopperCustomersWithEmail(String email, int page, int size, String sortColumn, String sortDirection) {
+    Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+    return this.customerRepository.findAllByEmailContainingIgnoreCase(email, pageable);
+  }
 
-    public Set<AutoCompleteRes> filterAutocompleteCustomer(String find, String ownerId) {
-        Set<TicTicCustomer> customers = customerRepository.findByOwnerIdAndAnyMatchingFields(ownerId, find);
+  public Set<AutoCompleteRes> filterAutocompleteCustomer(String find) {
+    Set<TicTicCustomer> customers = customerRepository.findByAnyMatchingFields(find);
 
-        return customers.stream().map(c -> {
-            AutoCompleteRes res = new AutoCompleteRes();
-            res.setValue(c.getEmail());
-            return res;
-        }).collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
+    return customers.stream().map(c -> {
+      AutoCompleteRes res = new AutoCompleteRes();
+      res.setValue(c.getEmail());
+      return res;
+    }).collect(Collectors.toCollection(LinkedHashSet::new));
+  }
     public void associateQRCodeWithCustomer(String ownerId, String qrCodeId, String customerId, TTAnimal animal) {
         Optional<TicTicCustomer> customerOpt = customerRepository.findByEmail(customerId);
         if (customerOpt.isEmpty()) {

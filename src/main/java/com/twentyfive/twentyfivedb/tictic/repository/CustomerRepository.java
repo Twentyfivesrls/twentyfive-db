@@ -14,8 +14,8 @@ import java.util.Set;
 @Repository
 public interface CustomerRepository extends MongoRepository<TicTicCustomer, String> {
     Page<TicTicCustomer> findAllByOwnerId(String ownerId, Pageable pageable);
-    @Query("{ 'ownerId': ?0, '$or': [ { 'name': { $regex: ?1, $options: 'i' } }, { 'lastName': { $regex: ?1, $options: 'i' } }, { 'email': { $regex: ?1, $options: 'i' } } ] }")
-    Set<TicTicCustomer> findByOwnerIdAndAnyMatchingFields(String ownerId, String find);
+  @Query("{ '$or': [ { 'name': { $regex: ?0, $options: 'i' } }, { 'lastName': { $regex: ?0, $options: 'i' } }, { 'email': { $regex: ?0, $options: 'i' } } ] }")
+  Set<TicTicCustomer> findByAnyMatchingFields(String find);
     Optional<TicTicCustomer> findByEmail(String email);
 
     boolean existsByOwnerId(String ownerId);
@@ -24,6 +24,6 @@ public interface CustomerRepository extends MongoRepository<TicTicCustomer, Stri
 
     boolean existsByEmail(String email, String ownerId);
 
-  Page<TicTicCustomer> findAllByEmailContainingIgnoreCase(String email, Pageable pageable);
+    Page<TicTicCustomer> findAllByEmailContainingIgnoreCase(String email, Pageable pageable);
 }
 
