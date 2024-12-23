@@ -76,9 +76,9 @@ public class ShopperService {
         this.shopperRepository.save(shopper);
     }
 
-    public Page<TicTicCustomer> getShopperCustomers(String ownerId, int page, int size, String sortColumn, String sortDirection) {
-        Pageable p = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-        return this.customerRepository.findAllByOwnerId(ownerId, p);
+    public Page<TicTicCustomer> getAllCustomers(int page, int size, String sortColumn, String sortDirection) {
+      Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+      return this.customerRepository.findAll(pageable);
     }
 
     public TicTicShopper saveShopper(TicTicShopper shopper) {

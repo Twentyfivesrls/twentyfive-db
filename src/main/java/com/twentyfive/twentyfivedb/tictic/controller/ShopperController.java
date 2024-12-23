@@ -40,14 +40,13 @@ public class ShopperController {
       return ResponseEntity.ok(shopperService.getShopperCustomersWithEmail(ownerId, email, page, size, sortColumn, sortDirection));
     }
 
-    @GetMapping("/customers")
-    public ResponseEntity<Page<TicTicCustomer>> getShopperCustomers(@RequestParam(name = "ownerId") String ownerId,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "5") int size,
-                                                                    @RequestParam(defaultValue = "lastname") String sortColumn,
-                                                                    @RequestParam(defaultValue = "asc") String sortDirection) {
-        return ResponseEntity.ok(shopperService.getShopperCustomers(ownerId, page, size, sortColumn, sortDirection));
-    }
+  @GetMapping("/customers")
+  public ResponseEntity<Page<TicTicCustomer>> getAllCustomers(@RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "5") int size,
+                                                              @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                              @RequestParam(defaultValue = "asc") String sortDirection) {
+    return ResponseEntity.ok(shopperService.getAllCustomers(page, size, sortColumn, sortDirection));
+  }
 
 
     @GetMapping("/getAnimalByQrCode/{idQrCode}")
