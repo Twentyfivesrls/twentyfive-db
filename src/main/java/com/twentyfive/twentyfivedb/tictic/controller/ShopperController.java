@@ -31,13 +31,12 @@ public class ShopperController {
     }
 
     @GetMapping("/customers/search")
-    public ResponseEntity<Page<TicTicCustomer>> getShopperCustomersWithEmail(@RequestParam(name = "ownerId") String ownerId,
-                                                                             @RequestParam(name = "email") String email,
+    public ResponseEntity<Page<TicTicCustomer>> getShopperCustomersWithEmail(@RequestParam(name = "email") String email,
                                                                              @RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "5") int size,
                                                                              @RequestParam(defaultValue = "lastname") String sortColumn,
                                                                              @RequestParam(defaultValue = "asc") String sortDirection) {
-      return ResponseEntity.ok(shopperService.getShopperCustomersWithEmail(ownerId, email, page, size, sortColumn, sortDirection));
+      return ResponseEntity.ok(shopperService.getShopperCustomersWithEmail(email, page, size, sortColumn, sortDirection));
     }
 
   @GetMapping("/customers")

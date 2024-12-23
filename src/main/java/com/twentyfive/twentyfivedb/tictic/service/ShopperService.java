@@ -3,17 +3,14 @@ package com.twentyfive.twentyfivedb.tictic.service;
 import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
-import com.twentyfive.twentyfivedb.tictic.repository.AnimalRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.CustomerRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 import twentyfive.twentyfiveadapter.models.tictickModels.TTAnimal;
@@ -87,7 +84,7 @@ public class ShopperService {
 
     public TicTicCustomer saveCustomer(TicTicCustomer customer) {
         String ownerId = customer.getOwnerId();
-        if (customerRepository.existsByEmailAndOwnerId(customer.getEmail(), ownerId)) {
+        if (customerRepository.existsByEmail(customer.getEmail(), ownerId)) {
             throw new RuntimeException("Customer already exists");
         } else {
             updateShopperCounter(ownerId, "customerCount", "1");
@@ -120,9 +117,9 @@ public class ShopperService {
         return opt.orElse(null);
     }
 
-    public Page<TicTicCustomer> getShopperCustomersWithEmail(String ownerId, String email, int page, int size, String sortColumn, String sortDirection) {
+    public Page<TicTicCustomer> getShopperCustomersWithEmail(String email, int page, int size, String sortColumn, String sortDirection) {
       Pageable p = Utility.makePageableObj(sortDirection, sortColumn, page, size);
-      return this.customerRepository.findAllByOwnerIdAndEmailContainingIgnoreCase(ownerId, email, p);
+      return this.customerRepository.findAllByEmailContainingIgnoreCase(email, p);
     }
 
     public Set<AutoCompleteRes> filterAutocompleteCustomer(String find, String ownerId) {

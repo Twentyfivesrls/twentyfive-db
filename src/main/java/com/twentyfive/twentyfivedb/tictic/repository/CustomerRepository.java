@@ -1,6 +1,5 @@
 package com.twentyfive.twentyfivedb.tictic.repository;
 
-import com.twentyfive.twentyfivemodel.models.qrGenModels.QrCodeObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -23,8 +22,8 @@ public interface CustomerRepository extends MongoRepository<TicTicCustomer, Stri
 
     void deleteByIdAndOwnerId(String customerId, String ownerId);
 
-    boolean existsByEmailAndOwnerId(String email, String ownerId);
+    boolean existsByEmail(String email, String ownerId);
 
-  Page<TicTicCustomer> findAllByOwnerIdAndEmailContainingIgnoreCase(String ownerId, String email, Pageable pageable);
+  Page<TicTicCustomer> findAllByEmailContainingIgnoreCase(String email, Pageable pageable);
 }
 
