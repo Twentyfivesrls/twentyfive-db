@@ -149,7 +149,7 @@ public class ShopperService {
         QrCodeGroup qrCodeGroup = opt.get();
         qrCodeGroup.setCustomerId(customerId);
         qrCodeGroup.setAnimalId(animalId);
-        qrCodeGroup.setAssociationDate(LocalDateTime.now());
+        qrCodeGroup.setAssociationDate(LocalDateTime.now().plusHours(1));
         qrCodeGroupRepository.save(qrCodeGroup);
         updateShopperCounter(ownerId, "soldPlates", "1");
         updateShopperCounter(ownerId, "remainingPlates", "-1");
