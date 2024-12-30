@@ -158,11 +158,11 @@ public class ShopperService {
 
 
   public boolean checkCustomerAndQRCodeExists(String ownerId) {
-    boolean customerExists = customerRepository.existsByOwnerId(ownerId);
+    //boolean customerExists = customerRepository.existsByOwnerId(ownerId);
     boolean qrCodeExists = qrCodeGroupRepository.existsByOwnerId(ownerId);
 
     // Ritorna true solo se entrambi esistono
-    return customerExists && qrCodeExists;
+    return qrCodeExists;
   }
 
   public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
