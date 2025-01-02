@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import twentyfive.twentyfiveadapter.models.qrGenModels.QrCodeGroup;
 
@@ -22,7 +23,11 @@ public interface QrCodeGroupRepository extends MongoRepository<QrCodeGroup, Stri
     boolean existsByOwnerId(String ownerId);
     Page<QrCodeGroup> findByOwnerId(String ownerId, Pageable pageable);
     List<QrCodeGroup> findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(String ownerId, String name);
-    Page<QrCodeGroup> findByOwnerIdAndCustomerId(String ownerId, String customerId, Pageable pageable);
+
+    //Page<QrCodeGroup> findByOwnerIdAndCustomerId(String ownerId, String customerId, Pageable pageable);
+
+  @Query("{ 'ownerId': ?0, '$or': [ { 'customerId': ?1 }, { 'idQrCode': ?1 } ] }")
+  Page<QrCodeGroup> findByOwnerIdAndSearchString(String ownerId, String searchString, Pageable pageable);
 
 
   @Query(value = "{}", count = true)

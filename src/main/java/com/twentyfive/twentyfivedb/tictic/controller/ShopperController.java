@@ -112,6 +112,7 @@ public class ShopperController {
     return shopperService.getQrCodes(ownerId, page, size, sortColumn, sortDirection);
   }
 
+  /*
   @GetMapping("/getQrcodeListByCustomer")
   public Page<QrCodeGroup> getQrCodesByCustomer(
     @RequestParam String ownerId,
@@ -122,6 +123,19 @@ public class ShopperController {
     @RequestParam(defaultValue = "asc") String sortDirection // Direzione di ordinamento predefinita
   ) {
     return shopperService.getQrCodesByCustomer(ownerId, customerId, page, size, sortColumn, sortDirection);
+  }
+   */
+
+  @GetMapping("/getQrcodeListBySearchString")
+  public Page<QrCodeGroup> getQrCodesBySearchString(
+    @RequestParam String ownerId,
+    @RequestParam String searchString, // Parametro generico per cercare in customerId o idQrCode
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn, // Colonna di ordinamento predefinita
+    @RequestParam(defaultValue = "asc") String sortDirection // Direzione di ordinamento predefinita
+  ) {
+    return shopperService.getQrCodesBySearchString(ownerId, searchString, page, size, sortColumn, sortDirection);
   }
 
     @GetMapping("/getQrCodesCustomer/{username}")

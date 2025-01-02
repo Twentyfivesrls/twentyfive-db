@@ -195,10 +195,18 @@ public class ShopperService {
     return Utility.convertListToPage(mappedResults, pageable);
   }
 
+ /*
   public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
     Pageable pageable = PageRequest.of(page, size, sort);
     return qrCodeGroupRepository.findByOwnerIdAndCustomerId(ownerId, customerId, pageable);
+  }
+*/
+
+  public Page<QrCodeGroup> getQrCodesBySearchString(String ownerId, String searchString, int page, int size, String sortColumn, String sortDirection) {
+    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return qrCodeGroupRepository.findByOwnerIdAndSearchString(ownerId, searchString, pageable);
   }
 
     public List<QrCodeGroup> getQrCodesForShopper(String usernameShopper) {
