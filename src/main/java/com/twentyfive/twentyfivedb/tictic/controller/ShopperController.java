@@ -138,9 +138,9 @@ public class ShopperController {
     return shopperService.getQrCodesBySearchString(ownerId, searchString, page, size, sortColumn, sortDirection);
   }
 
-    @GetMapping("/getQrCodesCustomer/{username}")
-    public List<QrCodeGroup> getQrCodesForShopper(@PathVariable String username) {
-        return shopperService.getQrCodesForShopper(username);
+    @GetMapping("/getQrCodesForCustomer/{customerId}")
+    public List<QrCodeGroup> getQrCodesForCustomer(@PathVariable String customerId) {
+        return shopperService.getQrCodesForCustomer(customerId);
     }
 
     @PostMapping("/associateQrCodeWhitCustomer")

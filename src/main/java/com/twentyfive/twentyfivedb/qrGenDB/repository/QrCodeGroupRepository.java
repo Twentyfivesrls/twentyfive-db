@@ -20,6 +20,7 @@ public interface QrCodeGroupRepository extends MongoRepository<QrCodeGroup, Stri
     Optional<QrCodeGroup> findByAnimalId(String animalId);
     List<QrCodeGroup> findAllByUsernameAndAndGroupName(String username, String groupName);
     List<QrCodeGroup> findAllByUsername(String username);
+    List<QrCodeGroup> findAllByCustomerId(String customerId);
     boolean existsByOwnerId(String ownerId);
     Page<QrCodeGroup> findByOwnerId(String ownerId, Pageable pageable);
     List<QrCodeGroup> findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(String ownerId, String name);

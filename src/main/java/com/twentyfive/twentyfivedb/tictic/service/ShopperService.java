@@ -213,6 +213,10 @@ public class ShopperService {
         return qrCodeGroupRepository.findAllByUsername(usernameShopper);
     }
 
+    public List<QrCodeGroup> getQrCodesForCustomer(String customerId) {
+        return qrCodeGroupRepository.findAllByCustomerId(customerId);
+    }
+
     public List<QrCodeGroup> getUnassignedQrCodes(String ownerId, String name) {
       // Recupera tutti i QR codes per l'ownerId
      return qrCodeGroupRepository.findAllByOwnerIdAndNameQrCodeContainsIgnoreCaseAndCustomerIdNull(ownerId, name);
