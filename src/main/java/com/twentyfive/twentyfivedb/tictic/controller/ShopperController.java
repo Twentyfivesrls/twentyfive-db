@@ -143,7 +143,7 @@ public class ShopperController {
         return shopperService.getQrCodesForCustomer(customerId);
     }
 
-    @PostMapping("/associateQrCodeWhitCustomer")
+    @PostMapping("/associateQrCodeWithCustomer")
     public ResponseEntity<Boolean> associateQRCodeWithCustomer(
             @RequestParam("ownerId") String ownerId,
             @RequestParam("qrCodeId") String qrCodeId,
