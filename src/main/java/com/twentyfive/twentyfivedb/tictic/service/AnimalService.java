@@ -91,6 +91,7 @@ public class AnimalService {
             animal1.setPathologies(animal.getPathologies());
             animal1.setSterilization(animal.isSterilization());
             animal1.setAge(animal.getAge());
+            animal1.setBirthDate(animal.getBirthDate());
             animal1.setWeight(animal.getWeight());
             animal1.setAddress(animal.getAddress());
             animal1.setPhone(animal.getPhone());
