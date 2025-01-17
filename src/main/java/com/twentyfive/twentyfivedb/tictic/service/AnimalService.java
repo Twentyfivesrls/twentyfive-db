@@ -191,4 +191,23 @@ public class AnimalService {
         return animalAndQrCode;
 
     }
+
+  public void deleteAnimalsWithoutQrCode() {
+    // Trova tutti gli ID degli animali che hanno un QR Code associato
+    List<String> associatedAnimalIds = mongoTemplate.findDistinct(
+      new Query(), // Nessun filtro, prendiamo tutti i QR code
+      "animalId", // Campo da estrarre
+      QrCodeGroup.class, // Collezione di origine
+      String.class // Tipo del campo estratto
+    );
+
+    // Crea un criterio per trovare gli animali non inclusi negli ID associati
+    Query query = new Query();
+    query.addCriteria(Criteria.where("_id").nin(associatedAnimalIds));
+
+    // Elimina tutti gli animali che non sono associati a un QR code
+    mongoTemplate.remove(query, TTAnimal.class);
+
+    log.info("Eliminati tutti gli animali senza un QR code associato.");
+  }
 }

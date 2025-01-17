@@ -89,4 +89,10 @@ public class AnimalController {
         }
         return animalService.getAnimalsSorted(ownerId, campo, ordine);
     }
+
+  @DeleteMapping("/remove-unassociated")
+  public ResponseEntity<String> removeUnassociatedAnimals() {
+    animalService.deleteAnimalsWithoutQrCode();
+    return ResponseEntity.ok("Animali non associati a QR Code eliminati con successo.");
+  }
 }
