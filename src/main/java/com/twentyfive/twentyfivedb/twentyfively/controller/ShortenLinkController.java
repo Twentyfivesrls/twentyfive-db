@@ -1,11 +1,11 @@
 package com.twentyfive.twentyfivedb.twentyfively.controller;
 
 import com.twentyfive.twentyfivedb.twentyfively.service.ShortenLinkService;
-import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.RequestValue;
-import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.ResponseValue;
-import com.twentyfive.twentyfivemodel.models.twentyfiveLyModels.ShortenLink;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.dto.twlyDto.RequestValue;
+import twentyfive.twentyfiveadapter.dto.twlyDto.ResponseValue;
+import twentyfive.twentyfiveadapter.models.twlyModels.ShortenLink;
 
 import java.util.List;
 
@@ -30,8 +30,6 @@ public class ShortenLinkController {
         ShortenLink result = shortenLinkService.generateForMailKeycloak(requestValue);
         return ResponseEntity.ok(new ResponseValue(result.getShortUrl()));
     }
-
-
 
     @GetMapping("/get-complete-link/{shortUrl}")
     public ResponseEntity<String> getCompleteShortenLink(@PathVariable String shortUrl) {

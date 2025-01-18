@@ -3,19 +3,15 @@ package com.twentyfive.twentyfivedb.twentyfively.service;
 
 import com.twentyfive.twentyfivedb.twentyfively.repository.ShortenLinkRepository;
 import com.twentyfive.twentyfivedb.twentyfively.utils.GeneratePasswordUtil;
-import com.twentyfive.twentyfivemodel.dto.twentyfiveLyDto.RequestValue;
-import com.twentyfive.twentyfivemodel.models.twentyfiveLyModels.ShortenLink;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import twentyfive.twentyfiveadapter.adapter.Document.ShortenLinkDocumentDB.ShortenLinkDocumentDB;
-import twentyfive.twentyfiveadapter.adapter.Mapper.TwentyFiveMapper;
+import twentyfive.twentyfiveadapter.dto.twlyDto.RequestValue;
+import twentyfive.twentyfiveadapter.models.twlyModels.ShortenLink;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.twentyfive.twentyfivedb.twentyfively.constants.ShortenLinkConstants.DEFAULT_SHORTEN_LINK_LENGTH;
 
@@ -36,93 +32,71 @@ public class ShortenLinkService {
         this.shortenLinkRepository = shortenLinkRepository;
     }
 
-
     public ShortenLink generateForMailKeycloak(RequestValue requestValue) {
-        ShortenLinkDocumentDB toSave = new ShortenLinkDocumentDB();
-        toSave.setDestinationUrl(requestValue.getUrl());
-
-        toSave.setShortUrl(generateUniqueLink());
-        toSave.setCreatedAt(new Date());
-        ShortenLinkDocumentDB response = shortenLinkRepository.save(toSave);
-
-        String shortUrlString = response.getShortUrl();
-        String composedUrl = baseUrl + shortUrlString;
-        response.setShortUrl(composedUrl);
-        return TwentyFiveMapper.INSTANCE.shortenLinkDocumentDBToShortenLink(response);
+        return generateShortUrl(requestValue);
     }
 
     public ShortenLink generateShortUrl(RequestValue requestValue) {
-        //TODO: modificare la chiamata con l'username una volta che sarà implementato il login
-        String userId = "";
+        String userId = requestValue.getUserToken();
 
-        ShortenLinkDocumentDB toSave = new ShortenLinkDocumentDB();
+        ShortenLink toSave = new ShortenLink();
         toSave.setDestinationUrl(requestValue.getUrl());
-
-        if (StringUtils.isBlank(userId) || userId.equals("Guest")) {
-            userId = requestValue.getUserToken();
-        }
-
         toSave.setUserId(userId);
         toSave.setShortUrl(generateUniqueLink());
         toSave.setCreatedAt(new Date());
-        ShortenLinkDocumentDB response = shortenLinkRepository.save(toSave);
-        this.removeOldestLink(userId);
 
-        String shortUrlString = response.getShortUrl();
-        String composedUrl = baseUrl + shortUrlString;
-        response.setShortUrl(composedUrl);
-        return TwentyFiveMapper.INSTANCE.shortenLinkDocumentDBToShortenLink(response);
+        ShortenLink savedLink = shortenLinkRepository.save(toSave);
+        removeOldestLink(userId);
+
+        return composeUrl(savedLink);
+    }
+
+    private ShortenLink composeUrl(ShortenLink shortenLink) {
+        shortenLink.setShortUrl(baseUrl + shortenLink.getShortUrl());
+        return shortenLink;
     }
 
     private void removeOldestLink(String userId) {
-        List<ShortenLinkDocumentDB> allByUserId = shortenLinkRepository.findAllByUserId(userId);
-        if (allByUserId.size() > threshold) {
-            ShortenLinkDocumentDB oldest = allByUserId.get(0);
-            for (ShortenLinkDocumentDB s : allByUserId) {
-                if (s.getCreatedAt().before(oldest.getCreatedAt())) {
-                    oldest = s;
-                }
-            }
-            shortenLinkRepository.delete(oldest);
+        List<ShortenLink> links = shortenLinkRepository.findAllByUserId(userId);
+        if (links.size() > threshold) {
+            ShortenLink oldestLink = links.stream()
+                    .min(Comparator.comparing(ShortenLink::getCreatedAt))
+                    .orElseThrow(() -> new IllegalStateException("No links found"));
+
+            shortenLinkRepository.delete(oldestLink);
         }
     }
 
     public String getCompleteShortenLink(String shortUrl) {
-        Optional<ShortenLinkDocumentDB> onDb = shortenLinkRepository.findByShortUrl(shortUrl);
-        return onDb.map(ShortenLinkDocumentDB::getDestinationUrl).orElse("");
+        return shortenLinkRepository.findByShortUrl(shortUrl)
+                .map(ShortenLink::getDestinationUrl)
+                .orElse("");
     }
 
     private String generateUniqueLink() {
-        while (true) {
-            String current = GeneratePasswordUtil.generateCommonLangPassword(DEFAULT_SHORTEN_LINK_LENGTH);
-            if (shortenLinkRepository.findByShortUrl(current).isEmpty()) {
-                return current;
-            }
-        }
+        String uniqueLink;
+        do {
+            uniqueLink = GeneratePasswordUtil.generateCommonLangPassword(DEFAULT_SHORTEN_LINK_LENGTH);
+        } while (shortenLinkRepository.findByShortUrl(uniqueLink).isPresent());
+        return uniqueLink;
     }
-
 
     public List<ShortenLink> getAllLinksForUserId(String userId) {
         if (StringUtils.isBlank(userId)) {
             log.info("User id is blank");
-            return new ArrayList<>();
-        }
-        List<ShortenLinkDocumentDB> res = shortenLinkRepository.findAllByUserId(userId);
-        List<ShortenLink> mapList = new ArrayList<>();
-        for (ShortenLinkDocumentDB s : res) {
-            mapList.add(TwentyFiveMapper.INSTANCE.shortenLinkDocumentDBToShortenLink(s));
+            return Collections.emptyList();
         }
 
-
-        for (ShortenLink s : mapList) {
-            String shortUrlString = s.getShortUrl();
-            String composedUrl = baseUrl + shortUrlString;
-            s.setShortUrl(composedUrl);
-        }
-        return mapList;
+        return shortenLinkRepository.findAllByUserIdAndDeleted(userId, false)
+                .stream()
+                .map(this::composeUrl)
+                .collect(Collectors.toList());
     }
 
     public void deleteLink(String id) {
-        shortenLinkRepository.deleteById(id);
+        shortenLinkRepository.findById(id).ifPresent(link -> {
+            link.setDeleted(true);
+            shortenLinkRepository.save(link);
+        });
     }
 }
