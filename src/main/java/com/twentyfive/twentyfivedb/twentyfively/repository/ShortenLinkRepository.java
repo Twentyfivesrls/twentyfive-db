@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface ShortenLinkRepository extends MongoRepository<ShortenLink, String> {
     List<ShortenLink> findAllByUserId(String userId);
 
+    List<ShortenLink> findAllByUserIdAndDeletedOrderByCreatedAtDesc(String userId, boolean b);
+
     Optional<ShortenLink> findByShortUrl(String current);
 
     List<ShortenLink> findAllByUserIdAndDeleted(String userId, boolean b);

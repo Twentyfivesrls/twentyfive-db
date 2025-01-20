@@ -46,6 +46,8 @@ public class ShortenLinkService {
         toSave.setCreatedAt(new Date());
 
         ShortenLink savedLink = shortenLinkRepository.save(toSave);
+
+        //this should never happen, but it is a good practice to check and keep the db clean
         removeOldestLink(userId);
 
         return composeUrl(savedLink);
@@ -57,7 +59,7 @@ public class ShortenLinkService {
     }
 
     private void removeOldestLink(String userId) {
-        List<ShortenLink> links = shortenLinkRepository.findAllByUserId(userId);
+        List<ShortenLink> links = shortenLinkRepository.findAllByUserIdAndDeleted(userId, false);
         if (links.size() > threshold) {
             ShortenLink oldestLink = links.stream()
                     .min(Comparator.comparing(ShortenLink::getCreatedAt))
@@ -87,7 +89,7 @@ public class ShortenLinkService {
             return Collections.emptyList();
         }
 
-        return shortenLinkRepository.findAllByUserIdAndDeleted(userId, false)
+        return shortenLinkRepository.findAllByUserIdAndDeletedOrderByCreatedAtDesc(userId, false)
                 .stream()
                 .map(this::composeUrl)
                 .collect(Collectors.toList());
