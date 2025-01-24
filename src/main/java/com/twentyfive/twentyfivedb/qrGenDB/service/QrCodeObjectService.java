@@ -8,6 +8,7 @@ import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,9 @@ public class QrCodeObjectService {
 
     private static String TICTIC_URL = "https://tictic25.it/";
 
+    @Value("${thresholdQrCodeCreation}")
+    private long thresholdQrCodeCreation;
+
     private static final Map<String, Function<QrCodeObject, String>> qrCodeTypeHandlers = new HashMap<>();
 
     static {
@@ -53,9 +57,15 @@ public class QrCodeObjectService {
         this.shopperService = shopperService;
     }
 
-    public QrCodeObject saveQrCodeObject(QrCodeObject qrCodeObject, String username) {
+    public QrCodeObject saveQrCodeObject(QrCodeObject qrCodeObject, String username, boolean isFullyEnabled) {
         if (qrCodeObject == null) {
             throw new IllegalArgumentException("QR code object cannot be null");
+        }
+
+        if (!isFullyEnabled) {
+            if(this.countByUsername(username) >= thresholdQrCodeCreation){
+                throw new IllegalArgumentException("You have reached the maximum number of QR codes that can be created");
+            }
         }
 
         log.info("QrType: " + qrCodeObject.getType());
@@ -81,6 +91,10 @@ public class QrCodeObjectService {
         return qrCodeObjectRepository.save(qrCodeObject);
     }
 
+    private long countByUsername(String username) {
+        return qrCodeObjectRepository.countByUsername(username);
+    }
+
 
     public QrCodeObject getQrCodeObjectById(String idQrCode) {
         if (StringUtils.isBlank(idQrCode)) {
@@ -92,11 +106,7 @@ public class QrCodeObjectService {
 
     public List<QrCodeObject> getAllQrCodeObject(String username) {
         List<QrCodeObject> qrCodeObjectList = qrCodeObjectRepository.findAllByUsername(username);
-        List<QrCodeObject> mapList = new ArrayList<>();
-        for (QrCodeObject qrCodeObject : qrCodeObjectList) {
-            mapList.add(qrCodeObject);
-        }
-        return mapList;
+        return new ArrayList<>(qrCodeObjectList);
     }
 
     public List<QrCodeObject> getObjectsByUsername(String username, Integer pageNumber, Integer pageSize) {

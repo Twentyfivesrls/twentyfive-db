@@ -16,4 +16,6 @@ public interface QrCodeObjectRepository extends MongoRepository<QrCodeObject,Str
 
     List<QrCodeObject> findAllByUsername(String username);
 
+    long countByUsername(String username);
+
 }

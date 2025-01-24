@@ -44,7 +44,7 @@ public class QrCodeObjectController {
     private final QrCodeSvgService qrCodeSvgService;
 
 
-    public QrCodeObjectController(QrCodeSvgService qrCodeSvgService,QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository, QrCodePdfService qrCodePdfService) {
+    public QrCodeObjectController(QrCodeSvgService qrCodeSvgService, QrCodeObjectService qrCodeObjectService, QrCodeObjectRepository qrCodeObjectRepository, QrCodePdfService qrCodePdfService) {
         this.qrCodeObjectService = qrCodeObjectService;
         this.qrCodeObjectRepository = qrCodeObjectRepository;
         this.qrCodePdfService = qrCodePdfService;
@@ -70,12 +70,12 @@ public class QrCodeObjectController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<QrCodeObject> saveQrCodeObject(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
+    public ResponseEntity<QrCodeObject> saveQrCodeObject(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username, @RequestParam("isFullyEnabled") boolean isFullyEnabled) {
         if (qrCodeObject == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        qrCodeObjectService.saveQrCodeObject(qrCodeObject, username);
+        qrCodeObjectService.saveQrCodeObject(qrCodeObject, username, isFullyEnabled);
         return ResponseEntity.status(HttpStatus.OK).body(qrCodeObject);
     }
 
@@ -144,9 +144,9 @@ public class QrCodeObjectController {
 
 
     @PostMapping(value = "/generateAndDownloadQRCode")
-    public ResponseEntity<QrCodeObject> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username) {
+    public ResponseEntity<QrCodeObject> download(@RequestBody QrCodeObject qrCodeObject, @RequestParam(value = "username") String username, @RequestParam("isFullyEnabled") boolean isFullyEnabled) {
         try {
-            QrCodeObject savedQrCode = qrCodeObjectService.saveQrCodeObject(qrCodeObject, username);
+            QrCodeObject savedQrCode = qrCodeObjectService.saveQrCodeObject(qrCodeObject, username, isFullyEnabled);
 
             if (savedQrCode == null) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -160,12 +160,13 @@ public class QrCodeObjectController {
 
 
     @PutMapping("/update/{idQrCode}")
-    ResponseEntity<QrCodeObject> updateQrCodeObject(@PathVariable String idQrCode, @RequestBody QrCodeObject qrCodeObject) {
+    ResponseEntity<QrCodeObject> updateQrCodeObject(@PathVariable String idQrCode, @RequestParam("isFullyEnabled") boolean isFullyEnabled, @RequestBody QrCodeObject qrCodeObject) {
         if (idQrCode == null || idQrCode.isEmpty())
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
-        //TODO: controll qrcodemodel
-
+        if (!isFullyEnabled) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         qrCodeObjectService.updateQrCodeObject(idQrCode, qrCodeObject);
         return ResponseEntity.status(HttpStatus.OK).body(qrCodeObject);
     }
