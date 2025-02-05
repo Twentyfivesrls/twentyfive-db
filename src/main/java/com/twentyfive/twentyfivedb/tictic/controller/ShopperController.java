@@ -112,6 +112,30 @@ public class ShopperController {
     return shopperService.getQrCodes(ownerId, page, size, sortColumn, sortDirection);
   }
 
+  // Recupera solo i QR Code associati (customerId != null)
+  @GetMapping("/getAssociatedQrcodeList")
+  public Page<QrCodeGroup> getAssociatedQrCodes(
+    @RequestParam String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection
+  ) {
+    return shopperService.getAssociatedQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
+
+  // Recupera solo i QR Code non associati (customerId == null)
+  @GetMapping("/getNonAssociatedQrcodeList")
+  public Page<QrCodeGroup> getNonAssociatedQrCodes(
+    @RequestParam String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection
+  ) {
+    return shopperService.getNonAssociatedQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
+
   /*
   @GetMapping("/getQrcodeListByCustomer")
   public Page<QrCodeGroup> getQrCodesByCustomer(

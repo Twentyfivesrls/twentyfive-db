@@ -244,6 +244,56 @@ public class ShopperService {
         return Sort.by(direction, sortColumn);
     }
 
+  public Page<QrCodeGroup> getAssociatedQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    List<AggregationOperation> operations = new ArrayList<>();
+    // Filtra per ownerId e solo QR Code associati (customerId != null)
+    operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)
+      .and("customerId").ne(null)));
+
+    if ("idQrCode".equalsIgnoreCase(sortColumn)) {
+      operations.add(
+        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
+            "isActivated", "ownerId", "customerId", "associationDate")
+          .and(ConvertOperators.valueOf("idQrCode").convertToDouble()).as("idNumeric")
+      );
+      operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
+    } else {
+      operations.add(Aggregation.sort(Sort.by(direction, sortColumn)));
+    }
+
+    Aggregation aggregation = Aggregation.newAggregation(operations);
+    AggregationResults<QrCodeGroup> results = mongoTemplate.aggregate(aggregation, "tictic_qrcode_group", QrCodeGroup.class);
+    List<QrCodeGroup> mappedResults = results.getMappedResults();
+    Pageable pageable = PageRequest.of(page, size);
+    return Utility.convertListToPage(mappedResults, pageable);
+  }
+
+  public Page<QrCodeGroup> getNonAssociatedQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    List<AggregationOperation> operations = new ArrayList<>();
+    // Filtra per ownerId e solo QR Code non associati (customerId == null)
+    operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)
+      .and("customerId").is(null)));
+
+    if ("idQrCode".equalsIgnoreCase(sortColumn)) {
+      operations.add(
+        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
+            "isActivated", "ownerId", "customerId", "associationDate")
+          .and(ConvertOperators.valueOf("idQrCode").convertToDouble()).as("idNumeric")
+      );
+      operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
+    } else {
+      operations.add(Aggregation.sort(Sort.by(direction, sortColumn)));
+    }
+
+    Aggregation aggregation = Aggregation.newAggregation(operations);
+    AggregationResults<QrCodeGroup> results = mongoTemplate.aggregate(aggregation, "tictic_qrcode_group", QrCodeGroup.class);
+    List<QrCodeGroup> mappedResults = results.getMappedResults();
+    Pageable pageable = PageRequest.of(page, size);
+    return Utility.convertListToPage(mappedResults, pageable);
+  }
+
 }
 
 
