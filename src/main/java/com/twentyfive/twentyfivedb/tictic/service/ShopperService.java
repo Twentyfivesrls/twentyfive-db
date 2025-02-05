@@ -78,6 +78,11 @@ public class ShopperService {
       return this.customerRepository.findAll(pageable);
     }
 
+  public Page<TicTicCustomer> getCustomersByOwner(String ownerId, int page, int size, String sortColumn, String sortDirection) {
+    Pageable pageable = Utility.makePageableObj(sortDirection, sortColumn, page, size);
+    return this.customerRepository.findByOwnerId(ownerId, pageable);
+  }
+
     public TicTicShopper saveShopper(TicTicShopper shopper) {
         return this.shopperRepository.save(shopper);
     }

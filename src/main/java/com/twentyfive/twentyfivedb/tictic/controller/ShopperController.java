@@ -47,8 +47,20 @@ public class ShopperController {
     return ResponseEntity.ok(shopperService.getAllCustomers(page, size, sortColumn, sortDirection));
   }
 
+  @GetMapping("/customers/by-owner")
+  public ResponseEntity<Page<TicTicCustomer>> getCustomersByOwner(
+    @RequestParam("ownerId") String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "5") int size,
+    @RequestParam(defaultValue = "lastname") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection) {
+    Page<TicTicCustomer> customers = shopperService.getCustomersByOwner(ownerId, page, size, sortColumn, sortDirection);
+    return ResponseEntity.ok(customers);
+  }
 
-    @GetMapping("/getAnimalByQrCode/{idQrCode}")
+
+
+  @GetMapping("/getAnimalByQrCode/{idQrCode}")
     public ResponseEntity<TTAnimal> getAnimalByIdQrCode(@PathVariable("idQrCode") String idQrCode) {
         return ResponseEntity.ok(shopperService.getAnimalByIdQrCode(idQrCode));
     }
