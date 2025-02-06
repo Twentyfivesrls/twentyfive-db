@@ -90,7 +90,7 @@ public class BustePagaController {
     }
 
     @PostMapping(value="/save-file")
-    public ResponseEntity<Boolean> saveFile(@RequestBody BPFile file) {
+    public ResponseEntity<BPFile> saveFile(@RequestBody BPFile file) {
         return ResponseEntity.ok(bustePagaService.saveFile(file));
     }
 
@@ -98,6 +98,11 @@ public class BustePagaController {
     public ResponseEntity<Void> deleteFile(@PathVariable String id) {
         bustePagaService.deleteFile(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/set-as-read/{id}")
+    public ResponseEntity<Boolean> setAsRead(@PathVariable String id) {
+        return ResponseEntity.ok(bustePagaService.setAsRead(id));
     }
 
 

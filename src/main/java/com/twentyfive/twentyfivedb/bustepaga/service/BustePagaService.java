@@ -123,12 +123,22 @@ public class BustePagaService {
         return this.fileRepository.getAllByEmployeeId(employeeId, pageable);
     }
 
-    public Boolean saveFile(BPFile file) {
-        this.fileRepository.save(file);
-        return true;
+    public BPFile saveFile(BPFile file) {
+        return this.fileRepository.save(file);
     }
 
     public void deleteFile(String id) {
         this.fileRepository.deleteById(id);
+    }
+
+    public Boolean setAsRead(String id) {
+        Optional<BPFile> file = this.fileRepository.findById(id);
+        if (file.isPresent()) {
+            BPFile bpFile = file.get();
+            bpFile.setConfirmed(true);
+            this.fileRepository.save(bpFile);
+            return true;
+        }
+        return false;
     }
 }
