@@ -25,5 +25,7 @@ public interface CustomerRepository extends MongoRepository<TicTicCustomer, Stri
     boolean existsByEmail(String email, String ownerId);
 
     Page<TicTicCustomer> findAllByEmailContainingIgnoreCase(String email, Pageable pageable);
+
+    Page<TicTicCustomer> findByOwnerId(String ownerId, Pageable pageable);
 }
 

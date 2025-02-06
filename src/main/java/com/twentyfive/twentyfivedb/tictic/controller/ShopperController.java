@@ -47,8 +47,20 @@ public class ShopperController {
     return ResponseEntity.ok(shopperService.getAllCustomers(page, size, sortColumn, sortDirection));
   }
 
+  @GetMapping("/customers/by-owner")
+  public ResponseEntity<Page<TicTicCustomer>> getCustomersByOwner(
+    @RequestParam("ownerId") String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "5") int size,
+    @RequestParam(defaultValue = "lastname") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection) {
+    Page<TicTicCustomer> customers = shopperService.getCustomersByOwner(ownerId, page, size, sortColumn, sortDirection);
+    return ResponseEntity.ok(customers);
+  }
 
-    @GetMapping("/getAnimalByQrCode/{idQrCode}")
+
+
+  @GetMapping("/getAnimalByQrCode/{idQrCode}")
     public ResponseEntity<TTAnimal> getAnimalByIdQrCode(@PathVariable("idQrCode") String idQrCode) {
         return ResponseEntity.ok(shopperService.getAnimalByIdQrCode(idQrCode));
     }
@@ -110,6 +122,30 @@ public class ShopperController {
     @RequestParam(defaultValue = "asc") String sortDirection // Default direction for sorting
   ) {
     return shopperService.getQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
+
+  // Recupera solo i QR Code associati (customerId != null)
+  @GetMapping("/getAssociatedQrcodeList")
+  public Page<QrCodeGroup> getAssociatedQrCodes(
+    @RequestParam String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection
+  ) {
+    return shopperService.getAssociatedQrCodes(ownerId, page, size, sortColumn, sortDirection);
+  }
+
+  // Recupera solo i QR Code non associati (customerId == null)
+  @GetMapping("/getNonAssociatedQrcodeList")
+  public Page<QrCodeGroup> getNonAssociatedQrCodes(
+    @RequestParam String ownerId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "customerId") String sortColumn,
+    @RequestParam(defaultValue = "asc") String sortDirection
+  ) {
+    return shopperService.getNonAssociatedQrCodes(ownerId, page, size, sortColumn, sortDirection);
   }
 
   /*
