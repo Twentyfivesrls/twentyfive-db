@@ -172,19 +172,25 @@ public class ShopperService {
 
   public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
     System.out.println(sortDirection);
-      Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
 
     List<AggregationOperation> operations = new ArrayList<>();
     operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)));
 
     if ("idQrCode".equalsIgnoreCase(sortColumn)) {
-      // Convertiamo il campo idQrCode da string a double
+      // Aggiungi il campo idNumeric tramite $addFields, così mantieni tutti gli altri campi
       operations.add(
-        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
-            "isActivated", "ownerId", "customerId", "associationDate")
-          .and(ConvertOperators.valueOf("idQrCode").convertToDouble()).as("idNumeric")
+        Aggregation.addFields()
+          .addField("idNumeric")
+          .withValue(
+            ConvertOperators.valueOf("idQrCode")
+              .convertToDouble()
+            // Se necessario, per gestire eventuali errori di conversione, puoi usare:
+            // .onError(0.0)
+          )
+          .build()
       );
-      // Ordinamento numerico
+      // Ordina per idNumeric usando la direzione specificata (asc o desc)
       operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
     } else {
       // Ordinamento diretto sulla colonna indicata
@@ -199,7 +205,6 @@ public class ShopperService {
 
     return Utility.convertListToPage(mappedResults, pageable);
   }
-
 
   public Page<QrCodeGroup> getQrCodesBySearchString(String ownerId, String searchString, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
