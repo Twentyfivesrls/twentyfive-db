@@ -97,16 +97,6 @@ public class ShopperController {
     return new ResponseEntity<>(shopperService.filterAutocompleteCustomer(filterObject), HttpStatus.OK);
   }
 
-    /*@PostMapping("/associate-qrcode")
-    public ResponseEntity<TicTicQrCodeCustomerAssociations> associateQRCodeWithCustomer(
-            @RequestParam String ownerId,
-            @RequestParam String qrCodeId,
-            @RequestParam String customerId) {
-
-        TicTicQrCodeCustomerAssociations association = shopperService.associateQRCodeWithCustomer(ownerId, qrCodeId, customerId);
-        return ResponseEntity.ok(association);
-    }*/
-
   @GetMapping("/check-customer-qrcode")
   public ResponseEntity<Boolean> checkCustomerAndQRCodeExists(@RequestParam String ownerId) {
     boolean exists = shopperService.checkCustomerAndQRCodeExists(ownerId);
@@ -147,20 +137,6 @@ public class ShopperController {
   ) {
     return shopperService.getNonAssociatedQrCodes(ownerId, page, size, sortColumn, sortDirection);
   }
-
-  /*
-  @GetMapping("/getQrcodeListByCustomer")
-  public Page<QrCodeGroup> getQrCodesByCustomer(
-    @RequestParam String ownerId,
-    @RequestParam String customerId,
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size,
-    @RequestParam(defaultValue = "customerId") String sortColumn, // Colonna di ordinamento predefinita
-    @RequestParam(defaultValue = "asc") String sortDirection // Direzione di ordinamento predefinita
-  ) {
-    return shopperService.getQrCodesByCustomer(ownerId, customerId, page, size, sortColumn, sortDirection);
-  }
-   */
 
   @GetMapping("/getQrcodeListBySearchString")
   public Page<QrCodeGroup> getQrCodesBySearchString(

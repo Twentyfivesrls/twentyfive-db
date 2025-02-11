@@ -200,13 +200,6 @@ public class ShopperService {
     return Utility.convertListToPage(mappedResults, pageable);
   }
 
- /*
-  public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
-    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
-    Pageable pageable = PageRequest.of(page, size, sort);
-    return qrCodeGroupRepository.findByOwnerIdAndCustomerId(ownerId, customerId, pageable);
-  }
-*/
 
   public Page<QrCodeGroup> getQrCodesBySearchString(String ownerId, String searchString, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
@@ -214,9 +207,6 @@ public class ShopperService {
     return qrCodeGroupRepository.findByOwnerIdAndSearchString(ownerId, searchString, pageable);
   }
 
-    public List<QrCodeGroup> getQrCodesForShopper(String usernameShopper) {
-        return qrCodeGroupRepository.findAllByUsername(usernameShopper);
-    }
 
     public List<QrCodeGroup> getQrCodesForCustomer(String customerId) {
         return qrCodeGroupRepository.findAllByCustomerId(customerId);
@@ -228,26 +218,6 @@ public class ShopperService {
 
     }
 
-    private Sort getExclusiveSortForColumn(String sortColumn, String sortDirection) {
-        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-
-        // Ordinamento principale per customerId, secondario per idQrCode (unico)
-        if ("customerId".equalsIgnoreCase(sortColumn)) {
-            if (direction == Sort.Direction.ASC) {
-                return Sort.by(
-                        Sort.Order.asc("customerId").nullsFirst(),
-                        Sort.Order.asc("idQrCode")  // Unico ID per evitare duplicati
-                );
-            } else {
-                return Sort.by(
-                        Sort.Order.desc("customerId").nullsLast(),
-                        Sort.Order.asc("idQrCode")
-                );
-            }
-        }
-
-        return Sort.by(direction, sortColumn);
-    }
 
   public Page<QrCodeGroup> getAssociatedQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
     Sort.Direction direction = Sort.Direction.fromString(sortDirection);
