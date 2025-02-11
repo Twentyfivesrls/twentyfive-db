@@ -178,22 +178,13 @@ public class ShopperService {
     operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)));
 
     if ("idQrCode".equalsIgnoreCase(sortColumn)) {
-      // Aggiungi il campo idNumeric tramite $addFields, così mantieni tutti gli altri campi
       operations.add(
-        Aggregation.addFields()
-          .addField("idNumeric")
-          .withValue(
-            ConvertOperators.valueOf("idQrCode")
-              .convertToDouble()
-            // Se necessario, per gestire eventuali errori di conversione, puoi usare:
-            // .onError(0.0)
-          )
-          .build()
+        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
+            "isActivated", "ownerId", "customerId", "associationDate")
+          .andExpression("toDouble(idQrCode)").as("idNumeric")
       );
-      // Ordina per idNumeric usando la direzione specificata (asc o desc)
       operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
     } else {
-      // Ordinamento diretto sulla colonna indicata
       operations.add(Aggregation.sort(Sort.by(direction, sortColumn)));
     }
 
