@@ -5,8 +5,10 @@ import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.qrGenDB.repository.QrCodeGroupRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.CustomerRepository;
 import com.twentyfive.twentyfivedb.tictic.repository.ShopperRepository;
+import com.twentyfive.twentyfivedb.tictic.util.CustomAggregationOperation;
 import com.twentyfive.twentyfivemodel.filterTicket.AutoCompleteRes;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -171,42 +173,39 @@ public class ShopperService {
   }
 
   public Page<QrCodeGroup> getQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
-    System.out.println(sortDirection);
-      Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-
+    System.out.println("Sort direction: " + sortDirection);
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
     List<AggregationOperation> operations = new ArrayList<>();
+
+    // Filtro per ownerId
     operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)));
 
     if ("idQrCode".equalsIgnoreCase(sortColumn)) {
-      // Convertiamo il campo idQrCode da string a double
-      operations.add(
-        Aggregation.project("idQrCode", "animalId", "nameQrCode", "groupName", "link", "type", "username",
-            "isActivated", "ownerId", "customerId", "associationDate")
-          .and(ConvertOperators.valueOf("idQrCode").convertToDouble()).as("idNumeric")
-      );
-      // Ordinamento numerico
-      operations.add(Aggregation.sort(Sort.by(direction, "idNumeric")));
+      // Aggiungi il campo idNumeric usando $convert per trasformare idQrCode in double
+      AddFieldsOperation addFields = Aggregation.addFields()
+        .addField("idNumeric")
+        .withValue(new Document("$convert", new Document("input", "$idQrCode")
+          .append("to", "double")
+          .append("onError", 0.0)
+          .append("onNull", 0.0)))
+        .build();
+      operations.add(addFields);
+
+      // Costruisci il sort manuale: se direction è DESC usa -1, altrimenti 1
+      int sortValue = direction == Sort.Direction.DESC ? -1 : 1;
+      Document sortDoc = new Document("idNumeric", sortValue);
+      operations.add(new CustomAggregationOperation(new Document("$sort", sortDoc)));
     } else {
-      // Ordinamento diretto sulla colonna indicata
+      // Ordinamento sulla colonna indicata
       operations.add(Aggregation.sort(Sort.by(direction, sortColumn)));
     }
 
     Aggregation aggregation = Aggregation.newAggregation(operations);
     AggregationResults<QrCodeGroup> results = mongoTemplate.aggregate(aggregation, "tictic_qrcode_group", QrCodeGroup.class);
-
     List<QrCodeGroup> mappedResults = results.getMappedResults();
     Pageable pageable = PageRequest.of(page, size);
-
     return Utility.convertListToPage(mappedResults, pageable);
   }
-
- /*
-  public Page<QrCodeGroup> getQrCodesByCustomer(String ownerId, String customerId, int page, int size, String sortColumn, String sortDirection) {
-    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
-    Pageable pageable = PageRequest.of(page, size, sort);
-    return qrCodeGroupRepository.findByOwnerIdAndCustomerId(ownerId, customerId, pageable);
-  }
-*/
 
   public Page<QrCodeGroup> getQrCodesBySearchString(String ownerId, String searchString, int page, int size, String sortColumn, String sortDirection) {
     Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortColumn);
@@ -214,9 +213,6 @@ public class ShopperService {
     return qrCodeGroupRepository.findByOwnerIdAndSearchString(ownerId, searchString, pageable);
   }
 
-    public List<QrCodeGroup> getQrCodesForShopper(String usernameShopper) {
-        return qrCodeGroupRepository.findAllByUsername(usernameShopper);
-    }
 
     public List<QrCodeGroup> getQrCodesForCustomer(String customerId) {
         return qrCodeGroupRepository.findAllByCustomerId(customerId);
@@ -228,26 +224,6 @@ public class ShopperService {
 
     }
 
-    private Sort getExclusiveSortForColumn(String sortColumn, String sortDirection) {
-        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-
-        // Ordinamento principale per customerId, secondario per idQrCode (unico)
-        if ("customerId".equalsIgnoreCase(sortColumn)) {
-            if (direction == Sort.Direction.ASC) {
-                return Sort.by(
-                        Sort.Order.asc("customerId").nullsFirst(),
-                        Sort.Order.asc("idQrCode")  // Unico ID per evitare duplicati
-                );
-            } else {
-                return Sort.by(
-                        Sort.Order.desc("customerId").nullsLast(),
-                        Sort.Order.asc("idQrCode")
-                );
-            }
-        }
-
-        return Sort.by(direction, sortColumn);
-    }
 
   public Page<QrCodeGroup> getAssociatedQrCodes(String ownerId, int page, int size, String sortColumn, String sortDirection) {
     Sort.Direction direction = Sort.Direction.fromString(sortDirection);
