@@ -89,6 +89,15 @@ public class BustePagaController {
         return ResponseEntity.ok(bustePagaService.getFilesByDipendenteId(employeeId, page, size, sortColumn, sortDirection));
     }
 
+    @GetMapping(value = "/get-files-by-email")
+    public ResponseEntity<Page<BPFile>> getFilesByDipendenteEmail(@RequestParam(name = "employeeEmail") String employeeEmail,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "5") int size,
+                                                               @RequestParam(defaultValue = "lastname") String sortColumn,
+                                                               @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(bustePagaService.getFilesByDipendenteEmail(employeeEmail, page, size, sortColumn, sortDirection));
+    }
+
     @PostMapping(value="/save-file")
     public ResponseEntity<BPFile> saveFile(@RequestBody BPFile file) {
         return ResponseEntity.ok(bustePagaService.saveFile(file));

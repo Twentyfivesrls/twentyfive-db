@@ -123,6 +123,23 @@ public class BustePagaService {
         return this.fileRepository.getAllByEmployeeId(employeeId, pageable);
     }
 
+    public Page<BPFile> getFilesByDipendenteEmail(String employeeEmail, int page, int size, String sortColumn, String sortDirection) {
+        Optional<Dipendente> dipendente = this.bustePagaRepository.findDipendenteByEmail(employeeEmail);
+        if (dipendente.isEmpty()) {
+            return null;
+        }
+        String employeeId = dipendente.get().getId();
+        Sort.Direction direction;
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            direction = Sort.Direction.DESC;
+        } else {
+            direction = Sort.Direction.ASC;
+        }
+        // Create a Pageable instance
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortColumn));
+        return this.fileRepository.getAllByEmployeeId(employeeId, pageable);
+    }
+
     public BPFile saveFile(BPFile file) {
         return this.fileRepository.save(file);
     }
