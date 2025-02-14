@@ -54,10 +54,19 @@ public class BustePagaService {
         return this.bustePagaRepository.save(dipendente);
     }
 
-    public void deleteDipendente(String id) {
+    public String deleteDipendente(String id) {
+        String email = "";
         this.deleteFileFromDipendenteId(id); //delete all records regarding files
         //TODO we've to delete all the files from the media manager
+
+        Optional<Dipendente> dipendente = bustePagaRepository.findById(id);
+
+        if(dipendente.isPresent()) {
+            email =dipendente.get().getEmail();
+        }
+
         this.bustePagaRepository.deleteById(id);
+        return email;
     }
 
     private void deleteFileFromDipendenteId(String id) {
@@ -110,6 +119,11 @@ public class BustePagaService {
         return this.bustePagaRepository.getDipendenteByUserIdAndId(userId, employeeId);
     }
 
+    public Dipendente getDipendenteByEmail(String email) {
+        return this.bustePagaRepository.getDipendenteByEmail(email);
+    }
+
+
     public Page<BPFile> getFilesByDipendenteId(String employeeId, int page, int size, String sortColumn, String sortDirection) {
         Sort.Direction direction;
         if ("desc".equalsIgnoreCase(sortDirection)) {
@@ -158,4 +172,5 @@ public class BustePagaService {
         }
         return false;
     }
+
 }

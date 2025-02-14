@@ -46,11 +46,13 @@ public class ThubProfileService {
 
 
     public ThubProfile createImageName(ThubProfile imageName){
-        ThubProfile existingImage = profileRepository.findAllByImageName(imageName.getImageName());
+        /*ThubProfile existingImage = profileRepository.findAllByImageName(imageName.getImageName());
 
         if (existingImage != null) {
             throw new IllegalArgumentException("An image with the same name already exists");
         }
+
+         */
 
         return profileRepository.save(imageName);
     }

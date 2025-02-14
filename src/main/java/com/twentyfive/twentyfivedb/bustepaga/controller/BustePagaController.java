@@ -45,15 +45,20 @@ public class BustePagaController {
         return ResponseEntity.ok(bustePagaService.getDipendenteById(userId, employeeId));
     }
 
+    @GetMapping(value = "/get-by-email")
+    public ResponseEntity<Dipendente> getDipendenteByEmail(@RequestParam(name = "email") String email) {
+        return ResponseEntity.ok(bustePagaService.getDipendenteByEmail(email));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Dipendente> createDipendente(@RequestBody Dipendente dipendente) {
         return ResponseEntity.ok(bustePagaService.createDipendente(dipendente));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteDipendente(@PathVariable String id) {
-        bustePagaService.deleteDipendente(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> deleteDipendente(@PathVariable String id) {
+
+        return ResponseEntity.ok().body(bustePagaService.deleteDipendente(id));
     }
 
 
