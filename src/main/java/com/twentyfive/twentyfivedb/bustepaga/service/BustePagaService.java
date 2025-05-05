@@ -119,6 +119,11 @@ public class BustePagaService {
         return this.bustePagaRepository.getDipendenteByUserIdAndId(userId, employeeId);
     }
 
+    //lavorazione
+    public Dipendente getByEmployeeId(String employeeId) {
+        return this.bustePagaRepository.findById(employeeId).orElseThrow(()-> new RuntimeException("No such employee with this id " + employeeId));
+    }
+
     public Dipendente getDipendenteByEmail(String email) {
         return this.bustePagaRepository.getDipendenteByEmail(email);
     }
