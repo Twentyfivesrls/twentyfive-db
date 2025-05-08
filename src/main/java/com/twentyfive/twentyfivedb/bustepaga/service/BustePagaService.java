@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import twentyfive.twentyfiveadapter.dto.bustepagaDto.ConfirmationState;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPConfiguration;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.BPFile;
 import twentyfive.twentyfiveadapter.models.bustepagaModels.Dipendente;
@@ -171,11 +172,31 @@ public class BustePagaService {
         Optional<BPFile> file = this.fileRepository.findById(id);
         if (file.isPresent()) {
             BPFile bpFile = file.get();
-            bpFile.setConfirmed(true);
+            if(bpFile.getConfirmationState()==ConfirmationState.CONFIRMED) {
+                this.fileRepository.save(bpFile);
+                return true;
+            }
+            ConfirmationState confirmationState = ConfirmationState.READ;
+            bpFile.setConfirmationState(confirmationState);
             this.fileRepository.save(bpFile);
             return true;
         }
         return false;
     }
 
+    public Boolean setAsConfirmed(String id) {
+        Optional<BPFile> file = this.fileRepository.findById(id);
+        if (file.isPresent()) {
+            BPFile bpFile = file.get();
+        ConfirmationState confirmationState = ConfirmationState.CONFIRMED;
+            bpFile.setConfirmationState(confirmationState);
+            this.fileRepository.save(bpFile);
+            return true;
+        }
+        return false;
+    }
+
+    public BPFile getById(String id) {
+        return fileRepository.findById(id).orElseThrow(()-> new RuntimeException("No such file with this id " + id));
+    }
 }

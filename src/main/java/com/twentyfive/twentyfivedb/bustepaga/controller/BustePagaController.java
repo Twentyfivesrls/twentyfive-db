@@ -126,5 +126,15 @@ public class BustePagaController {
         return ResponseEntity.ok(bustePagaService.setAsRead(id));
     }
 
+    @GetMapping("/set-as-confirmed/{id}")
+    public ResponseEntity<Boolean> setAsConfirmed(@PathVariable String id) {
+        return ResponseEntity.ok(bustePagaService.setAsConfirmed(id));
+    }
+
+    @GetMapping("/get-file-by-id")
+    public ResponseEntity<BPFile> getFileById(@RequestParam(name = "id") String id) {
+        return ResponseEntity.ok(bustePagaService.getById(id));
+    }
+
 
 }
