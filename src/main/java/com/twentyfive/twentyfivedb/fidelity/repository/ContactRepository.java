@@ -15,6 +15,7 @@ public interface ContactRepository extends MongoRepository<Contact, String> {
     Optional<Contact> findByEmail(String email);
 
     Contact findByEmailAndOwnerId(String email, String ownerId);
+    List<Contact>findAllByEmailAndOwnerId(String email, String ownerId);
 
     Page<Contact> findAllByNameIgnoreCase(String name, Pageable pageable);
 

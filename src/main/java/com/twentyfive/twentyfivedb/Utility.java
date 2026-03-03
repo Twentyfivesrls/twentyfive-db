@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class Utility {
@@ -68,25 +69,42 @@ public class Utility {
         return criteriaList;
     }
 
-    public static List<AggregationOperation> parseOtherFiltersForFidelityCard(FilterCardGroupRequest filterObject, String ownerId, Pageable pageable) {
+    public static List<AggregationOperation> parseOtherFiltersForFidelityCard(
+            FilterCardGroupRequest filterObject,
+            String ownerId,
+            boolean withPagination,
+            int page,
+            int size) {
+
         List<AggregationOperation> operations = new ArrayList<>();
 
-        // Match criteria on ownerId
+        // Filtro base su ownerId
         operations.add(Aggregation.match(Criteria.where("ownerId").is(ownerId)));
 
-        // Match criteria on Card
         if (filterObject != null) {
+            // Filtro su isActive
             if (filterObject.getIsActive() != null) {
                 operations.add(Aggregation.match(Criteria.where("isActive").is(filterObject.getIsActive())));
             }
 
-            if (filterObject.getToDate() != null || filterObject.getFromDate() != null) {
+            // Filtro su name OR surname OR email (case-insensitive)
+            if (filterObject.getName() != null && !filterObject.getName().isEmpty()) {
+                String value = filterObject.getName();
+                operations.add(Aggregation.match(new Criteria().orOperator(
+                        Criteria.where("name").regex("^" + Pattern.quote(value) + "$", "i"),
+                        Criteria.where("surname").regex("^" + Pattern.quote(value) + "$", "i"),
+                        Criteria.where("email").regex("^" + Pattern.quote(value) + "$", "i")
+                )));
+            }
 
-                operations.add(Aggregation.addFields().addField("cardGroupIdAsObjectId").withValueOf(
-                        new Document("$toObjectId", "$cardGroupId")
-                ).build());
+            // Filtri su date (fromDate / toDate) relativi al cardGroup
+            if (filterObject.getFromDate() != null || filterObject.getToDate() != null) {
+                // Converto cardGroupId in ObjectId per il lookup
+                operations.add(Aggregation.addFields()
+                        .addField("cardGroupIdAsObjectId")
+                        .withValueOf(new Document("$toObjectId", "$cardGroupId"))
+                        .build());
 
-                // Lookup to join CardGroup
                 LookupOperation lookupOperation = LookupOperation.newLookup()
                         .from("fidelity_card_group")
                         .localField("cardGroupIdAsObjectId")
@@ -94,32 +112,43 @@ public class Utility {
                         .as("cardGroup");
                 operations.add(lookupOperation);
 
-                // Unwind the joined CardGroup array
                 operations.add(Aggregation.unwind("cardGroup"));
 
-                // Match criteria on CardGroup's expirationDate
-                if (filterObject.getFromDate() != null && filterObject.getToDate() != null) {
-                    LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
-                    LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
-                } else if (filterObject.getToDate() != null) {
-                    LocalDateTime startDate = filterObject.getToDate().toLocalDate().atStartOfDay();
-                    LocalDateTime endDate = filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX);
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
-                } else if (filterObject.getFromDate() != null) {
-                    LocalDateTime startDate = filterObject.getFromDate().toLocalDate().atStartOfDay();
-                    LocalDateTime endDate = filterObject.getFromDate().toLocalDate().atTime(LocalTime.MAX);
-                    operations.add(Aggregation.match(Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)));
+                // Calcolo intervallo date
+                LocalDateTime startDate = filterObject.getFromDate() != null
+                        ? filterObject.getFromDate().toLocalDate().atStartOfDay()
+                        : null;
+                LocalDateTime endDate = filterObject.getToDate() != null
+                        ? filterObject.getToDate().toLocalDate().atTime(LocalTime.MAX)
+                        : null;
+
+                if (startDate != null && endDate != null) {
+                    operations.add(Aggregation.match(
+                            Criteria.where("cardGroup.expirationDate").gte(startDate).lte(endDate)
+                    ));
+                } else if (startDate != null) {
+                    operations.add(Aggregation.match(
+                            Criteria.where("cardGroup.expirationDate").gte(startDate).lte(startDate.plusDays(1))
+                    ));
+                } else if (endDate != null) {
+                    operations.add(Aggregation.match(
+                            Criteria.where("cardGroup.expirationDate").gte(endDate).lte(endDate.plusDays(1))
+                    ));
                 }
-
             }
-
         }
-        // Add pagination
-        operations.add(Aggregation.skip(pageable.getOffset()));
-        operations.add(Aggregation.limit(pageable.getPageSize()));
+
+        // Paginazione
+        if (withPagination) {
+            operations.add(Aggregation.skip((long) page * size));
+            operations.add(Aggregation.limit(size));
+        }
+
         return operations;
     }
+
+
+
 
     @Data
     public static class CountResult {

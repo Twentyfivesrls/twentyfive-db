@@ -101,12 +101,30 @@ public class ContactService {
     }
 
     /* TODO metodi aggiunta criteri per filtraggio*/
-    public Page<ContactDto> getContactFiltered(ContactDto filterObject, int page, int size, String ownerId) {
+    public Page<ContactDto> getContactFiltered(ContactDto filterObject,
+                                               int page,
+                                               int size,
+                                               String ownerId) {
+
         List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where(USER_KEY).is(ownerId));
-        criteriaList.addAll(parseOtherFilters(filterObject));
-        return this.pageMethod(criteriaList, page, size);
+
+        // 🔹 filtro email SOLO se valorizzato
+        if (filterObject != null && StringUtils.isNotBlank(filterObject.getName())) {
+
+            String value = filterObject.getName().trim();
+
+            if (value.contains("-")) {
+                String[] parts = value.split("-");
+                if (parts.length > 1) {
+                    String email = parts[1].trim();
+                    criteriaList.add(Criteria.where("email").is(email));
+                }
+            }
+        }
+
+        return this.pageMethod(criteriaList, ownerId, page, size);
     }
+
 
     private List<Criteria> parseOtherFilters(ContactDto filterObject){
         List<Criteria> criteriaList = new ArrayList<>();
@@ -119,31 +137,44 @@ public class ContactService {
         return criteriaList;
     }
 
-    private Page<ContactDto> pageMethod(List<Criteria> criteriaList, int page, int size) {
-        Query query = new Query();
-        if(CollectionUtils.isEmpty(criteriaList)){
-            log.info("criteria empty");
+    private Page<ContactDto> pageMethod(List<Criteria> criteriaList,
+                                        String ownerId,
+                                        int page,
+                                        int size) {
 
-        } else {
-            query = new Query().addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+        Query query = new Query();
+
+        // ownerId SEMPRE applicato
+        query.addCriteria(Criteria.where("ownerId").is(ownerId));
+
+        // aggiungo altri filtri solo se presenti
+        if (!CollectionUtils.isEmpty(criteriaList)) {
+            query.addCriteria(new Criteria().andOperator(
+                    criteriaList.toArray(new Criteria[0])
+            ));
         }
 
         long total = mongoTemplate.count(query, Contact.class);
+
         Pageable pageable = PageRequest.of(page, size);
         query.with(pageable);
 
         List<Contact> contacts = mongoTemplate.find(query, Contact.class);
-        List<ContactDto> contactsDto = new ArrayList<>();
-        for (Contact contact : contacts) {
-            contactsDto.add(this.fillContact(contact));
-        }
+
+        List<ContactDto> contactsDto = contacts.stream()
+                .map(this::fillContact)
+                .toList();
+
         return new PageImpl<>(contactsDto, pageable, total);
     }
 
-    public Set<AutoCompleteRes> filterSearch(String find){
+
+
+
+    public Set<AutoCompleteRes> filterSearch(String ownerId,String find){
         //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
         //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(find, find);
-        Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(find, find,find);
+        List<Contact> contacts = contactRepository.findAllByEmailAndOwnerId(find,ownerId);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Contact contact : contacts) {
             AutoCompleteRes temp = new AutoCompleteRes(contact.getName() + " " + contact.getSurname() + " - " + contact.getEmail());

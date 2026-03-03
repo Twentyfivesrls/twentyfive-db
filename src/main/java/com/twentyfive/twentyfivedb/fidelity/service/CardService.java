@@ -23,6 +23,8 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.util.*;
 
+import static com.twentyfive.twentyfivedb.Utility.parseOtherFiltersForFidelityCard;
+
 @Service
 @Slf4j
 public class CardService {
@@ -171,7 +173,7 @@ public class CardService {
     public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
         //Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCase(find);
         //Search by name or surname
-        Set<Card> cards = cardRepository.findAllByOwnerIdAndNameContainingIgnoreCaseOrSurnameContainingIgnoreCaseOrEmailContainingIgnoreCase(find, find, find, ownerId);
+        Set<Card> cards = cardRepository.findAllByOwnerIdAndNameContainingIgnoreCase(ownerId, find);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Card card : cards) {
             AutoCompleteRes temp = new AutoCompleteRes(card.getName() + " " + card.getSurname() + " - " + card.getEmail());
@@ -181,20 +183,23 @@ public class CardService {
     }
 
     public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size, String ownerId) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<AggregationOperation> operations = Utility.parseOtherFiltersForFidelityCard(filterObject, ownerId, pageable);
+       if (filterObject.getName().equals(null) || filterObject.getName() != "") {
+           String[] parts = filterObject.getName().split("-");
+           String email = parts[1].trim();
+           filterObject.setName(email);
+       }
 
-        // Build the aggregation pipeline
-        Aggregation aggregation = Aggregation.newAggregation(operations);
+        List<AggregationOperation> totalPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, false, 0, 0);
+        long total = getTotalCount(totalPipeline);
 
-        // Execute the aggregation query
+        List<AggregationOperation> pagedPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, true, page, size);
+        Aggregation aggregation = Aggregation.newAggregation(pagedPipeline);
         List<Card> cards = mongoTemplate.aggregate(aggregation, "fidelity_card", Card.class).getMappedResults();
 
-        // Get the total count for pagination
-        long total = getTotalCount(operations);
-
+        Pageable pageable = PageRequest.of(page, size);
         return new PageImpl<>(cards, pageable, total);
     }
+
 
     private long getTotalCount(List<AggregationOperation> operations) {
         operations.add(Aggregation.group().count().as("total"));

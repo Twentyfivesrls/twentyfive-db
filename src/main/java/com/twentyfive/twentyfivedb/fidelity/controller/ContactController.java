@@ -47,8 +47,8 @@ public class ContactController {
     }
 
     @PostMapping("/filter/contact/autocomplete")
-    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam("filterObject") String filterObject) {
-        return new ResponseEntity<>(contactService.filterSearch(filterObject), HttpStatus.OK);
+    public ResponseEntity<Set<AutoCompleteRes>> getGroupListAutocomplete(@RequestParam(name = "ownerId") String ownerId,@RequestParam("filterObject") String filterObject) {
+        return new ResponseEntity<>(contactService.filterSearch(ownerId,filterObject), HttpStatus.OK);
     }
 
     @GetMapping("/get-name")
