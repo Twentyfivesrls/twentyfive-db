@@ -174,7 +174,7 @@ public class ContactService {
     public Set<AutoCompleteRes> filterSearch(String ownerId,String find){
         //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
         //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(find, find);
-        List<Contact> contacts = contactRepository.findAllByEmailAndOwnerId(find,ownerId);
+        List<Contact> contacts = contactRepository.findAllByOwnerIdAndEmailContainingIgnoreCase(ownerId,find);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Contact contact : contacts) {
             AutoCompleteRes temp = new AutoCompleteRes(contact.getName() + " " + contact.getSurname() + " - " + contact.getEmail());

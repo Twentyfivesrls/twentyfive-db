@@ -135,6 +135,10 @@ public class CardService {
             card1.setCreationDate(card.getCreationDate());
             card1.setLastScanDate(card.getLastScanDate());
             card1.setIsActive(card.getIsActive());
+            card1.setType(card.getType());
+            card1.setTournamentName(card.getTournamentName());
+            card1.setVoucherAmount(card.getVoucherAmount());
+            card1.setTournamentPosition(card.getTournamentPosition());
             cardRepository.save(card1);
         }
     }
@@ -173,7 +177,7 @@ public class CardService {
     public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
         //Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCase(find);
         //Search by name or surname
-        Set<Card> cards = cardRepository.findAllByOwnerIdAndNameContainingIgnoreCase(ownerId, find);
+        Set<Card> cards = cardRepository.findAllByOwnerIdAndNameContainingIgnoreCaseOrOwnerIdAndSurnameContainingIgnoreCase(ownerId, find,ownerId, find);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Card card : cards) {
             AutoCompleteRes temp = new AutoCompleteRes(card.getName() + " " + card.getSurname() + " - " + card.getEmail());
@@ -212,4 +216,8 @@ public class CardService {
         return countResult.getUniqueMappedResult() != null ? countResult.getUniqueMappedResult().getTotal() : 0;
     }
 
+
+    public Optional<Card> findByEmailAndType(String email, String type) {
+        return cardRepository.findByEmailAndType(email, type);
+    }
 }

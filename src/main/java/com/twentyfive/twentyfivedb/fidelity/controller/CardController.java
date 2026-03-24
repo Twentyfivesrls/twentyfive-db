@@ -159,4 +159,11 @@ public class CardController {
                 .body(excelData);
     }
 
+    @GetMapping("/find-by-email-type")
+    public ResponseEntity<Card> getCardByEmailAndType(@RequestParam String email, @RequestParam String type) {
+        return cardService.findByEmailAndType(email, type)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
