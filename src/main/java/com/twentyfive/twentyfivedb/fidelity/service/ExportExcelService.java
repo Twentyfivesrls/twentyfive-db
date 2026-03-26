@@ -101,6 +101,7 @@ public class ExportExcelService {
             row.createCell(7).setCellValue("Data Creazione");
             row.createCell(8).setCellValue("Data Ultimo Scan");
             row.createCell(9).setCellValue("Attivo/Disattivo");
+            row.createCell(10).setCellValue("Punti");
 
             int rowNum = 1;
             for(Card card : data){
@@ -115,6 +116,7 @@ public class ExportExcelService {
                 row.createCell(7).setCellValue(String.valueOf(card.getCreationDate()));
                 row.createCell(8).setCellValue(String.valueOf(card.getLastScanDate()));
                 row.createCell(9).setCellValue(String.valueOf(card.getIsActive()));
+                row.createCell(10).setCellValue(String.valueOf(card.getVoucherAmount()));
             }
             return getBytes(workbook);
         }catch (IOException e){

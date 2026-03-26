@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import twentyfive.twentyfiveadapter.dto.fidelityDto.FilterCardGroupRequest;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,10 @@ import java.util.regex.Pattern;
 
 @Component
 public class Utility {
+
+    private static final String CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final int DEFAULT_LENGTH = 6;
 
     private Utility() {
     }
@@ -147,7 +152,19 @@ public class Utility {
         return operations;
     }
 
+    public static String generateCode(int length) {
+        StringBuilder sb = new StringBuilder(length);
 
+        for (int i = 0; i < length; i++) {
+            sb.append(CHARSET.charAt(RANDOM.nextInt(CHARSET.length())));
+        }
+
+        return sb.toString();
+    }
+
+    public static String generateCode() {
+        return generateCode(DEFAULT_LENGTH);
+    }
 
 
     @Data

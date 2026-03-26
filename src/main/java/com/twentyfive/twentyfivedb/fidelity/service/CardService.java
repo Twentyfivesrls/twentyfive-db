@@ -66,43 +66,81 @@ public class CardService {
     }
 
     public Card scannerCard(String id) {
+        if (StringUtils.isBlank(id)) {
+            log.error("Card identifier is null or empty");
+            throw new IllegalArgumentException("Card identifier cannot be null or empty");
+        }
+
+        String normalizedId = id.trim();
         Date currentDate = new Date();
-        Card card = cardRepository.findById(id).orElse(null);
-        assert card != null;
-        CardGroup group = cardGroupRepository.findById(card.getCardGroupId()).orElse(null);
-        if(card.isActive){
-            try {
-                assert group != null;
-                cardGroupService.checkExpirationDate(group);
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to scan card");
-            }
-            if (card.getScanNumberExecuted() < group.getScanNumber()) {
-                card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
-                card.setLastScanDate(currentDate);
-                cardRepository.save(card);
-            }
-            if (card.getScanNumberExecuted() == group.getScanNumber()) {
-                Premio premio = new Premio();
-                premio.setCardId(card.getId());
-                premio.setCardComplete(currentDate);
-                prizeRepository.save(premio);
-            }
-        } else {
+
+        Card card = resolveCardForScan(normalizedId);
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId())
+                .orElseThrow(() -> new IllegalArgumentException("CardGroup not found with id: " + card.getCardGroupId()));
+
+        if (!Boolean.TRUE.equals(card.getIsActive())) {
             throw new IllegalStateException("Unable to scan card: The card is not active");
         }
+
+        cardGroupService.checkExpirationDate(group);
+
+        if (card.getScanNumberExecuted() < group.getScanNumber()) {
+            card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
+            card.setLastScanDate(currentDate);
+            cardRepository.save(card);
+
+            if (card.getScanNumberExecuted() == group.getScanNumber()) {
+                savePrizeForCompletedCard(card, currentDate);
+            }
+        }
+
         return card;
     }
 
-    public Card createCard(Card card) {
-        CardGroup group = cardGroupRepository.findById(card.getCardGroupId()).orElse(null);
-        try {
-            assert group != null;
-            cardGroupService.checkExpirationDate(group);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to create card");
+    private Card resolveCardForScan(String identifier) {
+        Optional<Card> cardOptional;
+
+        if (identifier.length() == 6) {
+            log.info("Resolving card by card code: {}", identifier);
+            cardOptional = cardRepository.findByCardCode(identifier);
+        } else if (identifier.length() > 6) {
+            log.info("Resolving card by card id: {}", identifier);
+            cardOptional = cardRepository.findById(identifier);
+        } else {
+            throw new IllegalArgumentException("Invalid card identifier format");
         }
+
+        return cardOptional.orElseThrow(() -> new IllegalArgumentException("Card not found with identifier: " + identifier));
+    }
+
+    private void savePrizeForCompletedCard(Card card, Date completionDate) {
+        Premio premio = new Premio();
+        premio.setCardId(card.getId());
+        premio.setCardComplete(completionDate);
+        prizeRepository.save(premio);
+    }
+
+    public Card createCard(Card card) {
+        if (card == null) {
+            log.error("Card is null");
+            throw new IllegalArgumentException("Card cannot be null");
+        }
+
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId())
+                .orElseThrow(() -> new IllegalArgumentException("CardGroup not found with id: " + card.getCardGroupId()));
+
+        cardGroupService.checkExpirationDate(group);
+
+        this.addCodeToCard(card);
         return cardRepository.save(card);
+    }
+
+    private void addCodeToCard(Card card) {
+        String code;
+        do {
+            code = Utility.generateCode();
+        } while (cardRepository.findByCardCode(code).isPresent());
+        card.setCardCode(code);
     }
 
     public void deleteCard(String id) {
