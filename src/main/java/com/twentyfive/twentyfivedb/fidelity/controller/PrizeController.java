@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.TransactionDto;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
 
 import java.util.List;
@@ -48,10 +49,10 @@ public class PrizeController {
         }
     }
 
-    @GetMapping("/claim-last-prize/{cardId}")
-    public ResponseEntity<Premio> claimLastPrize(@PathVariable String cardId) {
+    @PostMapping("/claim-last-prize")
+    public ResponseEntity<Premio> claimLastPrize(@RequestBody TransactionDto transactionDto) {
         try {
-            Premio ultimoPremio = prizeService.claimLastPrize(cardId);
+            Premio ultimoPremio = prizeService.claimLastPrize(transactionDto);
             return new ResponseEntity<>(ultimoPremio, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

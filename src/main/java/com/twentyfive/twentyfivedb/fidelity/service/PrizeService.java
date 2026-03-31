@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import twentyfive.twentyfiveadapter.dto.fidelityDto.TransactionDto;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Premio;
@@ -87,17 +88,33 @@ public class PrizeService {
         }
     }
 
-    public Premio claimLastPrize(String cardId) {
+    public Premio claimLastPrize(TransactionDto transactionDto) {
         Date currentDate = new Date();
-        Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdOrderByCardCompleteDesc(cardId));
+        Optional<Card> card = cardRepository.findById(transactionDto.getIdCard());
 
-        if (ultimoPremioOptional.isPresent()) {
-            Premio ultimoPremio = ultimoPremioOptional.get();
-            ultimoPremio.setClaimed(true);
-            ultimoPremio.setClaimDate(currentDate);
-            return prizeRepository.save(ultimoPremio);
+        if (card.isEmpty()) {
+            throw new RuntimeException("Carta non trovata con ID: " + transactionDto.getIdCard());
         } else {
-            throw new RuntimeException("Nessun premio trovato per la carta con ID: " + cardId);
+            if (!card.get().getType().equals("voucher")) {
+                Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdOrderByCardCompleteDesc(transactionDto.getIdCard()));
+
+                if (ultimoPremioOptional.isPresent()) {
+                    Premio ultimoPremio = ultimoPremioOptional.get();
+                    ultimoPremio.setClaimed(true);
+                    ultimoPremio.setClaimDate(currentDate);
+                    return prizeRepository.save(ultimoPremio);
+                } else {
+                    throw new RuntimeException("Nessun premio trovato per la carta con ID: " + transactionDto.getIdCard());
+                }
+            } else {
+                Premio premio = new Premio();
+                premio.setCardId(transactionDto.getIdCard());
+                premio.setClaimDate(currentDate);
+                premio.setNote(transactionDto.getNote());
+                premio.setPoints(transactionDto.getAmount());
+                return prizeRepository.save(premio);
+            }
         }
+
     }
 }
