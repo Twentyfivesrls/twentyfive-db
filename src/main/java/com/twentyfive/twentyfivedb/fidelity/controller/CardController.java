@@ -160,10 +160,15 @@ public class CardController {
     }
 
     @GetMapping("/find-by-email-type")
-    public ResponseEntity<Card> getCardByEmailAndType(@RequestParam String email, @RequestParam String type) {
-        return cardService.findByEmailAndType(email, type)
+    public ResponseEntity<Card> getCardByEmailAndType(@RequestParam String email, @RequestParam String type, @RequestParam("groupId") String groupId) {
+        return cardService.findByEmailAndType(email, type, groupId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/find-all-by-customer")
+    public ResponseEntity<List<Card>> findAllByCustomer(@RequestParam String customerId) {
+        return ResponseEntity.ok(cardService.findAllByCustomer(customerId));
     }
 
 }

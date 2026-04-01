@@ -31,6 +31,6 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
     Optional<Card> findByCardCode(String cardCode);
     // Java
-    Optional<Card> findByEmailAndType(String email, String type);
+    Optional<Card> findByEmailAndTypeAndCardGroupId(String email, String type, String cardGroupId);
 
 }

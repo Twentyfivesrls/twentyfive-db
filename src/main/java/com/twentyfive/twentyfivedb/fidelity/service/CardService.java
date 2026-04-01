@@ -255,7 +255,11 @@ public class CardService {
     }
 
 
-    public Optional<Card> findByEmailAndType(String email, String type) {
-        return cardRepository.findByEmailAndType(email, type);
+    public Optional<Card> findByEmailAndType(String email, String type, String cardGroupId) {
+        return cardRepository.findByEmailAndTypeAndCardGroupId(email, type, cardGroupId);
+    }
+
+    public List<Card> findAllByCustomer(String customerId) {
+        return cardRepository.findAllByCustomerId(customerId);
     }
 }
