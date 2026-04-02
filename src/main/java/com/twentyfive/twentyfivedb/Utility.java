@@ -92,6 +92,11 @@ public class Utility {
                 operations.add(Aggregation.match(Criteria.where("isActive").is(filterObject.getIsActive())));
             }
 
+            // Filtro su cardGroupId
+            if (filterObject.getCardGroupId() != null && !filterObject.getCardGroupId().isEmpty()) {
+                operations.add(Aggregation.match(Criteria.where("cardGroupId").is(filterObject.getCardGroupId())));
+            }
+
             // Filtro su name OR surname OR email (case-insensitive)
             if (filterObject.getName() != null && !filterObject.getName().isEmpty()) {
                 String value = filterObject.getName();

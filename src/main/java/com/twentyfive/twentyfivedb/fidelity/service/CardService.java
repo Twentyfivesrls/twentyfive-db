@@ -225,7 +225,7 @@ public class CardService {
     }
 
     public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size, String ownerId) {
-       if (filterObject.getName().equals(null) || filterObject.getName() != "") {
+       if (filterObject.getName() != null && !filterObject.getName().isBlank()) {
            String[] parts = filterObject.getName().split("-");
            String email = parts[1].trim();
            filterObject.setName(email);
@@ -261,5 +261,9 @@ public class CardService {
 
     public List<Card> findAllByCustomer(String customerId) {
         return cardRepository.findAllByCustomerId(customerId);
+    }
+
+    public Card findByCardCodeLike(String cardCode) {
+        return cardRepository.findByCardCodeContainingIgnoreCase(cardCode);
     }
 }

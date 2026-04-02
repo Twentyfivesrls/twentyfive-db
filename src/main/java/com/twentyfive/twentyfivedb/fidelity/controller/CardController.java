@@ -171,4 +171,10 @@ public class CardController {
         return ResponseEntity.ok(cardService.findAllByCustomer(customerId));
     }
 
+    @GetMapping("/find-by-card-code")
+    public ResponseEntity<Card> findByCardCode(@RequestParam String cardCode) {
+        return ResponseEntity.ok(cardService.findByCardCodeLike(cardCode));
+    }
+
+
 }

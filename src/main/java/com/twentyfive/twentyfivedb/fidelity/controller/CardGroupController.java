@@ -14,6 +14,7 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -113,5 +114,10 @@ public class CardGroupController {
     @GetMapping("/count")
     public ResponseEntity<Long> countGroups(@RequestParam String ownerId) {
         return ResponseEntity.ok(cardGroupService.countGroups(ownerId));
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<CardGroup>> getAllGroups(@RequestParam String ownerId) {
+        return ResponseEntity.ok(cardGroupService.getAllGroups(ownerId));
     }
 }

@@ -225,4 +225,8 @@ public class CardGroupService {
         groupDto.setAssociatedCard(cardRepository.findAllByCardGroupId(cardGroup.getId()).size());
         return groupDto;
     }
+
+    public List<CardGroup> getAllGroups(String ownerId){
+        return cardGroupRepository.findAllByOwnerId(ownerId);
+    }
 }

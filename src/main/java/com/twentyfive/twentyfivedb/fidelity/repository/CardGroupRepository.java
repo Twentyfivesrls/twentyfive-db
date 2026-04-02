@@ -13,6 +13,7 @@ import java.util.Set;
 @Repository
 public interface CardGroupRepository extends MongoRepository<CardGroup, String> {
     Page<CardGroup> findAllByOwnerId(String ownerId, Pageable pageable);
+    List<CardGroup> findAllByOwnerId(String ownerId);
 
     List<CardGroup> findAllListByOwnerId(String ownerId);
 

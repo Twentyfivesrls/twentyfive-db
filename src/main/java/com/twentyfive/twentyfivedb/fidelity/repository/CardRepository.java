@@ -30,6 +30,7 @@ public interface CardRepository extends MongoRepository<Card, String> {
     List<Card> findAllByCustomerId(String customerId);
 
     Optional<Card> findByCardCode(String cardCode);
+    Card findByCardCodeContainingIgnoreCase(String cardCode);
     // Java
     Optional<Card> findByEmailAndTypeAndCardGroupId(String email, String type, String cardGroupId);
 
