@@ -15,10 +15,11 @@ public class FidelityProfileService {
     }
 
     public ProfileFidelity createImageName(ProfileFidelity imageName) {
-        ProfileFidelity existingImage = profileRepository.findAllByImageName(imageName.getImageName());
+        ProfileFidelity existingImage = profileRepository.findAllByOwnerId(imageName.getOwnerId());
 
         if (existingImage != null) {
-            throw new IllegalArgumentException("An image with the same name already exists");
+            existingImage.setImageName(imageName.getImageName());
+            return profileRepository.save(existingImage);
         }
 
         return profileRepository.save(imageName);

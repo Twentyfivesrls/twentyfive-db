@@ -30,11 +30,13 @@ public class CardGroupService {
     private final MongoTemplate mongoTemplate;
     private final CardRepository cardRepository;
     private static final String USER_KEY = "ownerId";
+    private final FidelityProfileService fidelityProfileService;
 
-    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate, CardRepository cardRepository) {
+    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate, CardRepository cardRepository, FidelityProfileService fidelityProfileService) {
         this.cardGroupRepository = cardGroupRepository;
         this.mongoTemplate = mongoTemplate;
         this.cardRepository = cardRepository;
+        this.fidelityProfileService = fidelityProfileService;
     }
 
     public CardGroupDto getCardGroup(String id) {
@@ -63,6 +65,7 @@ public class CardGroupService {
         List<Card> list = cardRepository.findAllByCardGroupId(id);
         cardRepository.deleteAll(list);
         this.cardGroupRepository.deleteById(id);
+        this.fidelityProfileService.deleteImageName(id);
     }
 
     public void updateCardGroup(String id, CardGroup cardGroup) {

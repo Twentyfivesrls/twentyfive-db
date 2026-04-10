@@ -11,5 +11,5 @@ public interface PrizeRepository extends MongoRepository<Premio, String> {
 
     Page<Premio> findAllByCardIdIgnoreCase(String id, Pageable pageable);
 
-    Premio findTopByCardIdOrderByCardCompleteDesc(String cardId);
+    Premio findTopByCardIdAndClaimedFalseOrderByCardCompleteDesc(String cardId);
 }

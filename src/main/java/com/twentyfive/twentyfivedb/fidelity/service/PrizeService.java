@@ -96,7 +96,7 @@ public class PrizeService {
             throw new RuntimeException("Carta non trovata con ID: " + transactionDto.getIdCard());
         } else {
             if (!card.get().getType().equals("voucher")) {
-                Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdOrderByCardCompleteDesc(transactionDto.getIdCard()));
+                Optional<Premio> ultimoPremioOptional = Optional.ofNullable(prizeRepository.findTopByCardIdAndClaimedFalseOrderByCardCompleteDesc(transactionDto.getIdCard()));
 
                 if (ultimoPremioOptional.isPresent()) {
                     Premio ultimoPremio = ultimoPremioOptional.get();

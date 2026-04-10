@@ -175,7 +175,11 @@ public class CardService {
             card1.setIsActive(card.getIsActive());
             card1.setType(card.getType());
             card1.setTournamentName(card.getTournamentName());
-            card1.setVoucherAmount(card.getVoucherAmount());
+            if (card1.getType().equals("voucher")) {
+                card1.setVoucherAmount(card.getVoucherAmount());
+            } else {
+                card1.setVoucherAmount(null);
+            }
             card1.setTournamentPosition(card.getTournamentPosition());
             cardRepository.save(card1);
         }
