@@ -104,6 +104,25 @@
             <version>3.0.5.M3</version>
         </dependency>
 
+        <!-- BouncyCastle: firma PKCS#7 per Apple Wallet -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.77</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk18on</artifactId>
+            <version>1.77</version>
+        </dependency>
+
+        <!-- JWT signing per Google Wallet -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>
