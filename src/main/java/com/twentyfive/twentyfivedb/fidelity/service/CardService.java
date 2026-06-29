@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.service;
 
 import com.twentyfive.twentyfivedb.Utility;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.InactiveCardGroup;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.PrizeRepository;
@@ -82,19 +83,43 @@ public class CardService {
             throw new IllegalStateException("Unable to scan card: The card is not active");
         }
 
+        if (!Boolean.TRUE.equals(group.getIsActive())) {
+            throw new InactiveCardGroup("Unable to scan card: The card group is not active");
+        }
+
         cardGroupService.checkExpirationDate(group);
 
-        if (card.getScanNumberExecuted() < group.getScanNumber()) {
-            card.setScanNumberExecuted(card.getScanNumberExecuted() + 1);
+        int target = group.getScanNumber();
+        int before = card.getScanNumberExecuted();
+        boolean isVoucher = "voucher".equals(card.getType());
+
+        // Le card fidelity possono superare scanNumber; le altre restano limitate al traguardo
+        if (!isVoucher || before < target) {
+            int after = before + 1;
+            card.setScanNumberExecuted(after);
             card.setLastScanDate(currentDate);
             cardRepository.save(card);
 
-            if (card.getScanNumberExecuted() == group.getScanNumber()) {
-                savePrizeForCompletedCard(card, currentDate);
-            }
+            // Un premio per ogni ciclo completato (a scanNumber, 2*scanNumber, ...)
+            generatePrizesForCompletedCycles(card, before, after, target, currentDate);
         }
 
         return card;
+    }
+
+    /**
+     * Genera un premio per ogni multiplo di {@code target} (la soglia del gruppo)
+     * attraversato passando da {@code before} a {@code after}.
+     * Es. target=100: a 100 un premio, a 200 un altro, ecc.
+     */
+    private void generatePrizesForCompletedCycles(Card card, int before, int after, int target, Date date) {
+        if (target <= 0) {
+            return;
+        }
+        int completedCycles = (after / target) - (before / target);
+        for (int i = 0; i < completedCycles; i++) {
+            savePrizeForCompletedCard(card, date);
+        }
     }
 
     private Card resolveCardForScan(String identifier) {
@@ -199,15 +224,47 @@ public class CardService {
     }
 
     public void resetScanExecuted(String id) {
-        Optional<Card> optionalCard = cardRepository.findById(id);
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("La carta con ID " + id + " non esiste"));
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId())
+                .orElseThrow(() -> new IllegalArgumentException("CardGroup not found with id: " + card.getCardGroupId()));
 
-        if (optionalCard.isPresent()) {
-            Card card = optionalCard.get();
-            card.setScanNumberExecuted(0);
-            cardRepository.save(card);
-        } else {
-            throw new IllegalArgumentException("La carta con ID " + id + " non esiste");
+        int target = group.getScanNumber();
+        int current = card.getScanNumberExecuted();
+        // Se la raccolta è oltre il traguardo, scala un ciclo mantenendo il surplus; altrimenti azzera
+        card.setScanNumberExecuted(current > target ? current - target : 0);
+        cardRepository.save(card);
+    }
+
+    /**
+     * Aggiunge più scansioni in una sola operazione: incrementa scanNumberExecuted
+     * di {@code times} (può superare scanNumber) e genera un premio per ogni ciclo
+     * (multiplo di scanNumber) completato — anche più di uno se l'aggiunta supera
+     * più traguardi in una volta.
+     */
+    public Card addScans(String id, int times) {
+        if (times <= 0) {
+            throw new IllegalArgumentException("Il numero di scansioni da aggiungere deve essere positivo");
         }
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("La carta con ID " + id + " non esiste"));
+        CardGroup group = cardGroupRepository.findById(card.getCardGroupId())
+                .orElseThrow(() -> new IllegalArgumentException("CardGroup not found with id: " + card.getCardGroupId()));
+
+        int target = group.getScanNumber();
+        int before = card.getScanNumberExecuted();
+        int newExecuted = before + times;   // può superare scanNumber
+
+        Date now = new Date();
+        card.setScanNumberExecuted(newExecuted);
+        card.setLastScanDate(now);
+        cardRepository.save(card);
+
+        // Un premio per ogni ciclo completato attraversando il/i traguardo/i
+        generatePrizesForCompletedCycles(card, before, newExecuted, target, now);
+
+        return card;
     }
 
 
@@ -217,22 +274,42 @@ public class CardService {
     }
 
     public Set<AutoCompleteRes> filterSearch(String find, String ownerId) {
-        //Set<Card> cards = cardRepository.findAllByNameContainingIgnoreCase(find);
-        //Search by name or surname
-        Set<Card> cards = cardRepository.findAllByOwnerIdAndNameContainingIgnoreCaseOrOwnerIdAndSurnameContainingIgnoreCase(ownerId, find,ownerId, find);
+        // Ricerca per nome o cognome (parziale) + per codice card (parziale)
+        Set<Card> cards = new HashSet<>();
+        cards.addAll(cardRepository.findAllByOwnerIdAndNameContainingIgnoreCaseOrOwnerIdAndSurnameContainingIgnoreCase(ownerId, find, ownerId, find));
+        cards.addAll(cardRepository.findAllByOwnerIdAndCardCodeContainingIgnoreCase(ownerId, find));
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Card card : cards) {
-            AutoCompleteRes temp = new AutoCompleteRes(card.getName() + " " + card.getSurname() + " - " + card.getEmail());
-            setCombinato.add(temp);
+            setCombinato.add(new AutoCompleteRes(buildAutocompleteLabel(card)));
         }
         return setCombinato;
     }
 
+    /**
+     * Costruisce l'etichetta del suggerimento autocomplete.
+     * Il token finale (dopo " - ") è l'identificativo usato per filtrare:
+     * l'email se presente, altrimenti il codice card (sempre presente e univoco).
+     */
+    private String buildAutocompleteLabel(Card card) {
+        String name = card.getName() != null ? card.getName() : "";
+        String surname = card.getSurname() != null ? card.getSurname() : "";
+        String fullName = (name + " " + surname).trim();
+        String token = (card.getEmail() != null && !card.getEmail().isBlank())
+                ? card.getEmail()
+                : card.getCardCode();
+        return fullName.isEmpty() ? token : fullName + " - " + token;
+    }
+
     public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size, String ownerId) {
-       if (filterObject.getName() != null && !filterObject.getName().isBlank()) {
-           String[] parts = filterObject.getName().split("-");
-           String email = parts[1].trim();
-           filterObject.setName(email);
+       // Dal suggerimento "Nome Cognome - <token>" estraggo il token finale (email o codice card)
+       // su cui effettuare la ricerca parziale (vedi parseOtherFiltersForFidelityCard).
+       if (filterObject.getSearchText() != null && !filterObject.getSearchText().isBlank()) {
+           String term = filterObject.getSearchText().trim();
+           int sep = term.lastIndexOf(" - ");
+           if (sep >= 0) {
+               term = term.substring(sep + 3).trim();
+           }
+           filterObject.setSearchText(term);
        }
 
         List<AggregationOperation> totalPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, false, 0, 0);

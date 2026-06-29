@@ -97,6 +97,11 @@ public class Utility {
                 operations.add(Aggregation.match(Criteria.where("cardGroupId").is(filterObject.getCardGroupId())));
             }
 
+            // Filtro su type (fidelity / voucher)
+            if (filterObject.getType() != null && !filterObject.getType().isEmpty()) {
+                operations.add(Aggregation.match(Criteria.where("type").is(filterObject.getType())));
+            }
+
             // Filtro su name OR surname OR email (case-insensitive)
             if (filterObject.getName() != null && !filterObject.getName().isEmpty()) {
                 String value = filterObject.getName();
@@ -104,6 +109,17 @@ public class Utility {
                         Criteria.where("name").regex("^" + Pattern.quote(value) + "$", "i"),
                         Criteria.where("surname").regex("^" + Pattern.quote(value) + "$", "i"),
                         Criteria.where("email").regex("^" + Pattern.quote(value) + "$", "i")
+                )));
+            }
+
+            // Ricerca unificata su name OR surname OR email OR cardCode (parziale, case-insensitive)
+            if (filterObject.getSearchText() != null && !filterObject.getSearchText().isEmpty()) {
+                String value = filterObject.getSearchText();
+                operations.add(Aggregation.match(new Criteria().orOperator(
+                        Criteria.where("name").regex(Pattern.quote(value), "i"),
+                        Criteria.where("surname").regex(Pattern.quote(value), "i"),
+                        Criteria.where("email").regex(Pattern.quote(value), "i"),
+                        Criteria.where("cardCode").regex(Pattern.quote(value), "i")
                 )));
             }
 

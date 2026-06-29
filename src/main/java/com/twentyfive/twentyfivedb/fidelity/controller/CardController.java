@@ -1,6 +1,7 @@
 package com.twentyfive.twentyfivedb.fidelity.controller;
 
 import com.twentyfive.twentyfivedb.fidelity.exceptions.ExpiredCard;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.InactiveCardGroup;
 import com.twentyfive.twentyfivedb.fidelity.exceptions.InvalidCard;
 import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.fidelity.service.CardService;
@@ -80,6 +81,11 @@ public class CardController {
         cardService.resetScanExecuted(id);
     }
 
+    @PutMapping("/add-scans/{id}")
+    public ResponseEntity<Card> addScans(@PathVariable String id, @RequestParam("times") int times) {
+        return ResponseEntity.ok(cardService.addScans(id, times));
+    }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<Card> getCard(@PathVariable String id) {
         return ResponseEntity.ok(cardService.getCard(id));
@@ -112,7 +118,11 @@ public class CardController {
     public ResponseEntity<Card> scanningCard(@PathVariable String id) {
         try{
             return ResponseEntity.ok(cardService.scannerCard(id));
-        }catch (NotFoundException e) {
+        } catch (InactiveCardGroup e) {
+            // Gruppo card non attivo: status dedicato (409) per distinguerlo dagli altri errori
+            System.err.println("Gruppo card non attivo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (NotFoundException e) {
             System.err.println("Card non riconosciuta: " + e.getMessage());
         } catch (ExpiredCard e) {
             System.err.println("Card scaduto: " + e.getMessage());
