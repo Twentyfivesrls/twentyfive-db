@@ -2,6 +2,7 @@ package com.twentyfive.twentyfivedb.fidelity.service;
 
 import com.twentyfive.twentyfivedb.Utility;
 import com.twentyfive.twentyfivedb.fidelity.exceptions.InactiveCardGroup;
+import com.twentyfive.twentyfivedb.fidelity.exceptions.NotFoundException;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardGroupRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.CardRepository;
 import com.twentyfive.twentyfivedb.fidelity.repository.PrizeRepository;
@@ -34,14 +35,16 @@ public class CardService {
     private final MongoTemplate mongoTemplate;
     private final CardGroupService cardGroupService;
     private final CardGroupRepository cardGroupRepository;
+    private final AuditLogService auditLogService;
     private static final String USER_KEY = "ownerId";
 
-    public CardService(CardRepository cardRepository, PrizeRepository prizeRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService, CardGroupRepository cardGroupRepository) {
+    public CardService(CardRepository cardRepository, PrizeRepository prizeRepository, MongoTemplate mongoTemplate, CardGroupService cardGroupService, CardGroupRepository cardGroupRepository, AuditLogService auditLogService) {
         this.cardRepository = cardRepository;
         this.prizeRepository = prizeRepository;
         this.mongoTemplate = mongoTemplate;
         this.cardGroupService = cardGroupService;
         this.cardGroupRepository = cardGroupRepository;
+        this.auditLogService = auditLogService;
     }
 
     public Card getCard(String id) {
@@ -157,7 +160,10 @@ public class CardService {
         cardGroupService.checkExpirationDate(group);
 
         this.addCodeToCard(card);
-        return cardRepository.save(card);
+        Card saved = cardRepository.save(card);
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CREATE,
+                saved.getId(), saved.getOwnerId(), saved.getCardCode());
+        return saved;
     }
 
     private void addCodeToCard(Card card) {
@@ -169,7 +175,10 @@ public class CardService {
     }
 
     public void deleteCard(String id) {
+        Card card = cardRepository.findById(id).orElse(null);
         this.cardRepository.deleteById(id);
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_DELETE,
+                id, card != null ? card.getOwnerId() : null, card != null ? card.getCardCode() : null);
     }
 
     public void updateCard(String id, Card card) {
@@ -183,31 +192,27 @@ public class CardService {
             throw new IllegalArgumentException("Card is null or empty");
         }
 
-        Card card1 = cardRepository.findById(id).orElse(null);
+        // L'update NON deve creare card: la creazione ha il suo endpoint dedicato (/card/create).
+        Card card1 = cardRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Card non trovata con id: " + id));
 
-        if (card1 == null) {
-            //se la card non esiste allora la creo
-            this.createCard(card);
-        } else {
-            //se la card esiste aggiorno
-            card1.setName(card.getName());
-            card1.setSurname(card.getSurname());
-            card1.setEmail(card.getEmail());
-            card1.setPhoneNumber(card.getPhoneNumber());
-            card1.setScanNumberExecuted(card.getScanNumberExecuted());
-            card1.setCreationDate(card.getCreationDate());
-            card1.setLastScanDate(card.getLastScanDate());
-            card1.setIsActive(card.getIsActive());
-            card1.setType(card.getType());
-            card1.setTournamentName(card.getTournamentName());
-            if (card1.getType().equals("voucher")) {
-                card1.setVoucherAmount(card.getVoucherAmount());
-            } else {
-                card1.setVoucherAmount(null);
-            }
-            card1.setTournamentPosition(card.getTournamentPosition());
-            cardRepository.save(card1);
+        card1.setName(card.getName());
+        card1.setSurname(card.getSurname());
+        card1.setEmail(card.getEmail());
+        card1.setPhoneNumber(card.getPhoneNumber());
+        card1.setScanNumberExecuted(card.getScanNumberExecuted());
+        card1.setCreationDate(card.getCreationDate());
+        card1.setLastScanDate(card.getLastScanDate());
+        card1.setIsActive(card.getIsActive());
+        card1.setType(card.getType());
+        card1.setTournamentName(card.getTournamentName());
+        // NB: il saldo voucher NON si modifica qui: ogni variazione deve passare
+        // dall'operazione tracciata (claim-last-prize), per avere il log completo.
+        if (!"voucher".equals(card1.getType())) {
+            card1.setVoucherAmount(null);
         }
+        card1.setTournamentPosition(card.getTournamentPosition());
+        cardRepository.save(card1);
     }
 
     public void updateStatus(String id, Boolean status) {

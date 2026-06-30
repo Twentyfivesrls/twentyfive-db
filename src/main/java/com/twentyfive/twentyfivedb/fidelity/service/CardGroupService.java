@@ -31,12 +31,14 @@ public class CardGroupService {
     private final CardRepository cardRepository;
     private static final String USER_KEY = "ownerId";
     private final FidelityProfileService fidelityProfileService;
+    private final AuditLogService auditLogService;
 
-    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate, CardRepository cardRepository, FidelityProfileService fidelityProfileService) {
+    public CardGroupService(CardGroupRepository cardGroupRepository, MongoTemplate mongoTemplate, CardRepository cardRepository, FidelityProfileService fidelityProfileService, AuditLogService auditLogService) {
         this.cardGroupRepository = cardGroupRepository;
         this.mongoTemplate = mongoTemplate;
         this.cardRepository = cardRepository;
         this.fidelityProfileService = fidelityProfileService;
+        this.auditLogService = auditLogService;
     }
 
     public CardGroupDto getCardGroup(String id) {
@@ -52,7 +54,10 @@ public class CardGroupService {
     public CardGroup createCardGroup(CardGroup cardGroup) {
         cardGroup.setExpirationDate(cardGroup.getExpirationDate());
         this.checkExpirationDate(cardGroup);
-        return this.cardGroupRepository.save(cardGroup);
+        CardGroup saved = this.cardGroupRepository.save(cardGroup);
+        auditLogService.log(AuditLogService.ENTITY_CARD_GROUP, AuditLogService.OP_CREATE,
+                saved.getId(), saved.getOwnerId(), saved.getName());
+        return saved;
     }
 
     public long numberCards(String groupId){
@@ -62,10 +67,14 @@ public class CardGroupService {
     }
 
     public void deleteCardGroup(String id) {
+        CardGroup group = cardGroupRepository.findById(id).orElse(null);
         List<Card> list = cardRepository.findAllByCardGroupId(id);
         cardRepository.deleteAll(list);
         this.cardGroupRepository.deleteById(id);
         this.fidelityProfileService.deleteImageName(id);
+        auditLogService.log(AuditLogService.ENTITY_CARD_GROUP, AuditLogService.OP_DELETE,
+                id, group != null ? group.getOwnerId() : null,
+                (group != null ? group.getName() : null) + " (" + list.size() + " carte eliminate in cascata)");
     }
 
     public void updateCardGroup(String id, CardGroup cardGroup) {

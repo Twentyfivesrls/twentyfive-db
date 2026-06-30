@@ -104,8 +104,14 @@ public class CardController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Void> updateCard(@PathVariable String id, @RequestBody Card card) {
-        cardService.updateCard(id, card);
-        return ResponseEntity.ok().build();
+        try {
+            cardService.updateCard(id, card);
+            return ResponseEntity.ok().build();
+        } catch (NotFoundException e) {
+            // L'update non crea card: se l'id non esiste è 404
+            System.err.println("Card non trovata in update: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PutMapping("/status/{id}")

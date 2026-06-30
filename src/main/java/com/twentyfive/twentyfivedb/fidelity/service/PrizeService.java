@@ -107,11 +107,18 @@ public class PrizeService {
                     throw new RuntimeException("Nessun premio trovato per la carta con ID: " + transactionDto.getIdCard());
                 }
             } else {
+                // Voucher: la variazione del saldo e il suo log avvengono insieme, lato server.
+                Card voucherCard = card.get();
+                int amount = transactionDto.getAmount() != null ? transactionDto.getAmount() : 0;
+                int current = voucherCard.getVoucherAmount() != null ? voucherCard.getVoucherAmount() : 0;
+                voucherCard.setVoucherAmount(current + amount);   // saldo calcolato lato server
+                cardRepository.save(voucherCard);
+
                 Premio premio = new Premio();
-                premio.setCardId(transactionDto.getIdCard());
+                premio.setCardId(voucherCard.getId());
                 premio.setClaimDate(currentDate);
                 premio.setNote(transactionDto.getNote());
-                premio.setPoints(transactionDto.getAmount());
+                premio.setPoints(amount);
                 return prizeRepository.save(premio);
             }
         }
