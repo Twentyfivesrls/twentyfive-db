@@ -109,19 +109,25 @@ public class PrizeService {
             } else {
                 // Voucher: la variazione del saldo e il suo log avvengono insieme, lato server.
                 Card voucherCard = card.get();
-                int amount = transactionDto.getAmount() != null ? transactionDto.getAmount() : 0;
-                int current = voucherCard.getVoucherAmount() != null ? voucherCard.getVoucherAmount() : 0;
-                voucherCard.setVoucherAmount(current + amount);   // saldo calcolato lato server
+                double amount = transactionDto.getAmount() != null ? transactionDto.getAmount() : 0.0;
+                double current = voucherCard.getVoucherAmount() != null ? voucherCard.getVoucherAmount() : 0.0;
+                double newBalance = roundTwoDecimals(current + amount);   // saldo calcolato lato server (2 decimali)
+                voucherCard.setVoucherAmount(newBalance);
                 cardRepository.save(voucherCard);
 
                 Premio premio = new Premio();
                 premio.setCardId(voucherCard.getId());
                 premio.setClaimDate(currentDate);
                 premio.setNote(transactionDto.getNote());
-                premio.setPoints(amount);
+                premio.setPoints(roundTwoDecimals(amount));
                 return prizeRepository.save(premio);
             }
         }
 
+    }
+
+    /** Arrotonda a 2 decimali (i punti voucher supportano i centesimi). */
+    private double roundTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
