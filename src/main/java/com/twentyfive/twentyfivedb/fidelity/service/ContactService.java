@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,10 +172,18 @@ public class ContactService {
 
 
 
-    public Set<AutoCompleteRes> filterSearch(String ownerId,String find){
-        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCase(find);
-        //Set<Contact> contacts = contactRepository.findAllByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(find, find);
-        List<Contact> contacts = contactRepository.findAllByOwnerIdAndEmailContainingIgnoreCase(ownerId,find);
+    public Set<AutoCompleteRes> filterSearch(String ownerId, String find){
+        // Ricerca (owner-scoped) per nome OR cognome OR email, parziale e case-insensitive
+        String term = find != null ? find : "";
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("ownerId").is(ownerId),
+                new Criteria().orOperator(
+                        Criteria.where("name").regex(Pattern.quote(term), "i"),
+                        Criteria.where("surname").regex(Pattern.quote(term), "i"),
+                        Criteria.where("email").regex(Pattern.quote(term), "i")
+                )
+        );
+        List<Contact> contacts = mongoTemplate.find(new Query(criteria), Contact.class);
         Set<AutoCompleteRes> setCombinato = new HashSet<>();
         for (Contact contact : contacts) {
             AutoCompleteRes temp = new AutoCompleteRes(contact.getName() + " " + contact.getSurname() + " - " + contact.getEmail());
