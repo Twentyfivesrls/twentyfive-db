@@ -98,6 +98,18 @@ public class ContactService {
             contact1.setPhoneNumber(contact.getPhoneNumber());
             contact1.setCreationDate(contact.getCreationDate());
             contactRepository.save(contact1);
+
+            // Propago i dati aggiornati alle card collegate al contatto (denormalizzati via customerId)
+            List<Card> linkedCards = cardRepository.findAllByCustomerId(id);
+            for (Card card : linkedCards) {
+                card.setName(contact1.getName());
+                card.setSurname(contact1.getSurname());
+                card.setEmail(contact1.getEmail());
+                card.setPhoneNumber(contact1.getPhoneNumber());
+            }
+            if (!linkedCards.isEmpty()) {
+                cardRepository.saveAll(linkedCards);
+            }
         }
     }
 
