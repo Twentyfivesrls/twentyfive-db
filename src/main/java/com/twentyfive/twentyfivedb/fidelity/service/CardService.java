@@ -215,6 +215,16 @@ public class CardService {
         cardRepository.save(card1);
     }
 
+    /** Sposta la card in un altro gruppo mantenendo TUTTO il resto (punti/saldo inclusi). */
+    public Card changeGroup(String id, String groupId) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Card non trovata con id: " + id));
+        cardGroupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Gruppo card non trovato con id: " + groupId));
+        card.setCardGroupId(groupId);
+        return cardRepository.save(card);
+    }
+
     public void updateStatus(String id, Boolean status) {
         if (StringUtils.isBlank(id)) {
             log.error("Id cannot be null or empty");

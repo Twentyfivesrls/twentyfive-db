@@ -100,8 +100,17 @@ public class CardGroupService {
             cardGroup1.setScanNumber(cardGroup.getScanNumber());
             cardGroup1.setNumberOfDaysForPrize(cardGroup.getNumberOfDaysForPrize());
             cardGroup1.setIsActive(cardGroup.getIsActive());
+            cardGroup1.setCategories(cardGroup.getCategories());
             cardGroupRepository.save(cardGroup1);
         }
+    }
+
+    /** Aggiorna SOLO le categorie del gruppo (senza toccare gli altri campi). */
+    public void updateCategories(String id, List<String> categories) {
+        CardGroup cardGroup = cardGroupRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Gruppo card non trovato con id: " + id));
+        cardGroup.setCategories(categories);
+        cardGroupRepository.save(cardGroup);
     }
 
     public void updateStatus(String id, Boolean status){
@@ -235,6 +244,7 @@ public class CardGroupService {
         groupDto.setNumberOfDaysForPrize(cardGroup.getNumberOfDaysForPrize());
         groupDto.setIsActive(cardGroup.getIsActive());
         groupDto.setAssociatedCard(cardRepository.findAllByCardGroupId(cardGroup.getId()).size());
+        groupDto.setCategories(cardGroup.getCategories());
         return groupDto;
     }
 

@@ -120,6 +120,8 @@ public class PrizeService {
                 premio.setClaimDate(currentDate);
                 premio.setNote(transactionDto.getNote());
                 premio.setPoints(roundTwoDecimals(amount));
+                // Categoria: valorizzata (e obbligatoria lato FE) solo in aggiunta punti
+                premio.setCategory(transactionDto.getCategory());
                 return prizeRepository.save(premio);
             }
         }

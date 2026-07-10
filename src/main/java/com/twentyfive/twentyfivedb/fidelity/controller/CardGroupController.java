@@ -89,6 +89,12 @@ public class CardGroupController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/categories")
+    public ResponseEntity<Void> updateCategories(@PathVariable String id, @RequestBody List<String> categories) {
+        cardGroupService.updateCategories(id, categories);
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/status/{id}")
     public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
         cardGroupService.updateStatus(id, status);

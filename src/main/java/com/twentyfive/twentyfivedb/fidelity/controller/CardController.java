@@ -114,6 +114,11 @@ public class CardController {
         }
     }
 
+    @PutMapping("/{id}/change-group")
+    public ResponseEntity<Card> changeGroup(@PathVariable String id, @RequestParam("groupId") String groupId) {
+        return ResponseEntity.ok(cardService.changeGroup(id, groupId));
+    }
+
     @PutMapping("/status/{id}")
     public ResponseEntity<Void> updateStatus(@PathVariable String id, @RequestParam("status") Boolean status) {
         cardService.updateStatus(id, status);
