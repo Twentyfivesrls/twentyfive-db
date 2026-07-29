@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -161,9 +162,38 @@ public class CardService {
 
         this.addCodeToCard(card);
         Card saved = cardRepository.save(card);
+        // I punti assegnati in fase di creazione entrano subito in cronologia,
+        // così il saldo iniziale è tracciato come ogni altra variazione.
+        savePrizeForInitialPoints(saved);
         auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CREATE,
                 saved.getId(), saved.getOwnerId(), saved.getCardCode());
         return saved;
+    }
+
+    /** Categoria usata per il movimento dei punti assegnati alla creazione della card. */
+    private static final String INITIAL_POINTS_CATEGORY = "Assegnazione iniziale";
+
+    /**
+     * Registra in cronologia i punti assegnati alla creazione della card (solo voucher
+     * con importo iniziale valorizzato). Il saldo resta quello salvato sulla card.
+     */
+    private void savePrizeForInitialPoints(Card card) {
+        if (!"voucher".equals(card.getType())) {
+            return;
+        }
+
+        Double initialAmount = card.getVoucherAmount();
+        if (initialAmount == null || initialAmount <= 0) {
+            return;
+        }
+
+        Premio premio = new Premio();
+        premio.setCardId(card.getId());
+        premio.setClaimDate(card.getCreationDate() != null ? card.getCreationDate() : new Date());
+        premio.setNote("Punti assegnati alla creazione della card");
+        premio.setPoints(Math.round(initialAmount * 100.0) / 100.0);
+        premio.setCategory(INITIAL_POINTS_CATEGORY);
+        prizeRepository.save(premio);
     }
 
     private void addCodeToCard(Card card) {
@@ -315,7 +345,12 @@ public class CardService {
         return fullName.isEmpty() ? token : fullName + " - " + token;
     }
 
-    public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size, String ownerId) {
+    // Colonne su cui è consentito ordinare (campi reali della Card). Evita $sort su campi arbitrari.
+    private static final Set<String> SORTABLE_CARD_FIELDS =
+            Set.of("cardCode", "name", "surname", "email", "voucherAmount", "scanNumberExecuted", "creationDate");
+
+    public Page<Card> getCardFiltered(FilterCardGroupRequest filterObject, int page, int size,
+                                      String sortColumn, String sortDirection, String ownerId) {
        // Dal suggerimento "Nome Cognome - <token>" estraggo il token finale (email o codice card)
        // su cui effettuare la ricerca parziale (vedi parseOtherFiltersForFidelityCard).
        if (filterObject.getSearchText() != null && !filterObject.getSearchText().isBlank()) {
@@ -330,7 +365,16 @@ public class CardService {
         List<AggregationOperation> totalPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, false, 0, 0);
         long total = getTotalCount(totalPipeline);
 
-        List<AggregationOperation> pagedPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, true, page, size);
+        // Pipeline paginata: filtri + (eventuale $sort su tutto il dataset) + skip + limit
+        List<AggregationOperation> pagedPipeline = parseOtherFiltersForFidelityCard(filterObject, ownerId, false, 0, 0);
+        if (sortColumn != null && SORTABLE_CARD_FIELDS.contains(sortColumn)) {
+            Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection)
+                    ? Sort.Direction.DESC : Sort.Direction.ASC;
+            pagedPipeline.add(Aggregation.sort(Sort.by(direction, sortColumn)));
+        }
+        pagedPipeline.add(Aggregation.skip((long) page * size));
+        pagedPipeline.add(Aggregation.limit(size));
+
         Aggregation aggregation = Aggregation.newAggregation(pagedPipeline);
         List<Card> cards = mongoTemplate.aggregate(aggregation, "fidelity_card", Card.class).getMappedResults();
 

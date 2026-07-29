@@ -46,8 +46,10 @@ public class CardController {
     public ResponseEntity<Page<Card>> getCardListFilteredPagination(@RequestBody FilterCardGroupRequest filterObject,
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "5") int size,
+                                                                    @RequestParam(name = "sortColumn", defaultValue = "") String sortColumn,
+                                                                    @RequestParam(name = "sortDirection", defaultValue = "") String sortDirection,
                                                                     @RequestParam(name = "ownerId") String ownerId) {
-        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size, ownerId));
+        return ResponseEntity.ok(cardService.getCardFiltered(filterObject, page, size, sortColumn, sortDirection, ownerId));
     }
 
     @PostMapping("/page")
