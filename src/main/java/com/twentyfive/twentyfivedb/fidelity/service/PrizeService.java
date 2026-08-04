@@ -33,13 +33,15 @@ public class PrizeService {
     private final CardRepository cardRepository;
     private final MongoTemplate mongoTemplate;
     private final CardService cardService;
+    private final AuditLogService auditLogService;
 
-    public PrizeService(PrizeRepository prizeRepository, CardGroupRepository groupRepository, CardRepository cardRepository, MongoTemplate mongoTemplate, CardService cardService) {
+    public PrizeService(PrizeRepository prizeRepository, CardGroupRepository groupRepository, CardRepository cardRepository, MongoTemplate mongoTemplate, CardService cardService, AuditLogService auditLogService) {
         this.prizeRepository = prizeRepository;
         this.groupRepository = groupRepository;
         this.cardRepository = cardRepository;
         this.mongoTemplate = mongoTemplate;
         this.cardService = cardService;
+        this.auditLogService = auditLogService;
     }
 
     public List<Premio> totalNumberPrizeCard(String id) {
@@ -84,6 +86,9 @@ public class PrizeService {
             premio.setClaimed(true);
             premio.setClaimDate(currentDate);
             prizeRepository.save(premio);
+            auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CLAIM_PRIZE,
+                    card.getId(), card.getOwnerId(),
+                    cardService.describeCard(card) + " - premio riscattato");
         }
         if(premio.getCardComplete().equals(currentDate) && card.getScanNumberExecuted() == group.getScanNumber()){
             card.setScanNumberExecuted(0);
@@ -105,7 +110,12 @@ public class PrizeService {
                     Premio ultimoPremio = ultimoPremioOptional.get();
                     ultimoPremio.setClaimed(true);
                     ultimoPremio.setClaimDate(currentDate);
-                    return prizeRepository.save(ultimoPremio);
+                    Premio saved = prizeRepository.save(ultimoPremio);
+                    Card fidelityCard = card.get();
+                    auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CLAIM_PRIZE,
+                            fidelityCard.getId(), fidelityCard.getOwnerId(),
+                            cardService.describeCard(fidelityCard) + " - premio riscattato");
+                    return saved;
                 } else {
                     throw new RuntimeException("Nessun premio trovato per la carta con ID: " + transactionDto.getIdCard());
                 }
@@ -125,7 +135,23 @@ public class PrizeService {
                 premio.setPoints(roundTwoDecimals(amount));
                 // Categoria: valorizzata (e obbligatoria lato FE) solo in aggiunta punti
                 premio.setCategory(transactionDto.getCategory());
-                return prizeRepository.save(premio);
+                Premio saved = prizeRepository.save(premio);
+
+                // Registro l'operazione sul saldo: aggiunta o riscossione punti
+                double points = roundTwoDecimals(amount);
+                StringBuilder details = new StringBuilder(cardService.describeCard(voucherCard))
+                        .append(points >= 0 ? " - aggiunti " : " - riscossi ")
+                        .append(Math.abs(points))
+                        .append(" punti (saldo ").append(newBalance).append(")");
+                if (transactionDto.getCategory() != null && !transactionDto.getCategory().isBlank()) {
+                    details.append(" - categoria: ").append(transactionDto.getCategory());
+                }
+
+                auditLogService.log(AuditLogService.ENTITY_CARD,
+                        points >= 0 ? AuditLogService.OP_ADD_POINTS : AuditLogService.OP_REMOVE_POINTS,
+                        voucherCard.getId(), voucherCard.getOwnerId(), details.toString());
+
+                return saved;
             }
         }
 

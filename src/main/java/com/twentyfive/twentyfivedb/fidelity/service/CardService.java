@@ -106,6 +106,10 @@ public class CardService {
 
             // Un premio per ogni ciclo completato (a scanNumber, 2*scanNumber, ...)
             generatePrizesForCompletedCycles(card, before, after, target, currentDate);
+
+            auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_SCAN,
+                    card.getId(), card.getOwnerId(),
+                    describeCard(card) + " - scansione (raccolta " + after + "/" + target + ")");
         }
 
         return card;
@@ -166,7 +170,7 @@ public class CardService {
         // così il saldo iniziale è tracciato come ogni altra variazione.
         savePrizeForInitialPoints(saved);
         auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CREATE,
-                saved.getId(), saved.getOwnerId(), saved.getCardCode());
+                saved.getId(), saved.getOwnerId(), describeCard(saved));
         return saved;
     }
 
@@ -208,7 +212,7 @@ public class CardService {
         Card card = cardRepository.findById(id).orElse(null);
         this.cardRepository.deleteById(id);
         auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_DELETE,
-                id, card != null ? card.getOwnerId() : null, card != null ? card.getCardCode() : null);
+                id, card != null ? card.getOwnerId() : null, card != null ? describeCard(card) : null);
     }
 
     public void updateCard(String id, Card card) {
@@ -243,16 +247,39 @@ public class CardService {
         }
         card1.setTournamentPosition(card.getTournamentPosition());
         cardRepository.save(card1);
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_UPDATE,
+                card1.getId(), card1.getOwnerId(), describeCard(card1));
+    }
+
+    /**
+     * Descrizione leggibile della card per il registro operazioni: codice + intestatario
+     * (nome e cognome), così il registro è ricercabile anche per nominativo.
+     */
+    public String describeCard(Card card) {
+        StringBuilder description = new StringBuilder();
+        description.append("Card ").append(card.getCardCode());
+
+        String holder = ((card.getName() != null ? card.getName() : "") + " "
+                + (card.getSurname() != null ? card.getSurname() : "")).trim();
+        if (!holder.isEmpty()) {
+            description.append(" - ").append(holder);
+        }
+
+        return description.toString();
     }
 
     /** Sposta la card in un altro gruppo mantenendo TUTTO il resto (punti/saldo inclusi). */
     public Card changeGroup(String id, String groupId) {
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Card non trovata con id: " + id));
-        cardGroupRepository.findById(groupId)
+        CardGroup group = cardGroupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Gruppo card non trovato con id: " + groupId));
         card.setCardGroupId(groupId);
-        return cardRepository.save(card);
+        Card saved = cardRepository.save(card);
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_CHANGE_GROUP,
+                saved.getId(), saved.getOwnerId(),
+                describeCard(saved) + " - nuovo gruppo: " + group.getName());
+        return saved;
     }
 
     public void updateStatus(String id, Boolean status) {
@@ -265,6 +292,9 @@ public class CardService {
         if (card != null) {
             card.setIsActive(status);
             cardRepository.save(card);
+            auditLogService.log(AuditLogService.ENTITY_CARD,
+                    Boolean.TRUE.equals(status) ? AuditLogService.OP_ACTIVATE : AuditLogService.OP_DEACTIVATE,
+                    card.getId(), card.getOwnerId(), describeCard(card));
         }
     }
 
@@ -279,6 +309,9 @@ public class CardService {
         // Se la raccolta è oltre il traguardo, scala un ciclo mantenendo il surplus; altrimenti azzera
         card.setScanNumberExecuted(current > target ? current - target : 0);
         cardRepository.save(card);
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_RESET_SCANS,
+                card.getId(), card.getOwnerId(),
+                describeCard(card) + " - raccolta da " + current + " a " + card.getScanNumberExecuted());
     }
 
     /**
@@ -308,6 +341,11 @@ public class CardService {
 
         // Un premio per ogni ciclo completato attraversando il/i traguardo/i
         generatePrizesForCompletedCycles(card, before, newExecuted, target, now);
+
+        auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_SCAN,
+                card.getId(), card.getOwnerId(),
+                describeCard(card) + " - +" + times + (times == 1 ? " scansione" : " scansioni")
+                        + " (raccolta " + newExecuted + "/" + target + ")");
 
         return card;
     }

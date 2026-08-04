@@ -39,10 +39,20 @@ public class ContactService {
     private static final String USER_KEY = "ownerId";
 
 
-    public ContactService(ContactRepository contactRepository, CardRepository cardRepository, MongoTemplate mongoTemplate) {
+    private final AuditLogService auditLogService;
+
+    public ContactService(ContactRepository contactRepository, CardRepository cardRepository, MongoTemplate mongoTemplate, AuditLogService auditLogService) {
         this.contactRepository = contactRepository;
         this.cardRepository = cardRepository;
         this.mongoTemplate = mongoTemplate;
+        this.auditLogService = auditLogService;
+    }
+
+    /** Descrizione leggibile del contatto usata nel registro operazioni */
+    private String describeContact(Contact contact) {
+        String fullName = ((contact.getName() != null ? contact.getName() : "") + " "
+                + (contact.getSurname() != null ? contact.getSurname() : "")).trim();
+        return "Contatto " + (fullName.isEmpty() ? contact.getEmail() : fullName);
     }
 
     public Page<Contact> pageContact(int page, int size){
@@ -70,11 +80,19 @@ public class ContactService {
         if (existingContact != null) {
             throw new IllegalArgumentException("A contact with this email already exists.");
         }
-        return this.contactRepository.save(contact);
+        Contact saved = this.contactRepository.save(contact);
+        auditLogService.log(AuditLogService.ENTITY_CONTACT, AuditLogService.OP_CREATE,
+                saved.getId(), ownerId, describeContact(saved));
+        return saved;
     }
 
     public void deleteContact(String id) {
+        Contact contact = contactRepository.findById(id).orElse(null);
         this.contactRepository.deleteById(id);
+        if (contact != null) {
+            auditLogService.log(AuditLogService.ENTITY_CONTACT, AuditLogService.OP_DELETE,
+                    id, contact.getOwnerId(), describeContact(contact));
+        }
     }
 
     public void updateContact(String id, Contact contact) {
@@ -110,6 +128,9 @@ public class ContactService {
             if (!linkedCards.isEmpty()) {
                 cardRepository.saveAll(linkedCards);
             }
+
+            auditLogService.log(AuditLogService.ENTITY_CONTACT, AuditLogService.OP_UPDATE,
+                    contact1.getId(), contact1.getOwnerId(), describeContact(contact1));
         }
     }
 

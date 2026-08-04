@@ -102,6 +102,8 @@ public class CardGroupService {
             cardGroup1.setIsActive(cardGroup.getIsActive());
             cardGroup1.setCategories(cardGroup.getCategories());
             cardGroupRepository.save(cardGroup1);
+            auditLogService.log(AuditLogService.ENTITY_CARD_GROUP, AuditLogService.OP_UPDATE,
+                    cardGroup1.getId(), cardGroup1.getOwnerId(), "Gruppo " + cardGroup1.getName());
         }
     }
 
@@ -111,6 +113,9 @@ public class CardGroupService {
                 .orElseThrow(() -> new IllegalArgumentException("Gruppo card non trovato con id: " + id));
         cardGroup.setCategories(categories);
         cardGroupRepository.save(cardGroup);
+        auditLogService.log(AuditLogService.ENTITY_CARD_GROUP, AuditLogService.OP_UPDATE,
+                cardGroup.getId(), cardGroup.getOwnerId(),
+                "Gruppo " + cardGroup.getName() + " - categorie aggiornate");
     }
 
     public void updateStatus(String id, Boolean status){
@@ -123,6 +128,9 @@ public class CardGroupService {
         if(cardGroup != null){
             cardGroup.setIsActive(status);
             cardGroupRepository.save(cardGroup);
+            auditLogService.log(AuditLogService.ENTITY_CARD_GROUP,
+                    Boolean.TRUE.equals(status) ? AuditLogService.OP_ACTIVATE : AuditLogService.OP_DEACTIVATE,
+                    cardGroup.getId(), cardGroup.getOwnerId(), "Gruppo " + cardGroup.getName());
         }
     }
 
