@@ -71,9 +71,21 @@ public class CardService {
     }
 
     public Card scannerCard(String id) {
+        return scannerCard(id, 1);
+    }
+
+    /**
+     * Registra {@code times} scansioni in un'unica operazione, con gli stessi controlli
+     * della scansione singola (card/gruppo attivi, scadenza): equivale a {@code times}
+     * scansioni consecutive. Per i voucher l'incremento resta limitato al traguardo.
+     */
+    public Card scannerCard(String id, int times) {
         if (StringUtils.isBlank(id)) {
             log.error("Card identifier is null or empty");
             throw new IllegalArgumentException("Card identifier cannot be null or empty");
+        }
+        if (times <= 0) {
+            throw new IllegalArgumentException("Il numero di scansioni deve essere positivo");
         }
 
         String normalizedId = id.trim();
@@ -99,7 +111,7 @@ public class CardService {
 
         // Le card fidelity possono superare scanNumber; le altre restano limitate al traguardo
         if (!isVoucher || before < target) {
-            int after = before + 1;
+            int after = isVoucher ? Math.min(before + times, target) : before + times;
             card.setScanNumberExecuted(after);
             card.setLastScanDate(currentDate);
             cardRepository.save(card);
@@ -107,9 +119,11 @@ public class CardService {
             // Un premio per ogni ciclo completato (a scanNumber, 2*scanNumber, ...)
             generatePrizesForCompletedCycles(card, before, after, target, currentDate);
 
+            int added = after - before;
             auditLogService.log(AuditLogService.ENTITY_CARD, AuditLogService.OP_SCAN,
                     card.getId(), card.getOwnerId(),
-                    describeCard(card) + " - scansione (raccolta " + after + "/" + target + ")");
+                    describeCard(card) + (added == 1 ? " - scansione" : " - " + added + " scansioni")
+                            + " (raccolta " + after + "/" + target + ")");
         }
 
         return card;

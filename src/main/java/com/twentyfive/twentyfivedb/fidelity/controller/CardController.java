@@ -128,9 +128,10 @@ public class CardController {
     }
 
     @PutMapping("/scanning/{id}")
-    public ResponseEntity<Card> scanningCard(@PathVariable String id) {
+    public ResponseEntity<Card> scanningCard(@PathVariable String id,
+                                             @RequestParam(value = "times", defaultValue = "1") int times) {
         try{
-            return ResponseEntity.ok(cardService.scannerCard(id));
+            return ResponseEntity.ok(cardService.scannerCard(id, times));
         } catch (InactiveCardGroup e) {
             // Gruppo card non attivo: status dedicato (409) per distinguerlo dagli altri errori
             System.err.println("Gruppo card non attivo: " + e.getMessage());
