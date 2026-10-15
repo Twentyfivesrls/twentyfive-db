@@ -10,6 +10,8 @@ import twentyfive.twentyfiveadapter.models.fidelityModels.ProfileFidelity;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -42,6 +44,9 @@ public class WalletImageService {
 
     /** Colore brand Fidelity (#1A1660). */
     public static final Color BRAND = new Color(26, 22, 96);
+    /** Viola del marchio Fidelity (le carte del logo). */
+    private static final Color VIOLET = new Color(58, 0, 150);
+    private static final Color VIOLET_BRIGHT = new Color(68, 0, 255);
 
     private static final int GOOGLE_LOGO_SIZE = 660;
     private static final int CACHE_SIZE = 64;
@@ -112,7 +117,10 @@ public class WalletImageService {
     // Apple
     // ══════════════════════════════════════════════════════════════════════
 
-    /** Icone e logo della tessera Apple alle tre densità (@1x, @2x, @3x). */
+    /**
+     * Immagini della tessera Apple alle tre densità (@1x, @2x, @3x):
+     * icona, logo in alto a sinistra (marchio Fidelity) e strip con il logo del gruppo.
+     */
     public Map<String, byte[]> appleImages(String groupId) throws IOException {
         return withFallback("immagini Apple del gruppo " + groupId,
                 () -> renderAppleImages(groupId),
@@ -120,12 +128,13 @@ public class WalletImageService {
     }
 
     private Map<String, byte[]> renderAppleImages(String groupId) throws IOException {
-        BufferedImage source = groupImage(groupId).orElse(fidelityMark());
+        BufferedImage groupLogo = groupImage(groupId).orElse(fidelityMark());
         Map<String, byte[]> images = new LinkedHashMap<>();
         for (int scale = 1; scale <= 3; scale++) {
             String suffix = scale == 1 ? "" : "@" + scale + "x";
             images.put("icon" + suffix + ".png", png(appleIcon(29 * scale)));
-            images.put("logo" + suffix + ".png", png(badge(source, 160 * scale, 50 * scale, scale)));
+            images.put("logo" + suffix + ".png", png(badge(fidelityMark(), 160 * scale, 50 * scale, scale)));
+            images.put("strip" + suffix + ".png", png(appleStrip(groupLogo, scale)));
         }
         return images;
     }
@@ -135,8 +144,50 @@ public class WalletImageService {
         for (String suffix : new String[]{"", "@2x", "@3x"}) {
             images.put("icon" + suffix + ".png", fallbackResource("icon" + suffix + ".png"));
             images.put("logo" + suffix + ".png", fallbackResource("logo" + suffix + ".png"));
+            images.put("strip" + suffix + ".png", fallbackResource("strip" + suffix + ".png"));
         }
         return images;
+    }
+
+    /**
+     * Fascia sotto l'intestazione (375×144 pt): sfumatura blu → viola Fidelity con il motivo
+     * delle carte del marchio e il logo del gruppo in un cerchio bianco a destra.
+     * Il valore principale (scansioni o saldo) viene scritto da Apple sopra, a sinistra.
+     */
+    private static BufferedImage appleStrip(BufferedImage logo, int scale) {
+        int w = 375 * scale;
+        int h = 144 * scale;
+        BufferedImage canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = canvas.createGraphics();
+        quality(g);
+
+        g.setPaint(new GradientPaint(0, 0, BRAND, w, h, VIOLET));
+        g.fillRect(0, 0, w, h);
+
+        // Motivo delle carte del logo Fidelity, inclinate e semitrasparenti
+        AffineTransform base = g.getTransform();
+        g.rotate(Math.toRadians(-16), w * 0.80, h * 0.50);
+        g.setColor(new Color(VIOLET_BRIGHT.getRed(), VIOLET_BRIGHT.getGreen(), VIOLET_BRIGHT.getBlue(), 70));
+        g.fill(new RoundRectangle2D.Float(w * 0.52f, h * 0.10f, w * 0.42f, h * 0.95f, 22f * scale, 22f * scale));
+        g.setColor(new Color(255, 255, 255, 16));
+        g.fill(new RoundRectangle2D.Float(w * 0.60f, -h * 0.25f, w * 0.46f, h * 1.05f, 22f * scale, 22f * scale));
+        g.setTransform(base);
+
+        // Logo del gruppo in un cerchio bianco con un alone, come su Google Wallet
+        int diameter = (int) (h * 0.72);
+        int cx = w - diameter / 2 - 18 * scale;
+        int cy = h / 2;
+        float glow = diameter * 0.85f;
+        g.setPaint(new RadialGradientPaint(cx, cy, glow, new float[]{0f, 1f},
+                new Color[]{new Color(255, 255, 255, 70), new Color(255, 255, 255, 0)}));
+        g.fill(new Ellipse2D.Float(cx - glow, cy - glow, glow * 2, glow * 2));
+        g.setColor(Color.WHITE);
+        g.fill(new Ellipse2D.Float(cx - diameter / 2f, cy - diameter / 2f, diameter, diameter));
+        BufferedImage fitted = fit(logo, (int) (diameter * 0.68), (int) (diameter * 0.68));
+        g.drawImage(fitted, cx - fitted.getWidth() / 2, cy - fitted.getHeight() / 2, null);
+
+        g.dispose();
+        return canvas;
     }
 
     /** Icona delle notifiche: marchio Fidelity su fondo bianco. */
