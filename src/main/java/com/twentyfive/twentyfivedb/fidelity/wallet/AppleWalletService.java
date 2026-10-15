@@ -153,32 +153,32 @@ public class AppleWalletService {
         }
 
         Map<String, Object> balance = field("balance", data.balanceLabel(), data.balanceValue());
+        // Nella strip solo il valore: l'etichetta è già nell'intestazione in alto a destra
+        balance.remove("label");
         // Testo della notifica sulla schermata di blocco quando il valore cambia
         balance.put("changeMessage", data.balanceLabel() + ": %@");
 
-        // Riga sotto la strip: scadenza per le card fedeltà, programma per i voucher
-        Map<String, Object> auxiliary;
+        // Retro della tessera: titolare, codice, programma e scadenza.
+        // Il fronte resta essenziale (strip + QR); il codice è comunque sotto il QR.
+        List<Map<String, Object>> back = new ArrayList<>();
+        back.add(field("holder", "Titolare", data.holder()));
+        back.add(field("code", "Codice", data.code()));
+        back.add(field("program", "Programma", data.groupName()));
         if (data.expirationDate() != null) {
-            auxiliary = field("expiration", "Scadenza",
+            Map<String, Object> expiration = field("expiration", "Scadenza",
                     DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
                             data.expirationDate().toInstant().atZone(ZoneId.systemDefault())));
-            auxiliary.put("dateStyle", "PKDateStyleShort");
-        } else {
-            auxiliary = field("program", "Programma", data.groupName());
+            expiration.put("dateStyle", "PKDateStyleShort");
+            back.add(expiration);
         }
+        back.add(field("circuit", "Circuito", content.getIssuerName()));
 
         Map<String, Object> storeCard = new LinkedHashMap<>();
         // Intestazione: visibile anche quando le tessere sono impilate nel Wallet
         storeCard.put("headerFields", List.of(field("headerBalance", data.balanceLabel(), data.balanceValue())));
         // Valore principale: Apple lo scrive sopra la strip, a sinistra del logo del gruppo
         storeCard.put("primaryFields", List.of(balance));
-        storeCard.put("secondaryFields", List.of(
-                field("holder", "Titolare", data.holder()),
-                field("code", "Codice", data.code())));
-        storeCard.put("auxiliaryFields", List.of(auxiliary));
-        storeCard.put("backFields", List.of(
-                field("program", "Programma", data.groupName()),
-                field("circuit", "Circuito", content.getIssuerName())));
+        storeCard.put("backFields", back);
         pass.put("storeCard", storeCard);
 
         pass.put("barcodes", List.of(Map.of(
