@@ -37,13 +37,14 @@ public class GoogleWalletService {
     private static final String API = "https://walletobjects.googleapis.com/walletobjects/v1";
     private static final String SCOPE = "https://www.googleapis.com/auth/wallet_object.issuer";
     private static final String SAVE_URL = "https://pay.google.com/gp/v/save/";
-    private static final String BACKGROUND_COLOR = "#EEF0FA";
+    /** Colore brand Fidelity: Google sceglie da solo il colore dei testi per il contrasto. */
+    private static final String BACKGROUND_COLOR = "#1A1660";
 
     private final String issuerId;
     private final String serviceAccountFile;
-    private final String logoUrl;
     private final List<String> origins;
     private final WalletCardContent content;
+    private final WalletImageService imageService;
     private final ObjectMapper objectMapper;
     private final HttpClient http = HttpClient.newHttpClient();
 
@@ -51,21 +52,22 @@ public class GoogleWalletService {
 
     public GoogleWalletService(@Value("${wallet.google.issuer-id:}") String issuerId,
                                @Value("${wallet.google.service-account-file:}") String serviceAccountFile,
-                               @Value("${wallet.logo-url:}") String logoUrl,
                                @Value("${wallet.google.origins:}") String origins,
                                WalletCardContent content,
+                               WalletImageService imageService,
                                ObjectMapper objectMapper) {
         this.issuerId = issuerId;
         this.serviceAccountFile = serviceAccountFile;
-        this.logoUrl = logoUrl;
         // Domini da cui viene mostrato il pulsante (separati da virgola)
         this.origins = Arrays.stream(origins.split(",")).map(String::trim).filter(o -> !o.isEmpty()).toList();
         this.content = content;
+        this.imageService = imageService;
         this.objectMapper = objectMapper;
     }
 
     public boolean isConfigured() {
-        return StringUtils.isNoneBlank(issuerId, serviceAccountFile, logoUrl)
+        // Il logo deve essere su un URL pubblico: Google lo scarica dai propri server
+        return StringUtils.isNoneBlank(issuerId, serviceAccountFile) && imageService.hasPublicUrl()
                 && Files.isReadable(Path.of(serviceAccountFile));
     }
 
@@ -108,7 +110,7 @@ public class GoogleWalletService {
         body.put("issuerName", content.getIssuerName());
         body.put("programName", group.getName());
         body.put("programLogo", Map.of(
-                "sourceUri", Map.of("uri", logoUrl),
+                "sourceUri", Map.of("uri", imageService.googleLogoUrl(group.getId())),
                 "contentDescription", localized(group.getName())));
         body.put("hexBackgroundColor", BACKGROUND_COLOR);
         body.put("reviewStatus", "UNDER_REVIEW");

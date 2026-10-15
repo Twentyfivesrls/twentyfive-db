@@ -6,10 +6,11 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
+import twentyfive.twentyfiveadapter.models.fidelityModels.ProfileFidelity;
 
 /**
  * Ogni salvataggio di una card o di un gruppo (scansioni, premi, saldo voucher,
- * stato, modifica dati) aggiorna le tessere wallet collegate.
+ * stato, modifica dati, immagine del gruppo) aggiorna le tessere wallet collegate.
  */
 @Configuration
 public class WalletMongoListeners {
@@ -31,6 +32,19 @@ public class WalletMongoListeners {
             @Override
             public void onAfterSave(AfterSaveEvent<CardGroup> event) {
                 walletService.groupChanged(event.getSource().getId());
+            }
+        };
+    }
+
+    /** Nuova immagine del gruppo (ownerId = id del gruppo; per i profili utente non trova card). */
+    @Bean
+    public AbstractMongoEventListener<ProfileFidelity> walletGroupImageListener(WalletService walletService) {
+        return new AbstractMongoEventListener<ProfileFidelity>() {
+            @Override
+            public void onAfterSave(AfterSaveEvent<ProfileFidelity> event) {
+                if (event.getSource().getOwnerId() != null) {
+                    walletService.groupChanged(event.getSource().getOwnerId());
+                }
             }
         };
     }

@@ -10,7 +10,6 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import twentyfive.twentyfiveadapter.models.fidelityModels.Card;
 import twentyfive.twentyfiveadapter.models.fidelityModels.CardGroup;
@@ -48,8 +47,6 @@ import java.util.zip.ZipOutputStream;
 public class AppleWalletService {
 
     private static final String APNS_URL = "https://api.push.apple.com/3/device/";
-    private static final List<String> IMAGES = List.of(
-            "icon.png", "icon@2x.png", "icon@3x.png", "logo.png", "logo@2x.png", "logo@3x.png");
 
     private final String passTypeId;
     private final String teamId;
@@ -58,6 +55,7 @@ public class AppleWalletService {
     private final String wwdrFile;
     private final String webServiceUrl;
     private final WalletCardContent content;
+    private final WalletImageService imageService;
     private final ObjectMapper objectMapper;
 
     private volatile SigningMaterial signing;
@@ -74,6 +72,7 @@ public class AppleWalletService {
                               @Value("${wallet.apple.wwdr-file:}") String wwdrFile,
                               @Value("${wallet.apple.web-service-url:}") String webServiceUrl,
                               WalletCardContent content,
+                              WalletImageService imageService,
                               ObjectMapper objectMapper) {
         this.passTypeId = passTypeId;
         this.teamId = teamId;
@@ -82,6 +81,7 @@ public class AppleWalletService {
         this.wwdrFile = wwdrFile;
         this.webServiceUrl = webServiceUrl;
         this.content = content;
+        this.imageService = imageService;
         this.objectMapper = objectMapper;
     }
 
@@ -109,11 +109,8 @@ public class AppleWalletService {
 
         Map<String, byte[]> files = new LinkedHashMap<>();
         files.put("pass.json", objectMapper.writeValueAsBytes(passJson(card, group)));
-        for (String image : IMAGES) {
-            try (InputStream in = new ClassPathResource("wallet/apple/" + image).getInputStream()) {
-                files.put(image, in.readAllBytes());
-            }
-        }
+        // Logo del gruppo (o logo Fidelity) e icona alle tre densità
+        files.putAll(imageService.appleImages(group.getId()));
 
         Map<String, String> manifest = new LinkedHashMap<>();
         for (Map.Entry<String, byte[]> file : files.entrySet()) {
@@ -143,9 +140,10 @@ public class AppleWalletService {
         pass.put("organizationName", content.getIssuerName());
         pass.put("description", (data.voucher() ? "Voucher " : "Carta fedeltà ") + data.groupName());
         pass.put("logoText", data.groupName());
-        pass.put("foregroundColor", "rgb(26, 22, 96)");
-        pass.put("backgroundColor", "rgb(238, 240, 250)");
-        pass.put("labelColor", "rgb(98, 96, 140)");
+        // Colori Fidelity: sfondo brand #1A1660, testi bianchi, etichette lilla
+        pass.put("foregroundColor", "rgb(255, 255, 255)");
+        pass.put("backgroundColor", "rgb(26, 22, 96)");
+        pass.put("labelColor", "rgb(190, 184, 255)");
         if (supportsUpdates()) {
             pass.put("webServiceURL", webServiceUrl);
             pass.put("authenticationToken", authenticationToken(data.cardId()));

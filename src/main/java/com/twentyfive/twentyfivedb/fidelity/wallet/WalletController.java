@@ -19,13 +19,27 @@ public class WalletController {
     private final WalletService walletService;
     private final GoogleWalletService googleWalletService;
     private final AppleWalletService appleWalletService;
+    private final WalletImageService imageService;
 
     public WalletController(WalletService walletService,
                             GoogleWalletService googleWalletService,
-                            AppleWalletService appleWalletService) {
+                            AppleWalletService appleWalletService,
+                            WalletImageService imageService) {
         this.walletService = walletService;
         this.googleWalletService = googleWalletService;
         this.appleWalletService = appleWalletService;
+        this.imageService = imageService;
+    }
+
+    /** Logo del gruppo per Google Wallet (Google lo scarica da questo URL pubblico). */
+    @GetMapping("/image/group/{groupId}/logo.png")
+    public ResponseEntity<byte[]> groupLogo(@PathVariable String groupId) {
+        try {
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(imageService.googleLogo(groupId));
+        } catch (Exception e) {
+            log.error("Generazione logo wallet non riuscita per il gruppo {}", groupId, e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/google/{id}")
