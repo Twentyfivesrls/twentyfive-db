@@ -104,6 +104,20 @@
             <version>3.0.5.M3</version>
         </dependency>
 
+        <!-- Fidelity wallet: autenticazione Google Wallet API -->
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>1.23.0</version>
+        </dependency>
+
+        <!-- Fidelity wallet: firma PKCS#7 delle tessere Apple Wallet (.pkpass) -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>
