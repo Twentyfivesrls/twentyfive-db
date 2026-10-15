@@ -32,6 +32,9 @@ import java.util.Optional;
  * Immagini delle tessere wallet: logo del gruppo (l'immagine caricata dalla dashboard)
  * su un badge bianco, così resta leggibile sullo sfondo scuro Fidelity anche se scura
  * o trasparente. Senza immagine si usa il marchio Fidelity, nello stesso badge.
+ *
+ * Nessuna immagine viene letta all'avvio: un problema di ImageIO non deve impedire
+ * l'avvio dell'applicazione. Se l'elaborazione fallisce si usano immagini pre-generate.
  */
 @Service
 @Slf4j
@@ -48,7 +51,7 @@ public class WalletImageService {
     private final FidelityProfileRepository profileRepository;
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
-    private final BufferedImage fidelityMark;
+    private volatile BufferedImage fidelityMark;
 
     /** Immagini dei gruppi già scaricate, per URL (l'URL cambia quando l'immagine viene sostituita). */
     private final Map<String, BufferedImage> cache = Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, true) {
@@ -60,11 +63,10 @@ public class WalletImageService {
 
     public WalletImageService(@Value("${wallet.group-image-base-url:}") String groupImageBaseUrl,
                               @Value("${wallet.public-base-url:}") String publicBaseUrl,
-                              FidelityProfileRepository profileRepository) throws IOException {
+                              FidelityProfileRepository profileRepository) {
         this.groupImageBaseUrl = groupImageBaseUrl;
         this.publicBaseUrl = publicBaseUrl;
         this.profileRepository = profileRepository;
-        this.fidelityMark = readResource("wallet/fidelity-mark.png");
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -87,7 +89,13 @@ public class WalletImageService {
 
     /** Logo quadrato per Google: Google lo ritaglia a cerchio, quindi il contenuto sta al centro. */
     public byte[] googleLogo(String groupId) throws IOException {
-        BufferedImage source = groupImage(groupId).orElse(fidelityMark);
+        return withFallback("logo Google del gruppo " + groupId,
+                () -> renderGoogleLogo(groupId),
+                () -> fallbackResource("google-logo.png"));
+    }
+
+    private byte[] renderGoogleLogo(String groupId) throws IOException {
+        BufferedImage source = groupImage(groupId).orElse(fidelityMark());
         int size = GOOGLE_LOGO_SIZE;
         BufferedImage canvas = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = canvas.createGraphics();
@@ -106,7 +114,13 @@ public class WalletImageService {
 
     /** Icone e logo della tessera Apple alle tre densità (@1x, @2x, @3x). */
     public Map<String, byte[]> appleImages(String groupId) throws IOException {
-        BufferedImage source = groupImage(groupId).orElse(fidelityMark);
+        return withFallback("immagini Apple del gruppo " + groupId,
+                () -> renderAppleImages(groupId),
+                this::fallbackAppleImages);
+    }
+
+    private Map<String, byte[]> renderAppleImages(String groupId) throws IOException {
+        BufferedImage source = groupImage(groupId).orElse(fidelityMark());
         Map<String, byte[]> images = new LinkedHashMap<>();
         for (int scale = 1; scale <= 3; scale++) {
             String suffix = scale == 1 ? "" : "@" + scale + "x";
@@ -116,14 +130,23 @@ public class WalletImageService {
         return images;
     }
 
+    private Map<String, byte[]> fallbackAppleImages() throws IOException {
+        Map<String, byte[]> images = new LinkedHashMap<>();
+        for (String suffix : new String[]{"", "@2x", "@3x"}) {
+            images.put("icon" + suffix + ".png", fallbackResource("icon" + suffix + ".png"));
+            images.put("logo" + suffix + ".png", fallbackResource("logo" + suffix + ".png"));
+        }
+        return images;
+    }
+
     /** Icona delle notifiche: marchio Fidelity su fondo bianco. */
-    private BufferedImage appleIcon(int size) {
+    private BufferedImage appleIcon(int size) throws IOException {
         BufferedImage canvas = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = canvas.createGraphics();
         quality(g);
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, size, size);
-        BufferedImage fitted = fit(fidelityMark, (int) (size * 0.8), (int) (size * 0.8));
+        BufferedImage fitted = fit(fidelityMark(), (int) (size * 0.8), (int) (size * 0.8));
         g.drawImage(fitted, (size - fitted.getWidth()) / 2, (size - fitted.getHeight()) / 2, null);
         g.dispose();
         return canvas;
@@ -186,6 +209,47 @@ public class WalletImageService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return Optional.empty();
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Resilienza ImageIO
+    // ══════════════════════════════════════════════════════════════════════
+
+    private interface ImageTask<T> {
+        T run() throws IOException;
+    }
+
+    /**
+     * Esegue l'elaborazione; se ImageIO fallisce (es. plugin di un'applicazione già fermata
+     * nello stesso Tomcat) ripulisce il registro e riprova, poi ripiega sulle immagini pre-generate.
+     */
+    private static <T> T withFallback(String description, ImageTask<T> task, ImageTask<T> fallback) throws IOException {
+        try {
+            return task.run();
+        } catch (Exception | LinkageError first) {
+            log.warn("Elaborazione {} non riuscita, nuovo tentativo dopo la pulizia di ImageIO: {}", description, first.toString());
+            ImageIoProviderCleanup.removeStaleProviders();
+            try {
+                return task.run();
+            } catch (Exception | LinkageError second) {
+                log.error("Elaborazione {} non riuscita, uso le immagini di riserva", description, second);
+                return fallback.run();
+            }
+        }
+    }
+
+    private BufferedImage fidelityMark() throws IOException {
+        if (fidelityMark == null) {
+            fidelityMark = readResource("wallet/fidelity-mark.png");
+        }
+        return fidelityMark;
+    }
+
+    /** Immagini pre-generate: lette come byte, senza passare da ImageIO. */
+    private static byte[] fallbackResource(String name) throws IOException {
+        try (InputStream in = new ClassPathResource("wallet/fallback/" + name).getInputStream()) {
+            return in.readAllBytes();
         }
     }
 

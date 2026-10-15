@@ -24,7 +24,6 @@ public class CardGroupController {
     private final CardGroupService cardGroupService;
 
     private final ExportExcelService exportService;
-//add test
 
     public CardGroupController(CardGroupService cardGroupService, ExportExcelService exportService) {
         this.cardGroupService = cardGroupService;
