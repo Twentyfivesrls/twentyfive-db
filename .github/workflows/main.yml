@@ -56,42 +56,14 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots clean package -DskipTests
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: unnecessary
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
-
-      - name: Create folders
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd ..
-            mkdir -p actions
-            cd actions
-            mkdir -p dist_tomcat
-            cd dist_tomcat
-            mkdir -p ${{ secrets.SSH_PROJECT_NAME }}
-            cd ${{ secrets.SSH_PROJECT_NAME }}
-
-
-      - name: Move build to server with rsync
-        run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" ./target/twentyfive-db.war ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/actions/dist_tomcat/twentyfive-db
-
-      - name: Move data inside Tomcat Container
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd /actions/dist_tomcat/twentyfive-db
-            docker cp ./ ${{ secrets.SSH_CONTAINER }}:/usr/local/tomcat/webapps
+      # L'utente deploy può solo lanciare deploy-ci sul server: riceve il pacchetto
+      # e lo installa nella destinazione di 'twentyfive-db' scritta in /etc/deploy-ci.conf.
+      - name: Deploy sul server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes deploy@80.211.123.141 twentyfive-db < target/twentyfive-db.war
